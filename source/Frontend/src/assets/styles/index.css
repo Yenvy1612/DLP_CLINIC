@@ -1,0 +1,23 @@
+@import "tailwindcss";
+@font-face {
+    font-family: 'Outfit';
+    src: url('../fonts/Outfit-Medium.ttf');
+}
+@font-face {
+    font-family: 'Manrope';
+    src: url('../fonts/Manrope-Light.ttf');
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('../fonts/Inter_18pt-Regular.ttf');
+}
+
+:root {
+    --main-font: 'Inter';
+}
+
+body {
+    font-family: var(--main-font);
+    background-color: #F6FCFF;
+}
