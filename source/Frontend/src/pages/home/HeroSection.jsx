@@ -8,7 +8,7 @@ export default function HeroSection() {
     const navigate = useNavigate();
     const role = getUserRole() || "GUEST";
     return (
-        <section className="flex flex-col md:flex-row items-center justify-between px-10 md:px-20 py-16 bg-sky-500 overflow-hidden">
+        <section className="flex flex-col md:flex-row items-center justify-between px-10 md:px-20 py-16 bg-[#00278D] overflow-hidden">
             {/* Bên trái: nội dung */}
             <motion.div
                 className="flex-1 text-left space-y-6"
@@ -26,8 +26,8 @@ export default function HeroSection() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3, duration: 0.8 }}
                 >
-                    Khám chữa bệnh <br />
-                    <span className="text-cyan-100">Chuyên nghiệp & Tận tâm</span>
+                    <p className="mb-3">Khám chữa bệnh</p>
+                    <span className="text-[#00278D] p-2 bg-white rounded-2xl">Chuyên nghiệp & Tận tâm</span>
                 </motion.h1>
 
                 <motion.div
@@ -82,7 +82,7 @@ export default function HeroSection() {
                 >
                     <span className="font-semibold text-white">A*Care Clinic</span> – phòng khám đa khoa
                     ứng dụng công nghệ hiện đại, đội ngũ bác sĩ giàu kinh nghiệm,
-                    mang đến giải pháp chăm sóc sức khỏe **toàn diện, nhanh chóng và hiệu quả**
+                    mang đến giải pháp chăm sóc sức khỏe toàn diện, nhanh chóng và hiệu quả
                     cho mọi lứa tuổi và nhu cầu.
                 </motion.p>
 

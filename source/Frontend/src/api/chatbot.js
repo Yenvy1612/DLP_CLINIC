@@ -24,7 +24,7 @@ export async function sendMessageToGemini(userMessage) {
 
     const prompt = `${contextData}
                     === NHIỆM VỤ ===
-                    Bạn là trợ lý ảo của A*Care Clinic. Trả lời câu hỏi sau bằng tiếng Việt, văn phong thân thiện, không dùng markdown (**, *, __, _).
+                    Bạn là trợ lý ảo của A*Care Clinic. Tra lời câu hỏi sau bằng tiếng Việt, văn phong thân thiện, không dùng markdown (**, *, __, _).
                     Câu hỏi: ${userMessage}
                     Hãy trả lời ngắn gọn, rõ ràng dựa trên thông tin ở trên.`;
 
