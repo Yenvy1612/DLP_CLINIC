@@ -119,7 +119,7 @@ Một số người dùng tiêu biểu:
 - Trần Thị Hương: email tran.huong@acareclinic.vn, role ADMIN, nữ.
 - Lê Minh Tuấn: email le.tuan@acareclinic.vn, role ADMIN, nam.
 
-**DOCTOR (15 người - chuyên khoa đa dạng):**
+**DOCTOR (22 người - chuyên khoa đa dạng):**
 - Phạm Thu Lan: email pham.lan@acareclinic.vn, role DOCTOR, nữ, chuyên khoa Nội.
 - Hoàng Minh Long: email hoang.long@acareclinic.vn, role DOCTOR, nam, chuyên khoa Nội.
 - Đỗ Thị Hằng: email do.hang@acareclinic.vn, role DOCTOR, nữ, chuyên khoa Nội.
@@ -135,8 +135,6 @@ Một số người dùng tiêu biểu:
 - Vũ Thị Lan: email vu.lan@acareclinic.vn, role DOCTOR, nữ, chuyên Chẩn đoán hình ảnh.
 - Đỗ Văn Nam: email do.nam@acareclinic.vn, role DOCTOR, nam, chuyên Xét nghiệm.
 - Phạm Thị Thảo: email pham.thao@acareclinic.vn, role DOCTOR, nữ, chuyên Xét nghiệm.
-
-**STAFF (7 người):**
 - Nguyễn Thị Hương: email nguyen.huong.staff@acareclinic.vn, role STAFF, nữ.
 - Trần Văn Bình: email tran.binh@acareclinic.vn, role STAFF, nam.
 - Lê Thị Nga, Phạm Văn Tú, Hoàng Thị Dung, Vũ Văn Cường, Đỗ Thị Liên.
