@@ -124,7 +124,7 @@ function Dashboard() {
             <motion.div 
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
+                transition={{ duration: 0.2 }}
                 className="max-w-7xl mx-auto flex items-center justify-between p-6"
             >
                 <h1 className="text-3xl font-bold p-2 rounded-xl shadow-xl text-[#00278D] bg-white">
@@ -138,7 +138,7 @@ function Dashboard() {
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
+                    transition={{ duration: 0.2 }}
                     className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
                 >
                     {stats.map((s, i) => (
@@ -146,7 +146,7 @@ function Dashboard() {
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.4, delay: 0.5 + i * 0.1 }}
+                                transition={{ duration: 0.2 }}
                                 className="cursor-pointer hover:bg-sky-200 group relative overflow-hidden rounded-3xl p-6 bg-white/70 backdrop-blur-md shadow-slate-300 shadow-2xl hover:shadow-xl transition-all duration-300"
                             >
                                 <div className="absolute inset-0"></div>

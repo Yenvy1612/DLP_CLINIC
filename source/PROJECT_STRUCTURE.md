@@ -17,8 +17,7 @@ source/
 │       │   │   ├── 📄 BackendApplication.java
 │       │   │   │
 │       │   │   ├── 📂 config/
-│       │   │   │   ├── CorsConfig
-│       │   │   │   └── SecurityConfig
+│       │   │   │   └── CorsConfig
 │       │   │   │
 │       │   │   ├── 📂 controller/
 │       │   │   │   ├── UserController
@@ -26,11 +25,11 @@ source/
 │       │   │   │   ├── ServiceController
 │       │   │   │   ├── RoomController
 │       │   │   │   └── ActivityController
+│       │   │   │   └── AuthController
+│       │   │   │   └── CustomErrorController
 │       │   │   │
 │       │   │   ├── 📂 dto/
-│       │   │   │   ├── UserDTO
-│       │   │   │   ├── AppointmentDTO
-│       │   │   │   └── ServiceDTO
+│       │   │   │   └── ResponseDTO
 │       │   │   │
 │       │   │   ├── 📂 entity/
 │       │   │   │   ├── User.java
@@ -50,7 +49,6 @@ source/
 │       │   │       ├── UserService
 │       │   │       ├── AppointmentService
 │       │   │       ├── ServiceService
-│       │   │       ├── RoomService
 │       │   │       └── ActivityLogService
 │       │   │
 │       │   └── 📂 resources/
@@ -136,6 +134,7 @@ source/
         │   ├── 📄 Header.jsx
         │   ├── 📄 Footer.jsx
         │   └── 📄 SideBar.jsx
+        │   └── 📄 Chatbot.jsx
         │
         ├── 📂 contexts/
         │   └── 📄 SideBarContext.jsx
