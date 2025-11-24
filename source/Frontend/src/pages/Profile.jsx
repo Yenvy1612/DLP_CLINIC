@@ -59,7 +59,7 @@ function Profile() {
                 variants={container}
                 initial="hidden"
                 animate="show"
-                className="max-w-5xl p-6"
+                className="max-w-6xl p-6"
             >
                 <motion.div variants={item} className="rounded-3xl bg-white border border-gray-100 shadow-xl">
                     <div className="p-8 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-8">

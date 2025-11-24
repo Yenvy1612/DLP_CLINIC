@@ -115,15 +115,14 @@ INSERT INTO users (full_name, email, phone, password_hash, role, gender, birth_d
 ('Đỗ Văn Nam', 'do.nam@acareclinic.vn', '0901000014', '$2a$10$hash17', 'DOCTOR', 'MALE', '1984-09-03', '78 Nguyễn Lương Bằng, Đống Đa, Hà Nội', '001184090317'),
 ('Phạm Thị Thảo', 'pham.thao@acareclinic.vn', '0901000015', '$2a$10$hash18', 'DOCTOR', 'FEMALE', '1989-05-26', '12 Cát Linh, Đống Đa, Hà Nội', '001189052618');
 
--- STAFF (7 người)
 INSERT INTO users (full_name, email, phone, password_hash, role, gender, birth_date, address, id_number) VALUES
-('Nguyễn Thị Hương', 'nguyen.huong.staff@acareclinic.vn', '0902000001', '$2a$10$hash19', 'STAFF', 'FEMALE', '1992-03-10', '23 Nguyễn Văn Cừ, Long Biên, Hà Nội', '001192031019'),
-('Trần Văn Bình', 'tran.binh@acareclinic.vn', '0902000002', '$2a$10$hash20', 'STAFF', 'MALE', '1990-06-15', '45 Minh Khai, Hai Bà Trưng, Hà Nội', '001190061520'),
-('Lê Thị Nga', 'le.nga@acareclinic.vn', '0902000003', '$2a$10$hash21', 'STAFF', 'FEMALE', '1993-08-22', '67 Phố Huế, Hai Bà Trưng, Hà Nội', '001193082221'),
-('Phạm Văn Tú', 'pham.tu@acareclinic.vn', '0902000004', '$2a$10$hash22', 'STAFF', 'MALE', '1991-12-05', '89 Đê La Thành, Đống Đa, Hà Nội', '001191120522'),
-('Hoàng Thị Dung', 'hoang.dung@acareclinic.vn', '0902000005', '$2a$10$hash23', 'STAFF', 'FEMALE', '1994-04-18', '12 Xã Đàn, Đống Đa, Hà Nội', '001194041823'),
-('Vũ Văn Cường', 'vu.cuong@acareclinic.vn', '0902000006', '$2a$10$hash24', 'STAFF', 'MALE', '1988-07-30', '34 Khâm Thiên, Đống Đa, Hà Nội', '001188073024'),
-('Đỗ Thị Liên', 'do.lien@acareclinic.vn', '0902000007', '$2a$10$hash25', 'STAFF', 'FEMALE', '1995-11-12', '56 Ô Chợ Dừa, Đống Đa, Hà Nội', '001195111225');
+('Nguyễn Thị Hương', 'nguyen.huong.staff@acareclinic.vn', '0902000001', '$2a$10$hash19', 'DOCTOR', 'FEMALE', '1992-03-10', '23 Nguyễn Văn Cừ, Long Biên, Hà Nội', '001192031019'),
+('Trần Văn Bình', 'tran.binh@acareclinic.vn', '0902000002', '$2a$10$hash20', 'DOCTOR', 'MALE', '1990-06-15', '45 Minh Khai, Hai Bà Trưng, Hà Nội', '001190061520'),
+('Lê Thị Nga', 'le.nga@acareclinic.vn', '0902000003', '$2a$10$hash21', 'DOCTOR', 'FEMALE', '1993-08-22', '67 Phố Huế, Hai Bà Trưng, Hà Nội', '001193082221'),
+('Phạm Văn Tú', 'pham.tu@acareclinic.vn', '0902000004', '$2a$10$hash22', 'DOCTOR', 'MALE', '1991-12-05', '89 Đê La Thành, Đống Đa, Hà Nội', '001191120522'),
+('Hoàng Thị Dung', 'hoang.dung@acareclinic.vn', '0902000005', '$2a$10$hash23', 'DOCTOR', 'FEMALE', '1994-04-18', '12 Xã Đàn, Đống Đa, Hà Nội', '001194041823'),
+('Vũ Văn Cường', 'vu.cuong@acareclinic.vn', '0902000006', '$2a$10$hash24', 'DOCTOR', 'MALE', '1988-07-30', '34 Khâm Thiên, Đống Đa, Hà Nội', '001188073024'),
+('Đỗ Thị Liên', 'do.lien@acareclinic.vn', '0902000007', '$2a$10$hash25', 'DOCTOR', 'FEMALE', '1995-11-12', '56 Ô Chợ Dừa, Đống Đa, Hà Nội', '001195111225');
 
 -- PATIENT (25 người)
 INSERT INTO users (full_name, email, phone, password_hash, role, gender, birth_date, address, id_number) VALUES
