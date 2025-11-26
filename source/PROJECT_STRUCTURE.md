@@ -3,67 +3,89 @@ source/
 ├── 📄 README.md
 ├── 📄 PROJECT_STRUCTURE.md
 ├── 📄 file_query.sql
+├── 📄 replay_pid23084.log
+├── 📂 .vscode/
 │
-├── 📂 Backend/
+├── 📂 Backend/ 
 │   ├── 📄 .gitattributes
 │   ├── 📄 .gitignore
 │   ├── 📄 pom.xml
 │   ├── 📄 mvnw
 │   ├── 📄 mvnw.cmd
 │   ├── 📂 .mvn/
+│   ├── 📂 target/
 │   └── 📂 src/
 │       ├── 📂 main/
 │       │   ├── 📂 java/com/acare/backend/
 │       │   │   ├── 📄 BackendApplication.java
 │       │   │   │
 │       │   │   ├── 📂 config/
-│       │   │   │   └── CorsConfig
+│       │   │   │   └── 📄 CorsConfig.java
 │       │   │   │
 │       │   │   ├── 📂 controller/
-│       │   │   │   ├── UserController
-│       │   │   │   ├── AppointmentController
-│       │   │   │   ├── ServiceController
-│       │   │   │   ├── RoomController
-│       │   │   │   └── ActivityController
-│       │   │   │   └── AuthController
-│       │   │   │   └── CustomErrorController
+│       │   │   │   ├── 📄 UserController.java
+│       │   │   │   ├── 📄 AppointmentController.java
+│       │   │   │   ├── 📄 ServiceController.java
+│       │   │   │   ├── 📄 RoomController.java
+│       │   │   │   ├── 📄 ActivityController.java
+│       │   │   │   ├── 📄 AuthController.java
+│       │   │   │   └── 📄 CustomErrorController.java
 │       │   │   │
 │       │   │   ├── 📂 dto/
-│       │   │   │   └── ResponseDTO
+│       │   │   │   └── 📄 ResponseDTO.java
 │       │   │   │
 │       │   │   ├── 📂 entity/
-│       │   │   │   ├── User.java
-│       │   │   │   ├── Appointment.java
-│       │   │   │   ├── Service.java
-│       │   │   │   ├── Room.java
-│       │   │   │   └── ActivityLog.java
+│       │   │   │   ├── 📄 User.java
+│       │   │   │   ├── 📄 Appointment.java
+│       │   │   │   ├── 📄 Service.java
+│       │   │   │   ├── 📄 Room.java
+│       │   │   │   └── 📄 ActivityLog.java
 │       │   │   │
 │       │   │   ├── 📂 repository/
-│       │   │   │   ├── UserRepository
-│       │   │   │   ├── AppointmentRepository
-│       │   │   │   ├── ServiceRepository
-│       │   │   │   ├── RoomRepository
-│       │   │   │   └── ActivityLogRepository
+│       │   │   │   ├── 📄 UserRepository.java
+│       │   │   │   ├── 📄 AppointmentRepository.java
+│       │   │   │   ├── 📄 ServiceRepository.java
+│       │   │   │   ├── 📄 RoomRepository.java
+│       │   │   │   └── 📄 ActivityLogRepository.java
 │       │   │   │
 │       │   │   └── 📂 service/
-│       │   │       ├── UserService
-│       │   │       ├── AppointmentService
-│       │   │       ├── ServiceService
-│       │   │       └── ActivityLogService
+│       │   │       ├── 📄 UserService.java
+│       │   │       ├── 📄 AppointmentService.java
+│       │   │       ├── 📄 ServiceService.java
+│       │   │       └── 📄 ActivityLogService.java
+│       │   │
+│       │   ├── 📂 python/
+│       │   │   └── 📂 RAG/  
+│       │   │       ├── 📄 app.py
+│       │   │       ├── 📄 config.py
+│       │   │       ├── 📄 rag.py
+│       │   │       ├── 📄 ingest.py
+│       │   │       ├── 📄 requirements.txt
+│       │   │       ├── 📂 data/
+│       │   │       │   ├── 📂 docs/
+│       │   │       │   │   └── 📄 CHATBOT_TRAINING_DATA.txt
+│       │   │       │   └── 📂 raw_texts/
+│       │   │       ├── 📂 vectordb/
+│       │   │       │   ├── 📄 index.faiss
+│       │   │       │   └── 📄 index.pkl
+│       │   │       └── 📂 __pycache__/
 │       │   │
 │       │   └── 📂 resources/
 │       │       └── 📄 application.properties
 │       │
 │       └── 📂 test/
 │           └── 📂 java/com/acare/backend/
-│               └── BackendApplicationTests.java
+│               └── 📄 BackendApplicationTests.java
 │
-└── 📂 Frontend/
+└── 📂 Frontend/   # React + Vite
     ├── 📄 .gitignore
+    ├── 📄 .env
+    ├── 📄 .env.example
     ├── 📄 package.json
     ├── 📄 package-lock.json
     ├── 📄 vite.config.js
     ├── 📄 index.html
+    ├── 📂 node_modules/
     ├── 📂 public/
     │
     └── 📂 src/
@@ -72,51 +94,49 @@ source/
         │
         ├── 📂 api/
         │   ├── 📄 auth.js
-        │   ├── 📄 chatbot.js
         │   ├── 📄 getAnswerFromGemini.js
-        │   ├── 📄 learningData.js
         │   │
         │   ├── 📂 activity/
-        │   │   └── getRecentActivities.js
+        │   │   └── 📄 getRecentActivities.js
         │   │
         │   ├── 📂 appointment/
-        │   │   ├── getAppointments.js
-        │   │   ├── getAppointmentById.js
-        │   │   ├── getAppointmentsByDoctorId.js
-        │   │   ├── getTodayAppointments.js
-        │   │   ├── filterAppointments.js
-        │   │   ├── addAppoinment.js
+        │   │   ├── 📄 getAppointments.js
+        │   │   ├── 📄 getAppointmentById.js
+        │   │   ├── 📄 getAppointmentsByDoctorId.js
+        │   │   ├── 📄 getTodayAppointments.js
+        │   │   ├── 📄 filterAppointments.js
+        │   │   ├── 📄 addAppoinment.js
         │   │   ├── 📂 delete/
         │   │   ├── 📂 done/
         │   │   ├── 📂 pending/
         │   │   └── 📂 update/
         │   │
         │   ├── 📂 room/
-        │   │   ├── getRoom.js
-        │   │   ├── getRoomById.js
-        │   │   ├── addRoom.js
-        │   │   ├── updateRoom.js
-        │   │   ├── deleteRoom.js
-        │   │   └── searchRooms.js
+        │   │   ├── 📄 getRoom.js
+        │   │   ├── 📄 getRoomById.js
+        │   │   ├── 📄 addRoom.js
+        │   │   ├── 📄 updateRoom.js
+        │   │   ├── 📄 deleteRoom.js
+        │   │   └── 📄 searchRooms.js
         │   │
         │   ├── 📂 service/
-        │   │   ├── getServices.js
-        │   │   ├── getServiceById.js
-        │   │   ├── getServiceByName.js
-        │   │   ├── addService.js
-        │   │   ├── updateService.js
-        │   │   ├── deleteService.js
-        │   │   └── searchServices.js
+        │   │   ├── 📄 getServices.js
+        │   │   ├── 📄 getServiceById.js
+        │   │   ├── 📄 getServiceByName.js
+        │   │   ├── 📄 addService.js
+        │   │   ├── 📄 updateService.js
+        │   │   ├── 📄 deleteService.js
+        │   │   └── 📄 searchServices.js
         │   │
         │   └── 📂 user/
-        │       ├── getUsers.js
-        │       ├── getUser.js
-        │       ├── getDoctors.js
-        │       ├── getPatients.js
-        │       ├── addUser.js
-        │       ├── updateUser.js
-        │       ├── deleteUser.js
-        │       └── searchUsers.js
+        │       ├── 📄 getUsers.js
+        │       ├── 📄 getUser.js
+        │       ├── 📄 getDoctors.js
+        │       ├── 📄 getPatients.js
+        │       ├── 📄 addUser.js
+        │       ├── 📄 updateUser.js
+        │       ├── 📄 deleteUser.js
+        │       └── 📄 searchUsers.js
         │
         ├── 📂 assets/
         │   ├── 📂 fonts/
@@ -133,7 +153,7 @@ source/
         ├── 📂 components/
         │   ├── 📄 Header.jsx
         │   ├── 📄 Footer.jsx
-        │   └── 📄 SideBar.jsx
+        │   ├── 📄 SideBar.jsx
         │   └── 📄 Chatbot.jsx
         │
         ├── 📂 contexts/
@@ -149,7 +169,6 @@ source/
         │   └── 📄 MainLayout.jsx
         │
         ├── 📂 pages/
-        │   │
         │   ├── 📄 About.jsx
         │   ├── 📄 Contact.jsx
         │   ├── 📄 Services.jsx
@@ -160,41 +179,40 @@ source/
         │   ├── 📄 NotFound.jsx
         │   │
         │   ├── 📂 admin/
-        │   │   │
         │   │   ├── 📂 dashboard/
-        │   │   │   ├── Dashboard.jsx
-        │   │   │   └── DashboardReportTable.jsx
+        │   │   │   ├── 📄 Dashboard.jsx
+        │   │   │   └── 📄 DashboardReportTable.jsx
         │   │   │
         │   │   ├── 📂 user-management/
-        │   │   │   ├── Users.jsx
-        │   │   │   ├── AddUser.jsx
-        │   │   │   ├── UpdateUser.jsx
-        │   │   │   └── ShowUser.jsx
+        │   │   │   ├── 📄 Users.jsx
+        │   │   │   ├── 📄 AddUser.jsx
+        │   │   │   ├── 📄 UpdateUser.jsx
+        │   │   │   └── 📄 ShowUser.jsx
         │   │   │
         │   │   ├── 📂 service-management/
-        │   │   │   ├── Services.jsx
-        │   │   │   ├── AddService.jsx
-        │   │   │   ├── UpdateService.jsx
-        │   │   │   └── ShowService.jsx
+        │   │   │   ├── 📄 Services.jsx
+        │   │   │   ├── 📄 AddService.jsx
+        │   │   │   ├── 📄 UpdateService.jsx
+        │   │   │   └── 📄 ShowService.jsx
         │   │   │
         │   │   ├── 📂 room-management/
-        │   │   │   ├── Rooms.jsx
-        │   │   │   ├── AddRoom.jsx
-        │   │   │   └── UpdateRoom.jsx
+        │   │   │   ├── 📄 Rooms.jsx
+        │   │   │   ├── 📄 AddRoom.jsx
+        │   │   │   └── 📄 UpdateRoom.jsx
         │   │   │
         │   │   └── 📂 appointment-management/
-        │   │       ├── Appointments.jsx
-        │   │       └── AppointmentLine.jsx
+        │   │       ├── 📄 Appointments.jsx
+        │   │       └── 📄 AppointmentLine.jsx
         │   │
         │   ├── 📂 auth/
-        │   │   ├── Login.jsx
-        │   │   └── Register.jsx
+        │   │   ├── 📄 Login.jsx
+        │   │   └── 📄 Register.jsx
         │   │
         │   ├── 📂 doctor/
         │   ├── 📂 patient/
         │   └── 📂 home/
         │
-        ├── 📂 routes/ 
+        ├── 📂 routes/
         │   └── 📄 index.jsx
         │
         └── 📂 utils/

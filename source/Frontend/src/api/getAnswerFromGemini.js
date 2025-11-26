@@ -1,28 +1,12 @@
-export async function getAnswerFromGemini(GEMINI_API_KEY, prompt) {
+export async function getAnswerFromGemini(prompt) {
     try {
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-        const response = await fetch(API_URL, {
+        const URL = `http://127.0.0.1:8005/ask`;
+        const response = await fetch(URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-                contents: [
-                    {
-                        parts: [
-                            {
-                                text: prompt
-                            }
-                        ]
-                    }
-                ],
-                generationConfig: {
-                    temperature: 0.7,
-                    topK: 40,
-                    topP: 0.95,
-                    maxOutputTokens: 100000,
-                }
-            })
+            body: JSON.stringify({"question" : prompt})
         });
 
         console.log("Response status:", response.status);
