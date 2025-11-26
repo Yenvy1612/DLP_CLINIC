@@ -88,7 +88,9 @@ BƯỚC 4: CHẠY FRONTEND
 
 5. Mở trình duyệt → vào: http://localhost:5173
 
-Bước 5: Chạy chatbot (nếu cần)
+================================================================================
+BƯỚC 5: CHẠY CHATBOT (NẾU CẦN)
+================================================================================
 ## Hướng dẫn chạy Chatbot RAG
 
 Hệ thống chatbot sử dụng RAG (Retrieval-Augmented Generation) được xây dựng bằng Python và chạy độc lập với Backend Java. Để khởi động server chatbot, thực hiện các bước sau:
