@@ -45,8 +45,10 @@ public class AppointmentController {
 
     @PostMapping("/book")
     public ResponseEntity<ResponseDTO> createAppointment(@RequestBody Appointment appointment) {
-        if (appointmentRepository.existsByDoctorIdAndStartTime(appointment.getDoctorId(), appointment.getStartTime())) return ResponseEntity.ok(new ResponseDTO(404, false, "Bác sĩ có lịch vào khung giờ này.", null));
-        if (appointmentRepository.existsByRoomIdAndStartTime(appointment.getRoomId(), appointment.getStartTime())) return ResponseEntity.ok(new ResponseDTO(404, false, "Phòng có lịch vào khung giờ này.", null));
+        if (appointmentRepository.existsByDoctorIdAndStartTime(appointment.getDoctorId(), appointment.getStartTime())) 
+            return ResponseEntity.ok(new ResponseDTO(404, false, "Bác sĩ có lịch vào khung giờ này.", null));
+        if (appointmentRepository.existsByRoomIdAndStartTime(appointment.getRoomId(), appointment.getStartTime())) 
+            return ResponseEntity.ok(new ResponseDTO(404, false, "Phòng có lịch vào khung giờ này.", null));
         Appointment saved = appointmentRepository.save(appointment);
 
         /* */

@@ -1,10 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiMessageCircle, FiX, FiSend, FiUser, FiEdit3, FiCheck } from "react-icons/fi";
-import { sendMessageToGemini } from "../api/chatbot";
-import { addLearningData } from "../api/learningData";
+import { FiX, FiSend, FiUser, FiEdit3, FiCheck } from "react-icons/fi";
 import { getUserRole } from "../utils/authUtils";
 import logo from "../assets/images/logo/clinic.png";
+import { getAnswerFromGemini } from "../api/getAnswerFromGemini";
 
 function Chatbot() {
     const [isOpen, setIsOpen] = useState(false);
@@ -12,17 +11,12 @@ function Chatbot() {
     const [messages, setMessages] = useState([
         {
             role: "assistant",
-            content: "Xin chào! Tôi là trợ lý ảo của A*Care Clinic. Tôi có thể giúp bạn về thông tin phòng khám, dịch vụ, đặt lịch khám và các câu hỏi thường gặp. Bạn cần hỗ trợ gì?" + (getUserRole() === "ADMIN" ? "\n\n💡 Mẹo: Bạn có thể dạy tôi bằng cách nhấn nút ✏️ bên cạnh câu trả lời của tôi!" : "")
+            content: "Xin chào! Tôi là trợ lý ảo của A*Care Clinic. Tôi có thể giúp bạn về thông tin phòng khám, dịch vụ, đặt lịch khám và các câu hỏi thường gặp. Bạn cần hỗ trợ gì?"
         }
     ]);
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const [editingMessageIndex, setEditingMessageIndex] = useState(null);
-    const [editedAnswer, setEditedAnswer] = useState("");
     const messagesEndRef = useRef(null);
-
-    // Kiểm tra user có phải admin không
-    const isAdmin = getUserRole() === "ADMIN";
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -44,33 +38,33 @@ function Chatbot() {
         setIsLoading(true);
 
         try {
-            const response = await sendMessageToGemini(userMessage);
-            setMessages(prev => [...prev, { 
-                role: "assistant", 
-                content: response,
-                userQuestion: userMessage // Lưu câu hỏi gốc để có thể dạy lại
+            const response = await getAnswerFromGemini(input);
+            setMessages(prev => [...prev, {
+                role: "assistant",
+                content: response?.answer,
+                userQuestion: userMessage
             }]);
-        } 
+        }
         catch (error) {
             console.error("Chat error:", error);
             let errorMessage = "Xin lỗi, tôi đang gặp sự cố kỹ thuật. ";
 
             if (error.message.includes("API error: 400")) {
                 errorMessage += "Có vấn đề với yêu cầu. Vui lòng thử lại với câu hỏi khác.";
-            } 
+            }
             else if (error.message.includes("API error: 401") || error.message.includes("API error: 403")) {
                 errorMessage += "API key không hợp lệ. Vui lòng kiểm tra cấu hình.";
-            } 
+            }
             else if (error.message.includes("API error: 429")) {
                 errorMessage = "Chatbot đang bảo trì. Vui lòng:\n\n" +
                     "• Thử lại sau 1-2 phút\n" +
                     "• Hoặc liên hệ trực tiếp:\n" +
-                    "  Email: hung.clinic@ptit.edu.vn\n" +
+                    "  Email: darkisknight126@gmail.com\n" +
                     "  Hotline: 037 933 0721";
-            } 
+            }
             else if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
                 errorMessage += "Không thể kết nối đến server. Vui lòng kiểm tra internet.";
-            } 
+            }
             else {
                 errorMessage += "Vui lòng thử lại sau hoặc liên hệ: hung.clinic@ptit.edu.vn";
             }
@@ -79,53 +73,10 @@ function Chatbot() {
                 role: "assistant",
                 content: errorMessage
             }]);
-        } 
+        }
         finally {
             setIsLoading(false);
         }
-    };
-
-    // Bắt đầu chỉnh sửa câu trả lời
-    const handleStartEdit = (index, currentAnswer) => {
-        setEditingMessageIndex(index);
-        setEditedAnswer(currentAnswer);
-    };
-
-    // Lưu câu trả lời đã chỉnh sửa và dạy chatbot
-    const handleSaveEdit = (index) => {
-        const message = messages[index];
-        if (message.userQuestion && editedAnswer.trim()) {
-            // Lưu vào learning data
-            const saved = addLearningData(message.userQuestion, editedAnswer.trim());
-            
-            if (saved) {
-                // Cập nhật message trong UI
-                setMessages(prev => {
-                    const newMessages = [...prev];
-                    newMessages[index] = {
-                        ...newMessages[index],
-                        content: editedAnswer.trim(),
-                        isLearned: true // Đánh dấu đã học
-                    };
-                    return newMessages;
-                });
-                
-                // Hiện thông báo
-                setMessages(prev => [...prev, {
-                    role: "assistant",
-                    content: "Cảm ơn bạn! Tôi đã học câu trả lời mới này và sẽ sử dụng nó cho những câu hỏi tương tự."
-                }]);
-            }
-        }
-        
-        setEditingMessageIndex(null);
-        setEditedAnswer("");
-    };
-
-    // Hủy chỉnh sửa
-    const handleCancelEdit = () => {
-        setEditingMessageIndex(null);
-        setEditedAnswer("");
     };
 
     return (
@@ -143,7 +94,7 @@ function Chatbot() {
                         <div className="bg-[#00278D] rounded-2xl shadow-2xl p-4 max-w-xs flex items-start gap-3 relative mb-3">
                             <div className="flex-1">
                                 <p className="text-sm text-white font-medium">
-                                    Bạn cần hỗ trợ gì không ạ? 
+                                    Bạn cần hỗ trợ gì không ạ?
                                 </p>
                             </div>
                             <button
@@ -216,57 +167,14 @@ function Chatbot() {
                                                 <img src={logo} alt="bot" className="w-6 h-6 object-contain rounded-full" />
                                             )}
                                         </div>
-                                        
+
                                         <div className="flex flex-col gap-1">
                                             {/* Message bubble */}
                                             <div className={`rounded-2xl px-4 py-2 ${msg.role === "user" ? "bg-sky-500 text-white" : "bg-white text-slate-800 shadow-sm"}`}>
-                                                {editingMessageIndex === index ? (
-                                                    <textarea
-                                                        value={editedAnswer}
-                                                        onChange={(e) => setEditedAnswer(e.target.value)}
-                                                        className="w-full text-sm leading-relaxed border border-sky-300 rounded p-2 min-h-[100px] focus:outline-none focus:ring-2 focus:ring-sky-500"
-                                                        placeholder="Nhập câu trả lời đúng..."
-                                                    />
-                                                ) : (
-                                                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                                                        {msg.content}
-                                                        {msg.isLearned && <span className="ml-2 text-green-500">✓ Đã học</span>}
-                                                    </p>
-                                                )}
+                                                <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                                                    {msg.content}
+                                                </p>
                                             </div>
-                                            
-                                            {/* Edit buttons - Chỉ hiện cho ADMIN và assistant messages có userQuestion */}
-                                            {isAdmin && msg.role === "assistant" && msg.userQuestion && (
-                                                <div className="flex gap-1 ml-1">
-                                                    {editingMessageIndex === index ? (
-                                                        <>
-                                                            <button
-                                                                onClick={() => handleSaveEdit(index)}
-                                                                className="text-xs px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 flex items-center gap-1"
-                                                                title="Lưu và dạy chatbot"
-                                                            >
-                                                                <FiCheck className="text-xs" />
-                                                                Lưu
-                                                            </button>
-                                                            <button
-                                                                onClick={handleCancelEdit}
-                                                                className="text-xs px-2 py-1 bg-slate-300 text-slate-700 rounded hover:bg-slate-400"
-                                                            >
-                                                                Hủy
-                                                            </button>
-                                                        </>
-                                                    ) : (
-                                                        <button
-                                                            onClick={() => handleStartEdit(index, msg.content)}
-                                                            className="text-xs px-2 py-1 bg-sky-100 text-sky-600 rounded hover:bg-sky-200 flex items-center gap-1"
-                                                            title="Sửa câu trả lời và dạy chatbot"
-                                                        >
-                                                            <FiEdit3 className="text-xs" />
-                                                            Dạy lại
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            )}
                                         </div>
                                     </div>
                                 </motion.div>
