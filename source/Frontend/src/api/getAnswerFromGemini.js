@@ -1,6 +1,6 @@
 export async function getAnswerFromGemini(prompt) {
     try {
-        const URL = `http://127.0.0.1:8005/ask`;
+        const URL = `http://localhost:8005/ask`;
         const response = await fetch(URL, {
             method: "POST",
             headers: {
@@ -24,3 +24,4 @@ export async function getAnswerFromGemini(prompt) {
         console.error(error);
     }
 }
+

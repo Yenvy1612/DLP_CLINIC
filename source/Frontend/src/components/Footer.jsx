@@ -139,15 +139,8 @@ function Footer() {
             </div>
             {/* thanh dưới cùng */}
             <div className="bg-[#011342]">
-                <div className="mx-auto max-w-6xl px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="mx-auto max-w-6xl px-4 py-4 flex flex-col md:flex-row items-center justify-center gap-4">
                     <p className="text-slate-300/90">© Copyright 2025 A<sup>*</sup> SQUAD, All rights reserved ®</p>
-                    <div className="flex items-center gap-4 text-2xl text-slate-200">
-                        <FaCcMastercard />
-                        <FaCcPaypal />
-                        <FaCcVisa />
-                        <SiBitcoin />
-                        <SiRazorpay />
-                    </div>
                 </div>
             </div>
             {/* nút back to top */}
