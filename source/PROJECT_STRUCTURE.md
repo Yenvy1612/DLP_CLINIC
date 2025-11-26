@@ -160,7 +160,6 @@ source/
         │   └── 📄 SideBarContext.jsx
         │
         ├── 📂 data/
-        │   ├── 📄 baseContextData.js
         │   ├── 📄 faq.js
         │   ├── 📄 footerList.js
         │   └── 📄 headerList.js
