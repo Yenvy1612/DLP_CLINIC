@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+#Cho phép Front-end truy cập 
 origins = [
     "http://localhost:5173",
 ]
