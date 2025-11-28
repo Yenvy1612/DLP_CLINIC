@@ -1,7 +1,9 @@
 import google.generativeai as genai
 import os
 
-os.environ["GOOGLE_API_KEY"] = "your_api_key";
+
+# Gọi API của model gemini 
+os.environ["GOOGLE_API_KEY"] = "your_api_key"
 genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 
 GEMINI_MODEL = "models/gemini-2.5-flash" 
