@@ -2,6 +2,8 @@ package com.acare.backend.dto;
 
 import lombok.Data;
 
+
+// Trả về 1 thông điệp dữ liệu chung của cả dự án 
 @Data
 public class ResponseDTO {
     private int status;

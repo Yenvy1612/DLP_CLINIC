@@ -60,12 +60,13 @@ public class RoomController {
         return rooms;
     }
 
-    
+    // Lấy phòng dựa trên id 
     @GetMapping("/{id}")
     public Optional<Room> getRoomById(@PathVariable Long id) {
         return repo.findById(id);
     }
 
+    // Thêm phòng 
     @PostMapping
     public ResponseEntity<String> addRoom(@RequestBody Room newRoom) {
         Optional<Room> rooms = repo.findByNameAndLocation(newRoom.getName(), newRoom.getLocation());
@@ -74,12 +75,14 @@ public class RoomController {
         return ResponseEntity.ok("ADDED ROOM SUCCESSFULLY");
     }
     
+    // Xóa phòng theo id 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteRoom(@PathVariable Long id) {
         repo.deleteById(id);
         return ResponseEntity.ok("DELETED ROOM SUCCESSFULY");
     }
 
+    // Cập nhật lại thông tin của phòng 
     @PutMapping("/{id}")
     public ResponseEntity<String> updateRoom(@PathVariable Long id, @RequestBody Room update) {
         Optional<Room> rooms = repo.findById(id);
