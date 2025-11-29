@@ -46,7 +46,7 @@ def load_documents():
     return texts
 
 def chunk_texts(texts):
-    splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=150)
+    splitter = RecursiveCharacterTextSplitter(chunk_size=2500, chunk_overlap=150)
     chunks = []
     for t in texts:
         chunks.extend(splitter.split_text(t))
