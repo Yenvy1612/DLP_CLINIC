@@ -27,6 +27,12 @@ public class ActivityLog {
 
     private String type;         // "APPOINTMENT", "SERVICE", "USER", ...
     @Column String message;   
+    @Column(name = "actor_user_id")
+    private Long actorUserId;
+    @Column(name = "target_user_id")
+    private Long targetUserId;
+    @Column(name = "appointment_id")
+    private Long appointmentId;
     private LocalDateTime time; 
 
     @PrePersist
@@ -40,6 +46,17 @@ public class ActivityLog {
         return ActivityLog.builder()
                 .type(type)
                 .message(message)
+                .time(LocalDateTime.now())
+                .build();
+    }
+
+    public static ActivityLog notification(String type, Long actorUserId, Long targetUserId, Long appointmentId, String message) {
+        return ActivityLog.builder()
+                .type(type)
+                .message(message)
+                .actorUserId(actorUserId)
+                .targetUserId(targetUserId)
+                .appointmentId(appointmentId)
                 .time(LocalDateTime.now())
                 .build();
     }

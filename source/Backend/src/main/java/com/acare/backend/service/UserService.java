@@ -2,15 +2,20 @@ package com.acare.backend.service;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.acare.backend.dto.ApiResponse;
+import com.acare.backend.dto.user.DoctorProfileResponse;
+import com.acare.backend.dto.user.DoctorProfileUpdateRequest;
 import com.acare.backend.dto.user.UserCreateRequest;
 import com.acare.backend.entity.DoctorProfile;
 import com.acare.backend.entity.PatientProfile;
@@ -135,6 +140,54 @@ public class UserService {
         return users;
     }
 
+    public DoctorProfileResponse getDoctorProfileByUserId(Long userId) {
+        User user = getUserById(userId);
+        if (user.getRole() != UserRole.DOCTOR) {
+            throw new BadRequestException("Nguoi dung nay khong phai bac si");
+        }
+
+        DoctorProfile profile = doctorProfileRepository.findByUserId(userId)
+                .orElseGet(() -> createDefaultDoctorProfile(userId));
+
+        return DoctorProfileResponse.from(profile);
+    }
+
+    public DoctorProfileResponse updateDoctorProfileByUserId(Long userId, DoctorProfileUpdateRequest request) {
+        if (request == null) {
+            throw new BadRequestException("Du lieu cap nhat khong hop le");
+        }
+
+        User user = getUserById(userId);
+        if (user.getRole() != UserRole.DOCTOR) {
+            throw new BadRequestException("Chi co the cap nhat lich lam viec cho bac si");
+        }
+
+        DoctorProfile profile = doctorProfileRepository.findByUserId(userId)
+                .orElseGet(() -> createDefaultDoctorProfile(userId));
+
+        String clinicLocation = normalizeClinicLocation(request.getClinicLocation(), profile.getClinicLocation());
+        String workingDays = normalizeWorkingDays(request.getWorkingDays(), profile.getWorkingDays());
+        java.time.LocalTime shiftStart = parseShiftTimeOrDefault(request.getShiftStart(), profile.getShiftStart());
+        java.time.LocalTime shiftEnd = parseShiftTimeOrDefault(request.getShiftEnd(), profile.getShiftEnd());
+        DoctorSpecialization specialization = resolveDoctorSpecializationForProfileUpdate(request.getSpecialtyId(), profile.getSpecialtyId());
+
+        if (!shiftEnd.isAfter(shiftStart)) {
+            throw new BadRequestException("Gio ket thuc phai sau gio bat dau");
+        }
+
+        DoctorProfile saved = doctorProfileRepository.save(profile.toBuilder()
+            .specialtyId(specialization.specialtyId())
+            .specialty(specialization.specialty())
+            .department(specialization.department())
+                .clinicLocation(clinicLocation)
+                .workingDays(workingDays)
+                .shiftStart(shiftStart)
+                .shiftEnd(shiftEnd)
+                .build());
+
+        return DoctorProfileResponse.from(saved);
+    }
+
     private UserRole parseRole(String role) {
         try {
             return UserRole.valueOf(role.trim().toUpperCase());
@@ -145,6 +198,86 @@ public class UserService {
 
     private User normalizeDefaultValues(User user) {
         return user.withDefaults();
+    }
+
+    private DoctorProfile createDefaultDoctorProfile(Long userId) {
+        DoctorSpecialization defaultSpecialization = resolveGeneralDoctorSpecialization();
+        DoctorProfile profile = DoctorProfile.createForUser(userId, defaultSpecialization.specialtyId()).toBuilder()
+                .department(defaultSpecialization.department())
+                .specialty(defaultSpecialization.specialty())
+                .clinicLocation("CS1 - Tầng 1")
+                .build();
+        return doctorProfileRepository.save(profile);
+    }
+
+    private String normalizeClinicLocation(String incoming, String fallback) {
+        String value = incoming != null ? incoming.trim() : null;
+        if (value == null || value.isBlank()) {
+            value = fallback;
+        }
+
+        if (value == null || value.isBlank()) {
+            throw new BadRequestException("Phong kham khong duoc de trong");
+        }
+
+        return value;
+    }
+
+    private String normalizeWorkingDays(String incoming, String fallback) {
+        String source = incoming;
+        if (source == null || source.isBlank()) {
+            source = fallback;
+        }
+        if (source == null || source.isBlank()) {
+            source = "MONDAY,TUESDAY,WEDNESDAY,THURSDAY,FRIDAY";
+        }
+
+        Set<String> normalized = new LinkedHashSet<>();
+        Arrays.stream(source.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .map(s -> s.toUpperCase(Locale.ROOT))
+                .forEach(day -> {
+                    try {
+                        java.time.DayOfWeek parsed = java.time.DayOfWeek.valueOf(day);
+                        if (parsed != java.time.DayOfWeek.SATURDAY && parsed != java.time.DayOfWeek.SUNDAY) {
+                            normalized.add(day);
+                        }
+                    } catch (IllegalArgumentException ex) {
+                        throw new BadRequestException("Ngay lam viec khong hop le: " + day);
+                    }
+                });
+
+        if (normalized.isEmpty()) {
+            throw new BadRequestException("Bac si phai co it nhat mot ngay lam viec");
+        }
+
+        return String.join(",", normalized);
+    }
+
+    private java.time.LocalTime parseShiftTimeOrDefault(String raw, java.time.LocalTime fallback) {
+        if (raw == null || raw.isBlank()) {
+            return fallback != null ? fallback : java.time.LocalTime.of(8, 0);
+        }
+
+        try {
+            return java.time.LocalTime.parse(raw.trim(), DateTimeFormatter.ofPattern("HH:mm"));
+        } catch (DateTimeParseException ex) {
+            throw new BadRequestException("Gio lam viec khong hop le (HH:mm)");
+        }
+    }
+
+    private DoctorSpecialization resolveDoctorSpecializationForProfileUpdate(Long incomingSpecialtyId, Long fallbackSpecialtyId) {
+        Long effectiveSpecialtyId = incomingSpecialtyId != null ? incomingSpecialtyId : fallbackSpecialtyId;
+        if (effectiveSpecialtyId == null) {
+            return resolveGeneralDoctorSpecialization();
+        }
+
+        Specialty specialty = specialtyService.getRequiredActiveById(effectiveSpecialtyId);
+        return new DoctorSpecialization(
+                specialty.getId(),
+                normalizeDepartmentValue(specialty.getCode()),
+                specialty.getName());
     }
 
     private void validateUniqueFields(User user, Long currentUserId) {
@@ -194,6 +327,7 @@ public class UserService {
             
             String days = (request != null && request.getWorkingDays() != null && !request.getWorkingDays().isBlank())
                  ? request.getWorkingDays() : "MONDAY,TUESDAY,WEDNESDAY,THURSDAY,FRIDAY";
+              days = normalizeWorkingDays(days, "MONDAY,TUESDAY,WEDNESDAY,THURSDAY,FRIDAY");
 
             String clinicLocation = (doctorClinicLocation != null && !doctorClinicLocation.isBlank())
                     ? doctorClinicLocation.trim()

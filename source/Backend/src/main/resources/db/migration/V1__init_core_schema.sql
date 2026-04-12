@@ -112,7 +112,7 @@ CREATE TABLE appointments (
     updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
     CONSTRAINT uq_appointments_code UNIQUE (appointment_code),
     CONSTRAINT uq_appt_doctor_time UNIQUE (doctor_id, start_time),
-    CONSTRAINT ck_appointments_status CHECK (status IN ('PENDING', 'CONFIRMED', 'DONE', 'CANCELLED', 'NO_SHOW')),
+    CONSTRAINT ck_appointments_status CHECK (status IN ('PENDING', 'DONE', 'CANCELLED', 'NO_SHOW')),
     CONSTRAINT ck_appointments_time CHECK (end_time > start_time),
     CONSTRAINT fk_appointments_patient FOREIGN KEY (patient_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE RESTRICT,
     CONSTRAINT fk_appointments_doctor FOREIGN KEY (doctor_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE RESTRICT,

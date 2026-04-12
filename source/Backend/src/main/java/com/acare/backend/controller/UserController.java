@@ -1,10 +1,8 @@
 package com.acare.backend.controller;
 
-import com.acare.backend.dto.ApiResponse;
-import com.acare.backend.dto.user.UserCreateRequest;
-import com.acare.backend.entity.User;
-import com.acare.backend.service.UserService;
-import lombok.RequiredArgsConstructor;
+import java.util.Comparator;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,10 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.Valid;
+import com.acare.backend.dto.ApiResponse;
+import com.acare.backend.dto.user.DoctorProfileResponse;
+import com.acare.backend.dto.user.DoctorProfileUpdateRequest;
+import com.acare.backend.dto.user.UserCreateRequest;
+import com.acare.backend.entity.User;
+import com.acare.backend.service.UserService;
 
-import java.util.Comparator;
-import java.util.List;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/users")
@@ -48,6 +51,18 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    @GetMapping("/{id}/doctor-profile")
+    public ResponseEntity<DoctorProfileResponse> getDoctorProfileByUserId(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getDoctorProfileByUserId(id));
+    }
+
+    @PutMapping("/{id}/doctor-profile")
+    public ResponseEntity<DoctorProfileResponse> updateDoctorProfileByUserId(
+            @PathVariable Long id,
+            @RequestBody DoctorProfileUpdateRequest request) {
+        return ResponseEntity.ok(userService.updateDoctorProfileByUserId(id, request));
     }
 
     @GetMapping("/doctor")

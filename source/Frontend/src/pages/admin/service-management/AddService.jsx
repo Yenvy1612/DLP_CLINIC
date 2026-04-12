@@ -15,7 +15,6 @@ function AddService() {
         price: 0,
         description: "",
         specialtyId: "",
-        durationMin: 30,
         active: true,
     });
 
@@ -73,7 +72,6 @@ function AddService() {
             description: form.description,
             specialtyId: Number(form.specialtyId),
             active: form.active,
-            durationMin: Number(form.durationMin)
         };
 
         setPendingServiceData(data);
@@ -115,7 +113,7 @@ function AddService() {
         setResultModal((prev) => ({ ...prev, isOpen: false, nextAction: "none" }));
 
         if (nextAction === "back-services") {
-            navigate("/admin/services");
+            window.location.assign("/admin/services");
         }
     };
 
@@ -168,20 +166,6 @@ function AddService() {
                                     label: `${specialty.name} (${specialty.code})`,
                                 }))}
                                 placeholder="-- Chọn chuyên khoa --"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-slate-800 text-sm mb-1">Thời lượng khám (phút)</label>
-                            <input
-                                type="number"
-                                min="10"
-                                step="5"
-                                name="durationMin"
-                                value={form.durationMin}
-                                onChange={onChange}
-                                required
-                                className="w-full text-slate-800 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00278D] focus:border-transparent transition duration-200"
                             />
                         </div>
 

@@ -27,6 +27,8 @@ import com.acare.backend.dto.auth.LoginRequest;
 import com.acare.backend.dto.auth.RegisterRequest;
 import com.acare.backend.dto.auth.UpdateProfileRequest;
 import com.acare.backend.dto.auth.UserProfileResponse;
+import com.acare.backend.dto.user.DoctorProfileResponse;
+import com.acare.backend.dto.user.DoctorProfileUpdateRequest;
 import com.acare.backend.entity.PatientProfile;
 import com.acare.backend.entity.RefreshToken;
 import com.acare.backend.entity.User;
@@ -52,6 +54,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AppSecurityProperties securityProperties;
+    private final UserService userService;
 
     @Transactional
     public AuthResponse login(LoginRequest request, HttpServletResponse response) {
@@ -206,6 +209,22 @@ public class AuthService {
             });
         }
         clearAuthCookies(response);
+    }
+
+    @Transactional(readOnly = true)
+    public DoctorProfileResponse getMyDoctorProfile(String email) {
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new BadRequestException("Nguoi dung khong ton tai"));
+        validateUserEnabled(user);
+        return userService.getDoctorProfileByUserId(user.getId());
+    }
+
+    @Transactional
+    public DoctorProfileResponse updateMyDoctorProfile(String email, DoctorProfileUpdateRequest request) {
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new BadRequestException("Nguoi dung khong ton tai"));
+        validateUserEnabled(user);
+        return userService.updateDoctorProfileByUserId(user.getId(), request);
     }
 
     private void issueAuthCookies(User user, HttpServletResponse response) {

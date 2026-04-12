@@ -22,6 +22,12 @@ export const userService = {
     async update(id, updated) {
         return httpPut(`/users/${id}`, updated);
     },
+    async getDoctorProfile(id) {
+        return httpGet(`/users/${id}/doctor-profile`);
+    },
+    async updateDoctorProfile(id, payload) {
+        return httpPut(`/users/${id}/doctor-profile`, payload);
+    },
     async remove(id) {
         return httpDelete(`/users/${id}`);
     },

@@ -1,28 +1,50 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getUserId } from "../../utils/authUtils";
-import AppointmentCard from "./AppointmentCard";
-import { motion } from "framer-motion";
-import { appointmentService } from "../../api";
+import { activityService, appointmentService, serviceService, userService } from "../../api";
 
-const item = {
-    hidden: { opacity: 0, y: 8 },
-    show: i => ({
-        opacity: 1,
-        y: 0,
-        transition: {
-            type: "spring",
-            stiffness: 120,
-            damping: 25,
-            mass: 0.8,
-            delay: i * 0.02,
-        },
-    }),
+const formatDateTime = (value) => {
+    if (!value) return "--/--/---- --:--";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value).replace("T", " ").slice(0, 16);
+    const dd = String(date.getDate()).padStart(2, "0");
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const yyyy = date.getFullYear();
+    const hh = String(date.getHours()).padStart(2, "0");
+    const min = String(date.getMinutes()).padStart(2, "0");
+    return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
 };
 
+const statusLabel = (status) => (status === "DONE" ? "Đã khám" : "Chưa khám");
+
+const statusClass = (status) =>
+    status === "DONE"
+        ? "bg-green-100 text-green-700 border-green-300"
+        : "bg-sky-100 text-sky-700 border-sky-300";
+
+const paymentMethodLabel = "Thanh toán tại quầy";
+const cancelReasonOptions = [
+    "Lịch cá nhân bận đột xuất",
+    "Sức khỏe tạm thời chưa đi khám được",
+    "Muốn đổi sang ngày khác",
+    "Lý do khác",
+];
+
 function Cart() {
+    const navigate = useNavigate();
     const id = getUserId();
     const [loading, setLoading] = useState(true);
-    const [data, setData] = useState([]);
+    const [appointments, setAppointments] = useState([]);
+    const [patientInfo, setPatientInfo] = useState(null);
+    const [doctorMap, setDoctorMap] = useState({});
+    const [serviceMap, setServiceMap] = useState({});
+    const [detailTarget, setDetailTarget] = useState(null);
+    const [notices, setNotices] = useState([]);
+    const [cancelTarget, setCancelTarget] = useState(null);
+    const [cancelingId, setCancelingId] = useState(null);
+    const [selectedCancelReason, setSelectedCancelReason] = useState(cancelReasonOptions[0]);
+    const [customCancelReason, setCustomCancelReason] = useState("");
+    const [cancelFormError, setCancelFormError] = useState("");
 
     useEffect(() => {
         if (!id) {
@@ -30,10 +52,53 @@ function Cart() {
             return;
         }
 
-        const getPendingAppointments = async () => {
+        const loadAppointments = async () => {
             try {
                 const pendingAppointments = await appointmentService.pendingByPatientId(id);
-                setData(pendingAppointments);
+
+                try {
+                    const [profile, activityNotices] = await Promise.all([
+                        userService.getById(id),
+                        activityService.getRecentByUser(id),
+                    ]);
+                    setPatientInfo(profile || null);
+                    setNotices(Array.isArray(activityNotices) ? activityNotices : []);
+                } catch {
+                    setPatientInfo(null);
+                    setNotices([]);
+                }
+
+                const merged = [...(pendingAppointments || [])]
+                    .filter((item) => item?.status !== "CANCELLED")
+                    .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+
+                setAppointments(merged);
+
+                const doctorIds = [...new Set(merged.map((item) => item.doctorId).filter(Boolean))];
+                const serviceIds = [...new Set(merged.map((item) => Number(item.serviceId ?? item.note)).filter((value) => !Number.isNaN(value)))];
+
+                const [doctorResponses, serviceResponses] = await Promise.all([
+                    Promise.all(doctorIds.map((doctorId) => userService.getById(doctorId))),
+                    Promise.all(serviceIds.map((serviceId) => serviceService.getById(serviceId))),
+                ]);
+
+                setDoctorMap(
+                    doctorResponses.reduce((acc, doctor) => {
+                        if (doctor?.id) {
+                            acc[doctor.id] = doctor;
+                        }
+                        return acc;
+                    }, {})
+                );
+
+                setServiceMap(
+                    serviceResponses.reduce((acc, service) => {
+                        if (service?.id) {
+                            acc[service.id] = service;
+                        }
+                        return acc;
+                    }, {})
+                );
 
             }
             catch (err) {
@@ -43,7 +108,7 @@ function Cart() {
                 setLoading(false);
             }
         };
-        getPendingAppointments();
+        loadAppointments();
 
     }, [id]);
 
@@ -52,51 +117,241 @@ function Cart() {
     return (
         <section className="bg-[var(--surface)] min-h-[40vh]">
             <div className="max-w-6xl mx-auto py-8 px-4">
-
-                <motion.div
-                    initial={{ opacity: 0, y: -8 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ type: "spring", damping: 22, stiffness: 180 }}
-                    className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-8"
-                >
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-8">
                     <div className="bg-white w-fit h-fit p-3 rounded-2xl shadow-lg">
-                        <h1 className="text-4xl font-bold text-[#00278D]">Giỏ dịch vụ của bạn</h1>
+                        <h1 className="text-4xl font-bold text-[#00278D]">Lịch hẹn của bạn</h1>
                     </div>
 
-                </motion.div>
+                </div>
 
-                {data.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {data.map((a, i) => (
-                            <motion.div
-                                key={a.id}
-                                custom={i}
-                                variants={item}
-                                initial="hidden"
-                                whileInView="show"
-                                viewport={{ once: true, amount: 0.15 }}
-                                className="will-change-transform transform-gpu"
-                                whileHover={{ translateY: -4 }}
-                                transition={{ type: "spring", damping: 24 }}
-                            >
-                                <div className="transition-shadow duration-200 hover:shadow-xl rounded-xl">
-                                    <AppointmentCard appointment={a} />
+                {notices.length > 0 ? (
+                    <div className="mb-5 rounded-xl border border-[#9AB8FF] bg-[#EAF1FF] p-4">
+                        <p className="text-sm font-semibold text-[#00278D] mb-2">Thông báo mới</p>
+                        <div className="space-y-1.5 text-sm text-[#00278D]">
+                            {notices.slice(0, 4).map((notice) => (
+                                <p key={notice.id}>• {String(notice.message || "").replace(/^\[USER:\d+\]\s*/, "")}</p>
+                            ))}
+                        </div>
+                    </div>
+                ) : null}
+
+                {appointments.length > 0 ? (
+                    <div className="space-y-4">
+                        {appointments.map((appointment) => {
+                            const doctor = doctorMap[appointment.doctorId] || {};
+                            const serviceId = Number(appointment.serviceId ?? appointment.note);
+                            const service = serviceMap[serviceId] || {};
+                            const canEdit = appointment.status !== "DONE";
+                            const canCancel = appointment.status !== "DONE";
+
+                            return (
+                                <div key={appointment.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                                        <div className="md:col-span-4">
+                                            <p className="text-xs uppercase tracking-wide text-slate-500">Bác sĩ</p>
+                                            <p className="text-base font-semibold text-slate-800">{doctor.fullName || "Đang cập nhật"}</p>
+                                        </div>
+                                        <div className="md:col-span-3">
+                                            <p className="text-xs uppercase tracking-wide text-slate-500">Dịch vụ</p>
+                                            <p className="text-base font-semibold text-slate-800">{service.name || "Đang cập nhật"}</p>
+                                        </div>
+                                        <div className="md:col-span-3">
+                                            <p className="text-xs uppercase tracking-wide text-slate-500">Thời gian khám</p>
+                                            <p className="text-base font-semibold text-slate-800">{formatDateTime(appointment.startTime)}</p>
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <span className={`inline-flex px-3 py-1 rounded-full text-sm border font-semibold ${statusClass(appointment.status)}`}>
+                                                {statusLabel(appointment.status)}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                                        <div className="text-sm text-slate-600">
+                                            <span className="font-semibold">Phương thức thanh toán:</span> {paymentMethodLabel}
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setDetailTarget({ appointment, doctor, service })}
+                                                className="px-3 py-1.5 text-sm rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100"
+                                            >
+                                                Chi tiết
+                                            </button>
+                                            <button
+                                                type="button"
+                                                disabled={!canEdit}
+                                                onClick={() => navigate(`/patient/edit-appointment/${appointment.id}`)}
+                                                className="px-3 py-1.5 text-sm rounded-lg bg-[#00278D] text-white hover:bg-[#001f5f] disabled:opacity-60"
+                                            >
+                                                Sửa lịch
+                                            </button>
+                                            <button
+                                                type="button"
+                                                disabled={!canCancel || cancelingId === appointment.id}
+                                                onClick={() => setCancelTarget(appointment)}
+                                                className="px-3 py-1.5 text-sm rounded-lg border border-rose-300 text-rose-700 hover:bg-rose-50 disabled:opacity-60"
+                                            >
+                                                {cancelingId === appointment.id ? "Đang hủy..." : "Hủy lịch"}
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </motion.div>
-                        ))}
+                            );
+                        })}
                     </div>
                 ) : (
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.4 }}
-                        className="text-xl text-[#00278D]"
-                    >
-                        {"Không có cuộc hẹn nào đang chờ."}
-                    </motion.p>
+                    <p className="text-xl text-[#00278D]">{"Bạn chưa có lịch hẹn nào."}</p>
                 )}
             </div>
+
+            {detailTarget ? (
+                <div className="fixed inset-0 z-[130] bg-black/40 p-4 flex items-center justify-center" onClick={() => setDetailTarget(null)}>
+                    <div className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl p-6" onClick={(event) => event.stopPropagation()}>
+                        <h3 className="text-2xl font-bold text-[#00278D]">Hóa đơn lịch hẹn</h3>
+                        <p className="text-sm text-slate-500 mt-1">Mã lịch hẹn: #{detailTarget.appointment.id}</p>
+
+                        <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <p className="text-slate-500 mb-1">Tên bệnh nhân</p>
+                                <p className="font-semibold text-slate-800">{patientInfo?.fullName || "Đang cập nhật"}</p>
+                            </div>
+                            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <p className="text-slate-500 mb-1">Số điện thoại bệnh nhân</p>
+                                <p className="font-semibold text-slate-800">{patientInfo?.phone || "Đang cập nhật"}</p>
+                            </div>
+                            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <p className="text-slate-500 mb-1">Bác sĩ</p>
+                                <p className="font-semibold text-slate-800">{detailTarget.doctor.fullName || "Đang cập nhật"}</p>
+                            </div>
+                            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <p className="text-slate-500 mb-1">Số điện thoại bác sĩ</p>
+                                <p className="font-semibold text-slate-800">{detailTarget.doctor.phone || "Đang cập nhật"}</p>
+                            </div>
+                            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <p className="text-slate-500 mb-1">Dịch vụ</p>
+                                <p className="font-semibold text-slate-800">{detailTarget.service.name || "Đang cập nhật"}</p>
+                            </div>
+                            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <p className="text-slate-500 mb-1">Thời gian khám</p>
+                                <p className="font-semibold text-slate-800">{formatDateTime(detailTarget.appointment.startTime)}</p>
+                            </div>
+                            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <p className="text-slate-500 mb-1">Phòng khám</p>
+                                <p className="font-semibold text-slate-800">{detailTarget.doctor.clinicLocation || "Đang cập nhật"}</p>
+                            </div>
+                            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <p className="text-slate-500 mb-1">Trạng thái</p>
+                                <p className="font-semibold text-slate-800">{statusLabel(detailTarget.appointment.status)}</p>
+                            </div>
+                            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <p className="text-slate-500 mb-1">Phương thức thanh toán</p>
+                                <p className="font-semibold text-slate-800">{paymentMethodLabel}</p>
+                            </div>
+                            <div className="rounded-xl border border-slate-200 bg-white p-4 md:col-span-2">
+                                <p className="text-slate-500 mb-1">Ghi chú</p>
+                                <p className="font-medium text-slate-700">{detailTarget.appointment.reason || detailTarget.appointment.note || "Không có"}</p>
+                            </div>
+                        </div>
+
+                        <div className="mt-5 border-t border-slate-200 pt-4 flex items-center justify-between">
+                            <span className="text-slate-600 font-medium">Tổng thanh toán</span>
+                            <span className="text-2xl font-extrabold text-[#001f5f]">{Number(detailTarget.service.price || 0).toLocaleString("vi-VN")} VND</span>
+                        </div>
+
+                        <div className="mt-5 flex justify-end">
+                            <button type="button" onClick={() => setDetailTarget(null)} className="px-5 py-2.5 rounded-lg bg-[#00278D] text-white hover:bg-[#001f5f]">
+                                Đã hiểu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : null}
+
+            {cancelTarget ? (
+                <div className="fixed inset-0 z-[140] bg-black/40 p-4 flex items-center justify-center" onClick={() => !cancelingId && setCancelTarget(null)}>
+                    <div className="w-full max-w-lg rounded-2xl bg-white border border-slate-200 shadow-2xl p-6" onClick={(event) => event.stopPropagation()}>
+                        <h3 className="text-xl font-bold text-[#00278D]">Xác nhận hủy lịch</h3>
+                        <p className="text-sm text-slate-600 mt-2">Vui lòng chọn hoặc nhập lý do hủy để gửi cho bác sĩ.</p>
+
+                        <div className="mt-4 space-y-2">
+                            {cancelReasonOptions.map((reason) => (
+                                <label key={reason} className="flex items-center gap-2 text-sm text-slate-700">
+                                    <input
+                                        type="radio"
+                                        name="patient-cancel-reason"
+                                        value={reason}
+                                        checked={selectedCancelReason === reason}
+                                        onChange={(event) => {
+                                            setSelectedCancelReason(event.target.value);
+                                            setCancelFormError("");
+                                        }}
+                                    />
+                                    {reason}
+                                </label>
+                            ))}
+                        </div>
+
+                        {selectedCancelReason === "Lý do khác" ? (
+                            <div className="mt-3">
+                                <textarea
+                                    rows={3}
+                                    value={customCancelReason}
+                                    onChange={(event) => {
+                                        setCustomCancelReason(event.target.value);
+                                        setCancelFormError("");
+                                    }}
+                                    className="w-full border border-slate-300 p-2 text-sm rounded-md focus:outline-none focus:border-[#001f5f]"
+                                    placeholder="Nhập lý do hủy..."
+                                />
+                            </div>
+                        ) : null}
+
+                        {cancelFormError ? <p className="mt-2 text-sm text-rose-600">{cancelFormError}</p> : null}
+
+                        <div className="mt-5 flex justify-end gap-2">
+                            <button
+                                type="button"
+                                disabled={!!cancelingId}
+                                onClick={() => setCancelTarget(null)}
+                                className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 disabled:opacity-60"
+                            >
+                                Đóng
+                            </button>
+                            <button
+                                type="button"
+                                disabled={!!cancelingId}
+                                onClick={async () => {
+                                    const target = cancelTarget;
+                                    if (!target?.id) return;
+                                    const reason = selectedCancelReason === "Lý do khác"
+                                        ? customCancelReason.trim()
+                                        : selectedCancelReason;
+
+                                    if (!reason) {
+                                        setCancelFormError("Vui lòng nhập lý do hủy.");
+                                        return;
+                                    }
+
+                                    setCancelingId(target.id);
+                                    try {
+                                        await appointmentService.remove(target.id, "PATIENT", reason);
+                                        window.location.reload();
+                                    } catch {
+                                        // Close modal to avoid stuck UI; user can retry from the list.
+                                    } finally {
+                                        setCancelTarget(null);
+                                        setCancelingId(null);
+                                    }
+                                }}
+                                className="px-4 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-700 disabled:opacity-60"
+                            >
+                                {cancelingId ? "Đang hủy..." : "Xác nhận hủy"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : null}
         </section>
     );
 }

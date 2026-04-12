@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ActivityLogService {
+
+    private static final String USER_TYPE_PREFIX = "USER_NOTICE_";
     
     /* cho phép thêm log và trả về 10 log gần nhất */
     private final ActivityLogRepository repo;
@@ -20,7 +22,79 @@ public class ActivityLogService {
         repo.save(ActivityLog.of(type, message));
     }
 
+    public void addNotification(String type, Long actorUserId, Long targetUserId, Long appointmentId, String message) {
+        if (targetUserId == null) {
+            return;
+        }
+        String tokenizedMessage = "[USER:" + targetUserId + "] " + message;
+        repo.save(ActivityLog.notification(type, actorUserId, targetUserId, appointmentId, tokenizedMessage));
+    }
+
+    public void addForUser(String type, Long userId, String message) {
+        if (userId == null) {
+            return;
+        }
+        addNotification(USER_TYPE_PREFIX + userId, null, userId, null, message);
+    }
+
     public List<ActivityLog> getRecent() {
         return repo.findTop10ByOrderByTimeDesc();
+    }
+
+    public List<ActivityLog> getRecentForUser(Long userId) {
+        if (userId == null) {
+            return List.of();
+        }
+        List<ActivityLog> byTargetUser = repo.findTop20ByTargetUserIdOrderByTimeDesc(userId);
+        if (byTargetUser != null && !byTargetUser.isEmpty()) {
+            return byTargetUser;
+        }
+
+        List<ActivityLog> typed = repo.findTop20ByTypeOrderByTimeDesc(USER_TYPE_PREFIX + userId);
+        if (typed != null && !typed.isEmpty()) {
+            return typed;
+        }
+        String token = "[USER:" + userId + "]";
+        return repo.findTop20ByMessageContainingOrderByTimeDesc(token);
+    }
+
+    public long countForUser(Long userId) {
+        if (userId == null) {
+            return 0;
+        }
+        long byTargetUser = repo.countByTargetUserId(userId);
+        if (byTargetUser > 0) {
+            return byTargetUser;
+        }
+        return repo.countByType(USER_TYPE_PREFIX + userId);
+    }
+
+    public boolean deleteForUser(Long userId, Long notificationId) {
+        if (userId == null || notificationId == null) {
+            return false;
+        }
+
+        var ownedByTargetUser = repo.findByIdAndTargetUserId(notificationId, userId);
+        if (ownedByTargetUser.isPresent()) {
+            repo.deleteById(notificationId);
+            return true;
+        }
+
+        String type = USER_TYPE_PREFIX + userId;
+        var ownedByType = repo.findByIdAndType(notificationId, type);
+        if (ownedByType.isPresent()) {
+            repo.deleteById(notificationId);
+            return true;
+        }
+
+        String token = "[USER:" + userId + "]";
+        var fallback = repo.findById(notificationId)
+                .filter(log -> log.getMessage() != null && log.getMessage().contains(token));
+        if (fallback.isPresent()) {
+            repo.deleteById(notificationId);
+            return true;
+        }
+
+        return false;
     }
 }

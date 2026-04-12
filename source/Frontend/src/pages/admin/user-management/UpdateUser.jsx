@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { authService, userService } from "../../../api";
+import { authService, specialtyService, userService } from "../../../api";
 import CustomDropdown from "../../../components/CustomDropdown";
 import ActionModal from "../../../components/ActionModal";
 import { clearCurrentUser, getCurrentUser, getUserId, resolveUserRole, setCurrentUser } from "../../../utils/authUtils";
@@ -41,6 +41,44 @@ const dmyToYmd = (value) => {
     return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 };
 
+const WEEKDAY_OPTIONS = [
+    { value: "MONDAY", label: "T2" },
+    { value: "TUESDAY", label: "T3" },
+    { value: "WEDNESDAY", label: "T4" },
+    { value: "THURSDAY", label: "T5" },
+    { value: "FRIDAY", label: "T6" },
+];
+
+const splitWorkingDays = (value) => {
+    const allowed = new Set(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"]);
+    if (!value) return Array.from(allowed);
+    const normalized = String(value)
+        .split(",")
+        .map((day) => day.trim())
+        .filter((day) => allowed.has(day));
+    return normalized.length ? normalized : Array.from(allowed);
+};
+
+const resolveSpecialtyId = (doctorProfile, specialtyList) => {
+    const directId =
+        doctorProfile?.specialtyId
+        ?? doctorProfile?.specialityId
+        ?? doctorProfile?.specialty_id
+        ?? doctorProfile?.speciality_id;
+
+    if (directId !== null && directId !== undefined && String(directId).trim() !== "") {
+        return String(directId);
+    }
+
+    const specialtyName = String(doctorProfile?.specialty || "").trim().toLowerCase();
+    if (!specialtyName || !Array.isArray(specialtyList)) {
+        return "";
+    }
+
+    const matched = specialtyList.find((item) => String(item?.name || "").trim().toLowerCase() === specialtyName);
+    return matched?.id ? String(matched.id) : "";
+};
+
 function AdminEditProfile() {
     const navigate = useNavigate();
     const { id: routeId } = useParams();
@@ -58,7 +96,13 @@ function AdminEditProfile() {
         idNumber: "",
         email: "",
         role: "",
+        clinicLocation: "",
+        specialtyId: "",
+        workingDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
+        shiftStart: "08:00",
+        shiftEnd: "17:00",
     });
+    const [specialties, setSpecialties] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -81,12 +125,40 @@ function AdminEditProfile() {
         tone: "info",
         nextAction: "none",
     });
+    const [doctorSpecialtyLabel, setDoctorSpecialtyLabel] = useState("");
+
+    const specialtyOptions = useMemo(() => {
+        const base = specialties.map((item) => ({
+            value: String(item.id),
+            label: `${item.name} (${item.code})`,
+        }));
+
+        if (form.role === "DOCTOR" && form.specialtyId && !base.some((opt) => opt.value === String(form.specialtyId))) {
+            base.unshift({
+                value: String(form.specialtyId),
+                label: doctorSpecialtyLabel || `Chuyên môn hiện tại (ID: ${form.specialtyId})`,
+            });
+        }
+
+        return base;
+    }, [doctorSpecialtyLabel, form.role, form.specialtyId, specialties]);
 
     useEffect(() => {
         const animation = animatePageEnter(pageRef.current);
         return () => {
             animation?.pause?.();
         };
+    }, []);
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const data = await specialtyService.getAll();
+                setSpecialties(Array.isArray(data) ? data.filter((item) => item?.active !== false) : []);
+            } catch {
+                setSpecialties([]);
+            }
+        })();
     }, []);
 
     useEffect(() => {
@@ -108,8 +180,26 @@ function AdminEditProfile() {
                     birthDate: dmyToYmd(data?.birthDate) || "",
                     idNumber: data?.idNumber || "",
                     email: data?.email || "",
-                    role: data?.role || ""
-                })
+                    role: data?.role || "",
+                    clinicLocation: "",
+                    specialtyId: "",
+                    workingDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
+                    shiftStart: "08:00",
+                    shiftEnd: "17:00",
+                });
+
+                if (data?.role === "DOCTOR") {
+                    const doctorProfile = await userService.getDoctorProfile(targetUserId);
+                    setForm((prev) => ({
+                        ...prev,
+                        clinicLocation: doctorProfile?.clinicLocation || "",
+                        specialtyId: resolveSpecialtyId(doctorProfile, specialties),
+                        workingDays: splitWorkingDays(doctorProfile?.workingDays),
+                        shiftStart: String(doctorProfile?.shiftStart || "08:00").slice(0, 5),
+                        shiftEnd: String(doctorProfile?.shiftEnd || "17:00").slice(0, 5),
+                    }));
+                    setDoctorSpecialtyLabel(doctorProfile?.specialty || "");
+                }
             }
             catch (e) {
                 setError(e?.message || "Không tải được dữ liệu");
@@ -120,10 +210,49 @@ function AdminEditProfile() {
         })();
     }, [targetUserId]);
 
+    useEffect(() => {
+        if (form.role !== "DOCTOR") return;
+        if (form.specialtyId) return;
+        if (!doctorSpecialtyLabel) return;
+        if (!specialties.length) return;
+
+        const matched = specialties.find(
+            (item) => String(item?.name || "").trim().toLowerCase() === doctorSpecialtyLabel.trim().toLowerCase()
+        );
+        if (matched?.id) {
+            setForm((prev) => ({ ...prev, specialtyId: String(matched.id) }));
+        }
+    }, [doctorSpecialtyLabel, form.role, form.specialtyId, specialties]);
+
     const onChange = (e) => {
+        const { name, value } = e.target;
         setForm({
             ...form,
-            [e.target.name]: e.target.value
+            [name]: value,
+            ...(name === "role" && value !== "DOCTOR"
+                ? {
+                    clinicLocation: "",
+                    specialtyId: "",
+                    workingDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
+                    shiftStart: "08:00",
+                    shiftEnd: "17:00",
+                }
+                : {}),
+        });
+    };
+
+    const handleWorkingDaysChange = (event) => {
+        const day = event.target.value;
+        setForm((prev) => {
+            const current = [...prev.workingDays];
+            if (event.target.checked && !current.includes(day)) {
+                current.push(day);
+            }
+            if (!event.target.checked) {
+                const next = current.filter((value) => value !== day);
+                return { ...prev, workingDays: next };
+            }
+            return { ...prev, workingDays: current };
         });
     };
 
@@ -138,7 +267,7 @@ function AdminEditProfile() {
         e.preventDefault();
         setError("");
 
-        const data = {
+        const userPayload = {
             fullName: form.fullName.trim(),
             phone: form.phone.trim(),
             gender: form.gender,
@@ -149,7 +278,32 @@ function AdminEditProfile() {
             role: form.role.trim()
         };
 
-        setPendingUpdate(data);
+        let doctorPayload = null;
+        if (form.role === "DOCTOR") {
+            if (!form.specialtyId) {
+                setError("Bác sĩ phải có chuyên môn.");
+                return;
+            }
+            if (!form.clinicLocation.trim()) {
+                setError("Bác sĩ phải có phòng làm việc.");
+                return;
+            }
+
+            if (!form.workingDays.length) {
+                setError("Bác sĩ phải có ít nhất một ngày làm việc.");
+                return;
+            }
+
+            doctorPayload = {
+                specialtyId: Number(form.specialtyId),
+                clinicLocation: form.clinicLocation.trim(),
+                workingDays: form.workingDays.join(","),
+                shiftStart: form.shiftStart,
+                shiftEnd: form.shiftEnd,
+            };
+        }
+
+        setPendingUpdate({ userPayload, doctorPayload });
         setConfirmOpen(true);
     };
 
@@ -159,7 +313,11 @@ function AdminEditProfile() {
         setSaving(true);
         setError("");
         try {
-            const updatedUser = await userService.update(targetUserId, pendingUpdate);
+            const updatedUser = await userService.update(targetUserId, pendingUpdate.userPayload);
+
+            if (pendingUpdate.doctorPayload) {
+                await userService.updateDoctorProfile(targetUserId, pendingUpdate.doctorPayload);
+            }
 
             if (isSelfEditing) {
                 const current = getCurrentUser() || {};
@@ -176,7 +334,7 @@ function AdminEditProfile() {
                 title: "Lưu thành công",
                 message: "Thông tin đã được cập nhật.",
                 tone: "success",
-                nextAction: isSelfEditing ? "none" : "back-users",
+                nextAction: isSelfEditing ? "reload-profile" : "back-users",
             });
         }
         catch (e) {
@@ -263,7 +421,11 @@ function AdminEditProfile() {
         setResultModal((prev) => ({ ...prev, isOpen: false, nextAction: "none" }));
 
         if (nextAction === "back-users") {
-            navigate("/admin/users");
+            window.location.assign("/admin/users");
+        }
+
+        if (nextAction === "reload-profile") {
+            window.location.reload();
         }
 
         if (nextAction === "logout") {
@@ -278,7 +440,7 @@ function AdminEditProfile() {
             <section className="bg-[var(--surface)] min-h-screen p-10">
                 <div className="w-[50vw] mx-auto p-6 rounded-4xl bg-white shadow-2xl">
                     <h1 className="w-full p-3 rounded-xl text-3xl font-semibold mb-3 text-[#00278D]">
-                        {isSelfEditing ? "Chỉnh sửa hồ sơ cá nhân" : "Chỉnh sửa hồ sơ"}
+                        {isSelfEditing ? "Chỉnh sửa hồ sơ cá nhân" : "Chi tiết và chỉnh sửa hồ sơ"}
                     </h1>
 
                     {error && (
@@ -368,6 +530,76 @@ function AdminEditProfile() {
                                 className="w-full border text-slate-800 border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00278D] focus:border-transparent transition duration-200"
                             />
                         </div>
+
+                        {form.role === "DOCTOR" && (
+                            <div className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                                <div className="md:col-span-2">
+                                    <h3 className="text-lg font-semibold text-[#00278D]">Thông tin làm việc của bác sĩ</h3>
+                                </div>
+
+                                <div className="md:col-span-2">
+                                    <label className="block text-slate-800 text-sm mb-1">Chuyên môn</label>
+                                    <CustomDropdown
+                                        name="specialtyId"
+                                        value={form.specialtyId}
+                                        onChange={onChange}
+                                        options={specialtyOptions}
+                                        placeholder="-- Chọn chuyên môn --"
+                                    />
+                                </div>
+
+                                <div className="md:col-span-2">
+                                    <label className="block text-slate-800 text-sm mb-1">Phòng làm việc</label>
+                                    <input
+                                        name="clinicLocation"
+                                        value={form.clinicLocation}
+                                        onChange={onChange}
+                                        placeholder="Ví dụ: Tòa A - Phòng 301"
+                                        className="w-full border text-slate-800 border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00278D] focus:border-transparent transition duration-200"
+                                    />
+                                </div>
+
+                                <div className="md:col-span-2">
+                                    <label className="block text-slate-800 text-sm mb-1">Ngày làm việc trong tuần</label>
+                                    <div className="flex flex-wrap gap-3">
+                                        {WEEKDAY_OPTIONS.map((day) => (
+                                            <label key={day.value} className="flex items-center gap-2 text-slate-700 text-sm">
+                                                <input
+                                                    type="checkbox"
+                                                    value={day.value}
+                                                    checked={form.workingDays.includes(day.value)}
+                                                    onChange={handleWorkingDaysChange}
+                                                    className="rounded text-[#00278D] focus:ring-[#00278D]"
+                                                />
+                                                <span>{day.label}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-slate-800 text-sm mb-1">Giờ bắt đầu</label>
+                                    <input
+                                        type="time"
+                                        name="shiftStart"
+                                        value={form.shiftStart}
+                                        onChange={onChange}
+                                        className="w-full border text-slate-800 border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00278D] focus:border-transparent transition duration-200"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-slate-800 text-sm mb-1">Giờ kết thúc</label>
+                                    <input
+                                        type="time"
+                                        name="shiftEnd"
+                                        value={form.shiftEnd}
+                                        onChange={onChange}
+                                        className="w-full border text-slate-800 border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00278D] focus:border-transparent transition duration-200"
+                                    />
+                                </div>
+                            </div>
+                        )}
 
                         <div className="pt-2 flex gap-2 col-span-2">
                             <button

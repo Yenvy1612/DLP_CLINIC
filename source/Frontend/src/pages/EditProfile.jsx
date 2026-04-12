@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { clearCurrentUser, getCurrentUser, getRoleHomePath, getUserRole, resolveUserRole, setCurrentUser } from "../utils/authUtils";
-import { authService } from "../api";
+import { authService, specialtyService } from "../api";
 import CustomDropdown from "../components/CustomDropdown";
 import ActionModal from "../components/ActionModal";
 import { animatePageEnter } from "../utils/animeAnimations";
@@ -41,6 +41,44 @@ const dmyToYmd = (value) => {
     return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 };
 
+const WEEKDAY_OPTIONS = [
+    { value: "MONDAY", label: "T2" },
+    { value: "TUESDAY", label: "T3" },
+    { value: "WEDNESDAY", label: "T4" },
+    { value: "THURSDAY", label: "T5" },
+    { value: "FRIDAY", label: "T6" },
+];
+
+const splitWorkingDays = (value) => {
+    const allowed = new Set(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"]);
+    if (!value) return Array.from(allowed);
+    const normalized = String(value)
+        .split(",")
+        .map((day) => day.trim())
+        .filter((day) => allowed.has(day));
+    return normalized.length ? normalized : Array.from(allowed);
+};
+
+const resolveSpecialtyId = (doctorProfile, specialtyList) => {
+    const directId =
+        doctorProfile?.specialtyId
+        ?? doctorProfile?.specialityId
+        ?? doctorProfile?.specialty_id
+        ?? doctorProfile?.speciality_id;
+
+    if (directId !== null && directId !== undefined && String(directId).trim() !== "") {
+        return String(directId);
+    }
+
+    const specialtyName = String(doctorProfile?.specialty || "").trim().toLowerCase();
+    if (!specialtyName || !Array.isArray(specialtyList)) {
+        return "";
+    }
+
+    const matched = specialtyList.find((item) => String(item?.name || "").trim().toLowerCase() === specialtyName);
+    return matched?.id ? String(matched.id) : "";
+};
+
 function EditProfile() {
     const navigate = useNavigate();
     const role = getUserRole();
@@ -53,8 +91,14 @@ function EditProfile() {
         birthDate: "",
         address: "",
         idNumber: "",
-        email: ""
+        email: "",
+        clinicLocation: "",
+        specialtyId: "",
+        workingDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
+        shiftStart: "08:00",
+        shiftEnd: "17:00",
     });
+    const [specialties, setSpecialties] = useState([]);
 
     const [passwordForm, setPasswordForm] = useState({
         currentPassword: "",
@@ -80,6 +124,24 @@ function EditProfile() {
         tone: "info",
         nextAction: "none",
     });
+    const [isDoctor, setIsDoctor] = useState(false);
+    const [doctorSpecialtyLabel, setDoctorSpecialtyLabel] = useState("");
+
+    const specialtyOptions = useMemo(() => {
+        const base = specialties.map((item) => ({
+            value: String(item.id),
+            label: `${item.name} (${item.code})`,
+        }));
+
+        if (isDoctor && form.specialtyId && !base.some((opt) => opt.value === String(form.specialtyId))) {
+            base.unshift({
+                value: String(form.specialtyId),
+                label: doctorSpecialtyLabel || `Chuyên môn hiện tại (ID: ${form.specialtyId})`,
+            });
+        }
+
+        return base;
+    }, [doctorSpecialtyLabel, form.specialtyId, isDoctor, specialties]);
 
     useEffect(() => {
         const animation = animatePageEnter(pageRef.current);
@@ -101,7 +163,31 @@ function EditProfile() {
                     birthDate: dmyToYmd(data?.birthDate) || "",
                     idNumber: data?.idNumber || "",
                     email: data?.email || "",
-                })
+                    clinicLocation: "",
+                    workingDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
+                    shiftStart: "08:00",
+                    shiftEnd: "17:00",
+                });
+
+                const doctorRole = data?.role === "DOCTOR";
+                setIsDoctor(doctorRole);
+
+                if (doctorRole) {
+                    const specialtyData = await specialtyService.getAll();
+                    const activeSpecialties = Array.isArray(specialtyData) ? specialtyData.filter((item) => item?.active !== false) : [];
+                    setSpecialties(activeSpecialties);
+
+                    const doctorProfile = await authService.getMyDoctorProfile();
+                    setForm((prev) => ({
+                        ...prev,
+                        clinicLocation: doctorProfile?.clinicLocation || "",
+                        specialtyId: resolveSpecialtyId(doctorProfile, activeSpecialties),
+                        workingDays: splitWorkingDays(doctorProfile?.workingDays),
+                        shiftStart: String(doctorProfile?.shiftStart || "08:00").slice(0, 5),
+                        shiftEnd: String(doctorProfile?.shiftEnd || "17:00").slice(0, 5),
+                    }));
+                    setDoctorSpecialtyLabel(doctorProfile?.specialty || "");
+                }
             }
             catch (e) {
                 setError(e?.message || "Không tải được dữ liệu");
@@ -126,6 +212,20 @@ function EditProfile() {
         }));
     };
 
+    const handleWorkingDaysChange = (event) => {
+        const day = event.target.value;
+        setForm((prev) => {
+            const current = [...prev.workingDays];
+            if (event.target.checked && !current.includes(day)) {
+                current.push(day);
+            }
+            if (!event.target.checked) {
+                return { ...prev, workingDays: current.filter((value) => value !== day) };
+            }
+            return { ...prev, workingDays: current };
+        });
+    };
+
     const onSubmit = async (e) => {
         e.preventDefault();
         setError("");
@@ -140,6 +240,21 @@ function EditProfile() {
             email: form.email.trim()
         };
 
+        if (isDoctor) {
+            if (!form.specialtyId) {
+                setError("Bác sĩ phải có chuyên môn.");
+                return;
+            }
+            if (!form.clinicLocation.trim()) {
+                setError("Bác sĩ phải có phòng làm việc.");
+                return;
+            }
+            if (!form.workingDays.length) {
+                setError("Bác sĩ phải có ít nhất một ngày làm việc.");
+                return;
+            }
+        }
+
         setPendingProfileUpdate(data);
         setConfirmProfileOpen(true);
     };
@@ -153,6 +268,16 @@ function EditProfile() {
             const updatedProfile = await authService.updateMe(pendingProfileUpdate);
             const current = getCurrentUser() || {};
 
+            if (isDoctor) {
+                await authService.updateMyDoctorProfile({
+                    specialtyId: Number(form.specialtyId),
+                    clinicLocation: form.clinicLocation.trim(),
+                    workingDays: form.workingDays.join(","),
+                    shiftStart: form.shiftStart,
+                    shiftEnd: form.shiftEnd,
+                });
+            }
+
             setCurrentUser({
                 ...current,
                 ...updatedProfile,
@@ -165,7 +290,7 @@ function EditProfile() {
                 title: "Lưu thành công",
                 message: "Thông tin hồ sơ đã được cập nhật.",
                 tone: "success",
-                nextAction: "none",
+                nextAction: "reload-profile",
             });
         }
         catch (e) {
@@ -249,6 +374,11 @@ function EditProfile() {
     const closeResultModal = () => {
         const { nextAction } = resultModal;
         setResultModal((prev) => ({ ...prev, isOpen: false, nextAction: "none" }));
+
+        if (nextAction === "reload-profile") {
+            window.location.reload();
+            return;
+        }
 
         if (nextAction === "logout") {
             clearCurrentUser();
@@ -351,6 +481,76 @@ function EditProfile() {
                                 className="w-full border text-slate-800 border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00278D] focus:border-transparent transition duration-200"
                             />
                         </div>
+
+                        {isDoctor && (
+                            <div className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                                <div className="md:col-span-2">
+                                    <h3 className="text-lg font-semibold text-[#00278D]">Thông tin làm việc của bác sĩ</h3>
+                                </div>
+
+                                <div className="md:col-span-2">
+                                    <label className="block text-slate-800 text-sm mb-1">Chuyên môn</label>
+                                    <CustomDropdown
+                                        name="specialtyId"
+                                        value={form.specialtyId}
+                                        onChange={onChange}
+                                        options={specialtyOptions}
+                                        placeholder="-- Chọn chuyên môn --"
+                                    />
+                                </div>
+
+                                <div className="md:col-span-2">
+                                    <label className="block text-slate-800 text-sm mb-1">Phòng làm việc</label>
+                                    <input
+                                        name="clinicLocation"
+                                        value={form.clinicLocation}
+                                        onChange={onChange}
+                                        placeholder="Ví dụ: Tòa A - Phòng 301"
+                                        className="w-full border text-slate-800 border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00278D] focus:border-transparent transition duration-200"
+                                    />
+                                </div>
+
+                                <div className="md:col-span-2">
+                                    <label className="block text-slate-800 text-sm mb-1">Ngày làm việc trong tuần</label>
+                                    <div className="flex flex-wrap gap-3">
+                                        {WEEKDAY_OPTIONS.map((day) => (
+                                            <label key={day.value} className="flex items-center gap-2 text-slate-700 text-sm">
+                                                <input
+                                                    type="checkbox"
+                                                    value={day.value}
+                                                    checked={form.workingDays.includes(day.value)}
+                                                    onChange={handleWorkingDaysChange}
+                                                    className="rounded text-[#00278D] focus:ring-[#00278D]"
+                                                />
+                                                <span>{day.label}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-slate-800 text-sm mb-1">Giờ bắt đầu</label>
+                                    <input
+                                        type="time"
+                                        name="shiftStart"
+                                        value={form.shiftStart}
+                                        onChange={onChange}
+                                        className="w-full border text-slate-800 border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00278D] focus:border-transparent transition duration-200"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-slate-800 text-sm mb-1">Giờ kết thúc</label>
+                                    <input
+                                        type="time"
+                                        name="shiftEnd"
+                                        value={form.shiftEnd}
+                                        onChange={onChange}
+                                        className="w-full border text-slate-800 border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00278D] focus:border-transparent transition duration-200"
+                                    />
+                                </div>
+                            </div>
+                        )}
 
                         <div className="pt-2 flex gap-2 col-span-2">
                             <button

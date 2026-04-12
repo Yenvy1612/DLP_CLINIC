@@ -60,9 +60,6 @@ public class Service {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
-
-    @Column(name="duration_min", nullable=false)
-    private Integer durationMin;
     
     @PrePersist
     protected void onCreate() {
@@ -93,7 +90,6 @@ public class Service {
                 .department(update.getDepartment() != null ? update.getDepartment() : this.department)
             .specialtyId(update.getSpecialtyId() != null ? update.getSpecialtyId() : this.specialtyId)
                 .price(update.getPrice() != null ? update.getPrice() : this.price)
-                .durationMin(update.getDurationMin() != null ? update.getDurationMin() : this.durationMin)
                 .active(update.getActive() != null ? update.getActive() : this.active)
                 .build();
     }

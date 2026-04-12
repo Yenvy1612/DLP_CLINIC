@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { getUserRole } from "../../utils/authUtils";
 import { appointmentService, serviceService, userService } from "../../api";
@@ -11,7 +10,6 @@ function AppointmentCard({ appointment }) {
     const [patientInfo, setPatientInfo] = useState({});
     const [serviceInfo, setServiceInfo] = useState({});
     const [currentStatus, setCurrentStatus] = useState(status);
-    const [isDeleted, setIsDeleted] = useState(false);
     const [isActing, setIsActing] = useState(false);
     const [confirmModal, setConfirmModal] = useState({
         isOpen: false,
@@ -41,7 +39,6 @@ function AppointmentCard({ appointment }) {
 
     const statusColors = {
         PENDING: "bg-sky-200 text-sky-700 border-sky-300",
-        CONFIRMED: "bg-sky-200 text-sky-700 border-sky-300",
         DONE: "bg-green-100 text-green-700 border-green-300",
         CANCELLED: "bg-red-100 text-red-700 border-red-300"
     };
@@ -121,30 +118,6 @@ function AppointmentCard({ appointment }) {
         }
     };
 
-    const requestDeleteAppointment = () => {
-        openConfirmModal({
-            title: "Xác nhận xóa cuộc hẹn",
-            message: "Nếu tiếp tục, cuộc hẹn sẽ bị xóa khỏi hệ thống.",
-            confirmText: "Xóa",
-            action: async () => {
-                await appointmentService.remove(id);
-                setIsDeleted(true);
-            },
-        });
-    };
-
-    const requestMarkDone = () => {
-        openConfirmModal({
-            title: "Xác nhận hoàn thành",
-            message: "Đánh dấu cuộc hẹn này là đã xong?",
-            confirmText: "Đánh dấu đã xong",
-            action: async () => {
-                await appointmentService.markDone(id);
-                setCurrentStatus("DONE");
-            },
-        });
-    };
-
     const requestMarkCancelled = () => {
         openConfirmModal({
             title: "Xác nhận hủy cuộc hẹn",
@@ -157,14 +130,8 @@ function AppointmentCard({ appointment }) {
         });
     };
 
-    if (isDeleted) return null;
-
     const resolvedStatusColor = statusColors[currentStatus] || "bg-slate-100 text-slate-700 border-slate-300";
-    const statusLabel = currentStatus === "PENDING" || currentStatus === "CONFIRMED"
-        ? "Đã xác nhận"
-        : currentStatus === "CANCELLED"
-            ? "Bác sĩ đã hủy"
-            : "Đã xong";
+    const statusLabel = currentStatus === "DONE" ? "Đã khám" : "Chưa khám";
 
     return (
         <>
@@ -205,19 +172,13 @@ function AppointmentCard({ appointment }) {
                         {statusLabel}
                     </span>
 
-                    {role === "PATIENT" ? currentStatus === "PENDING" ? (
+                    {role === "PATIENT" ? (
                         <button
                             onClick={() => appointment && navigate(`/patient/edit-appointment/${appointment.id}`)}
-                            className="cursor-pointer bg-sky-500 hover:bg-sky-600 text-white w-[100px] rounded text-sm flex justify-center items-center"
+                            disabled={currentStatus === "DONE"}
+                            className="cursor-pointer bg-sky-500 hover:bg-sky-600 text-white w-[120px] rounded text-sm disabled:opacity-60"
                         >
-                            <FaEdit />
-                        </button>
-                    ) : (
-                        <button
-                            onClick={requestDeleteAppointment}
-                            className="cursor-pointer hover:bg-red-800 delete-appointment bg-red-700 text-white w-[100px] rounded text-sm"
-                        >
-                            Xóa
+                            Sửa lịch
                         </button>
                     ) : ""}
 
@@ -231,26 +192,7 @@ function AppointmentCard({ appointment }) {
                     ) : ""}
                 </div>
 
-                {role === "PATIENT" ? (
-                    <div className="edit-done mt-4 flex justify-between">
-                        {currentStatus === "PENDING" ? (
-                            <button
-                                onClick={requestMarkDone}
-                                className="py-2 px-3 cursor-pointer delete-appointment hover:bg-green-800 bg-green-700 text-white w-2/3 rounded text-sm"
-                            >
-                                Đánh dấu là đã xong
-                            </button>
-                        ) : ""}
-                        {currentStatus === "PENDING" ? (
-                            <button
-                                onClick={requestDeleteAppointment}
-                                className="cursor-pointer hover:bg-red-800 delete-appointment bg-red-700 text-white w-[100px] rounded text-sm"
-                            >
-                                Hủy
-                            </button>
-                        ) : ""}
-                    </div>
-                ) : ""}
+                {role === "PATIENT" ? null : ""}
             </div>
 
             <ActionModal

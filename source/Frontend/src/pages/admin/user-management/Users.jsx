@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { FiEye, FiEdit2, FiTrash2, FiSearch, FiUserPlus } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiSearch, FiUserPlus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { userService } from "../../../api";
 import CustomDropdown from "../../../components/CustomDropdown";
@@ -264,16 +264,10 @@ function AdminUserManagement() {
                                         </td>
                                         <td className="px-6 py-3 text-right flex justify-end gap-2">
                                             <button
-                                                onClick={() => navigate(`/admin/show-user/${u.id}`)}
-                                                className="px-3 py-1.5 rounded-xl border border-[#00278D]/40 border-2 cursor-pointer text-[#00278D] hover:bg-slate-100 flex items-center gap-1 text-xs transition"
-                                            >
-                                                <FiEye size={14} /> Xem
-                                            </button>
-                                            <button
                                                 onClick={() => navigate(`/admin/edit-user/${u.id}`)}
                                                 className="px-3 py-1.5 rounded-xl border border-slate-400 border-2 cursor-pointer text-slate-700 hover:bg-slate-100 flex items-center gap-1 text-xs transition"
                                             >
-                                                <FiEdit2 size={14} /> Sửa
+                                                <FiEdit2 size={14} /> Chi tiết/Sửa
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(u.id)}

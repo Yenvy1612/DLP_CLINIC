@@ -16,6 +16,12 @@ export const authService = {
     async updateMe(payload) {
         return httpPut("/auth/me", payload);
     },
+    async getMyDoctorProfile() {
+        return httpGet("/auth/me/doctor-profile");
+    },
+    async updateMyDoctorProfile(payload) {
+        return httpPut("/auth/me/doctor-profile", payload);
+    },
     async changePassword(payload) {
         return httpPut("/auth/change-password", payload);
     },

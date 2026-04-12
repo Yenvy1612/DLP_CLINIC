@@ -14,7 +14,6 @@ import EditAppointment from "../pages/patient/EditAppointment";
 import Register from "../pages/auth/Register";
 import Schedule from "../pages/doctor/Schedule";
 import Statistic from "../pages/doctor/Statistic";
-import Patients from "../pages/doctor/Patients";
 import Dashboard from "../pages/admin/dashboard/Dashboard";
 import AdminUserManagement from "../pages/admin/user-management/Users";
 import AdminEditProfile from "../pages/admin/user-management/UpdateUser";
@@ -68,7 +67,8 @@ const router = createBrowserRouter([
                             { path: "payment", element: <Payment /> },
                             { path: "profile", element: <EditProfile /> },
                             { path: "edit", element: <EditProfile /> },
-                            { path: "cart", element: <Cart />, },
+                            { path: "appointments", element: <Cart />, },
+                            { path: "cart", element: <Navigate to="/patient/appointments" replace /> },
                             { path: "history", element: <HistoryPage /> },
                             { path: "edit-appointment/:id", element: <EditAppointment /> }
                         ],
@@ -85,7 +85,6 @@ const router = createBrowserRouter([
                             { path: "edit", element: <EditProfile /> },
                             { path: "schedule", element: <Schedule /> },
                             { path: "reports", element: <Statistic /> },
-                            { path: "patients", element: <Patients /> },
                         ]
                     }
                 ]
