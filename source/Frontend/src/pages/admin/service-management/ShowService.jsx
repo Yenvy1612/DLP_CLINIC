@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { serviceService } from "../../../api/services";
-// Đổi path này cho đúng với API của anhimport { getUserRole } from "../../../utils/authUtils";
+import { serviceService } from "../../../api";
+import ActionModal from "../../../components/ActionModal";
+import { getUserRole, isLoggedIn } from "../../../utils/authUtils";
 
 const container = {
     hidden: { opacity: 0, y: 20 },
@@ -36,6 +37,16 @@ function AdminShowService() {
     const [service, setService] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [actionModal, setActionModal] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        tone: "info",
+        confirmText: "Đóng",
+        cancelText: "Hủy",
+        showCancel: false,
+        onConfirm: null,
+    });
 
     useEffect(() => {
         const fetchService = async () => {
@@ -50,6 +61,48 @@ function AdminShowService() {
         };
         fetchService();
     }, [id]);
+
+    const closeActionModal = () => {
+        setActionModal((prev) => ({ ...prev, isOpen: false, onConfirm: null }));
+    };
+
+    const handleBookService = () => {
+        if (!service?.id) return;
+
+        const currentRole = getUserRole();
+
+        if (!isLoggedIn()) {
+            setActionModal({
+                isOpen: true,
+                title: "Cần đăng nhập",
+                message: "Bạn cần đăng nhập tài khoản bệnh nhân trước khi đặt lịch hẹn.",
+                tone: "warning",
+                confirmText: "Đăng nhập",
+                cancelText: "Để sau",
+                showCancel: true,
+                onConfirm: () => navigate("/login"),
+            });
+            return;
+        }
+
+        if (currentRole !== "PATIENT") {
+            setActionModal({
+                isOpen: true,
+                title: "Không thể đặt lịch",
+                message: "Chỉ tài khoản bệnh nhân mới có thể đặt lịch hẹn từ trang dịch vụ.",
+                tone: "warning",
+                confirmText: "Đã hiểu",
+                cancelText: "Hủy",
+                showCancel: false,
+                onConfirm: null,
+            });
+            return;
+        }
+
+        navigate("/patient/book", {
+            state: { preselectedServiceId: String(service.id) },
+        });
+    };
 
     if (loading)
         return (
@@ -77,7 +130,7 @@ function AdminShowService() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="min-h-screen bg-gradient-to-tl from-sky-50 via-white to-sky-500 px-6 py-10"
+            className="min-h-screen bg-[var(--surface)] px-6 py-10"
         >
             <motion.div
                 variants={container}
@@ -119,8 +172,14 @@ function AdminShowService() {
 
                     <motion.div
                         variants={item}
-                        className="flex justify-end pt-4 border-t border-slate-100"
+                        className="flex justify-end gap-2 pt-4 border-t border-slate-100"
                     >
+                        <button
+                            onClick={handleBookService}
+                            className="px-5 py-2.5 rounded-xl bg-[#001f5f] text-white text-sm font-medium hover:bg-[#001647] transition"
+                        >
+                            Đặt lịch hẹn
+                        </button>
                         <button
                             onClick={() => navigate(role == "ADMIN" ? "/admin/services" : "/services")}
                             className="px-5 py-2.5 rounded-xl bg-[#00278D] text-white text-sm font-medium hover:bg-sky-500 transition"
@@ -130,6 +189,18 @@ function AdminShowService() {
                     </motion.div>
                 </motion.div>
             </motion.div>
+
+            <ActionModal
+                isOpen={actionModal.isOpen}
+                title={actionModal.title}
+                message={actionModal.message}
+                tone={actionModal.tone}
+                confirmText={actionModal.confirmText}
+                cancelText={actionModal.cancelText}
+                showCancel={actionModal.showCancel}
+                onClose={closeActionModal}
+                onConfirm={actionModal.onConfirm || closeActionModal}
+            />
         </motion.div>
     );
 }

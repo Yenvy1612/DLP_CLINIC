@@ -1,11 +1,6 @@
 package com.acare.backend.controller;
 
-import com.acare.backend.dto.ApiResponse;
-import com.acare.backend.entity.Appointment;
-import com.acare.backend.service.AppointmentService;
-import lombok.RequiredArgsConstructor;
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,6 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.acare.backend.dto.ApiResponse;
+import com.acare.backend.dto.appointment.AppointmentAvailabilityOption;
+import com.acare.backend.dto.appointment.AppointmentCreateRequest;
+import com.acare.backend.entity.Appointment;
+import com.acare.backend.service.AppointmentService;
+
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/api/appointments")
 @RequiredArgsConstructor
@@ -28,19 +31,42 @@ public class AppointmentController {
 
     private final AppointmentService appointmentService;
 
+    @PostMapping
+    public ResponseEntity<ApiResponse<Appointment>> create(@RequestBody AppointmentCreateRequest request) {
+        return ResponseEntity.ok(appointmentService.createAppointment(request));
+    }
+
     @PostMapping("/book")
     public ResponseEntity<ApiResponse<Appointment>> createAppointment(@RequestBody Appointment appointment) {
         return ResponseEntity.ok(appointmentService.createAppointment(appointment));
     }
 
     @GetMapping
-    public List<Appointment> getAllAppointments() {
-        return appointmentService.getAllAppointments();
+    public List<Appointment> getAppointments(
+            @RequestParam(required = false) Long doctorId,
+            @RequestParam(required = false) Long patientId,
+            @RequestParam(required = false) Boolean pending,
+            @RequestParam(required = false) Boolean today,
+            @RequestParam(required = false) Boolean doneThisMonth,
+            @RequestParam(required = false) String doctorName,
+            @RequestParam(required = false) String patientName,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate appointmentDate,
+            @RequestParam(required = false) String status) {
+            return appointmentService.getAppointments(
+                doctorId,
+                patientId,
+                pending,
+                today,
+                doneThisMonth,
+                doctorName,
+                patientName,
+                appointmentDate,
+                status);
     }
 
     @GetMapping("/today")
     public ResponseEntity<List<Appointment>> getTodayAppointments() {
-        return ResponseEntity.ok(appointmentService.getTodayAppointments());
+            return ResponseEntity.ok(appointmentService.getTodayAppointments());
     }
 
     @GetMapping("/today/pending")
@@ -56,6 +82,27 @@ public class AppointmentController {
     @GetMapping("/month/done/{doctorId}")
     public ResponseEntity<List<Appointment>> getMonthDoneAppointmentsByDoctorId(@PathVariable Long doctorId) {
         return ResponseEntity.ok(appointmentService.getMonthDoneAppointmentsByDoctorId(doctorId));
+    }
+
+    @GetMapping("/availability")
+    public ResponseEntity<List<AppointmentAvailabilityOption>> getAvailability(
+            @RequestParam Long serviceId,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+        return ResponseEntity.ok(appointmentService.getAvailability(serviceId, date));
+    }
+
+    @GetMapping("/doctor-availability")
+    public ResponseEntity<List<AppointmentAvailabilityOption>> getDoctorAvailability(
+            @RequestParam Long doctorId,
+            @RequestParam Long serviceId,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+        return ResponseEntity.ok(appointmentService.getDoctorAvailability(doctorId, serviceId, date));
+    }
+
+    @GetMapping("/doctors-by-service")
+    public ResponseEntity<List<java.util.Map<String, Object>>> getDoctorsByService(
+            @RequestParam Long serviceId) {
+        return ResponseEntity.ok(appointmentService.getDoctorsByServiceId(serviceId));
     }
 
     @GetMapping("/{id}")
@@ -83,6 +130,13 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.getByDoctorId(doctorId));
     }
 
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ApiResponse<Object>> updateAppointmentStatus(
+            @PathVariable Long id,
+            @RequestParam String status) {
+        return ResponseEntity.ok(appointmentService.updateStatus(id, status));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Object>> deleteAppointmentById(@PathVariable Long id) {
         return ResponseEntity.ok(appointmentService.deleteById(id));
@@ -90,12 +144,12 @@ public class AppointmentController {
 
     @PatchMapping("/done/{id}")
     public ResponseEntity<ApiResponse<Object>> changeAppointmentStatusFromPendingToDone(@PathVariable Long id) {
-        return ResponseEntity.ok(appointmentService.updateStatusDone(id));
+        return ResponseEntity.ok(appointmentService.updateStatus(id, "DONE"));
     }
 
     @PatchMapping("/cancel/{id}")
     public ResponseEntity<ApiResponse<Object>> changeAppointmentStatusFromPendingToCanceled(@PathVariable Long id) {
-        return ResponseEntity.ok(appointmentService.updateStatusCancelled(id));
+        return ResponseEntity.ok(appointmentService.updateStatus(id, "CANCELLED"));
     }
 
     @PutMapping("/{id}")
@@ -108,12 +162,11 @@ public class AppointmentController {
             @RequestParam(required = false) String doctorName,
             @RequestParam(required = false) String patientName,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate appointmentDate,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String roomName) {
-        
-        List<Appointment> filteredAppointments = appointmentService.filterAppointments(
-                doctorName, patientName, appointmentDate, status, roomName);
-        filteredAppointments.sort(Comparator.comparing(Appointment::getStartTime));
-        return ResponseEntity.ok(filteredAppointments);
+            @RequestParam(required = false) String status) {
+        return ResponseEntity.ok(appointmentService.filterAppointments(
+            doctorName,
+            patientName,
+            appointmentDate,
+            status));
     }
 }

@@ -140,7 +140,7 @@ function ClinicServicesSection() {
                         {clinicServices.map((s, i) => (
                             <motion.div
                                 key={i}
-                                className="group flex flex-col gap-2 rounded-3xl border border-cyan-100 bg-gradient-to-br from-cyan-50 to-white px-5 py-5 shadow-md transition-all hover:-translate-y-1 hover:shadow-xl"
+                                className="group flex flex-col gap-2 rounded-3xl border border-slate-200 bg-white px-5 py-5 shadow-md transition-all hover:-translate-y-1 hover:shadow-xl"
                                 variants={cardVariants}
                             >
                                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-500 text-white transition group-hover:bg-[var(--brand-navy)]">

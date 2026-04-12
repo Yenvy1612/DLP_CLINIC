@@ -5,7 +5,7 @@ import { GiTrophyCup } from "react-icons/gi";
 import { RiServiceLine } from "react-icons/ri";
 import { getUserId } from "../../utils/authUtils";
 import { motion } from "framer-motion";
-import { appointmentService, serviceService, userService } from "../../api/services";
+import { appointmentService, serviceService, userService } from "../../api";
 
 const container = {
     hidden: { opacity: 0, y: 20 },
@@ -54,7 +54,7 @@ function Statistic() {
                 let totalRevenue = 0;
                 const recents = await Promise.all(
                     data.map(async (a) => {
-                        const serviceId = Number.parseInt(a.note, 10);
+                        const serviceId = Number.parseInt(a.serviceId ?? a.note, 10);
                         const [serviceResp, patientResp] = await Promise.all([
                             Number.isNaN(serviceId) ? Promise.resolve(null) : serviceService.getById(serviceId),
                             userService.getById(a.patientId),
@@ -100,7 +100,7 @@ function Statistic() {
     }, [doctorId]);
 
     return (
-        <section className="bg-gradient-to-tl from-sky-50 via-white to-sky-500 min-h-[40vh] text-slate-700 p-10 ">
+        <section className="bg-[var(--surface)] min-h-[40vh] text-slate-700 p-10 ">
             {/* Header */}
             <div className="max-w-7xl mx-auto">
                 <motion.div

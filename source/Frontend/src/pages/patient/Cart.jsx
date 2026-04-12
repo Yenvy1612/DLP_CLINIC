@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getUserId } from "../../utils/authUtils";
 import AppointmentCard from "./AppointmentCard";
 import { motion } from "framer-motion";
-import { appointmentService } from "../../api/services";
+import { appointmentService } from "../../api";
 
 const item = {
     hidden: { opacity: 0, y: 8 },
@@ -50,7 +50,7 @@ function Cart() {
     if (loading) return <p className="text-center text-gray-500 py-10">Đang tải...</p>;
 
     return (
-        <section className="bg-gradient-to-tl from-sky-50 via-white to-sky-500 min-h-[40vh]">
+        <section className="bg-[var(--surface)] min-h-[40vh]">
             <div className="max-w-6xl mx-auto py-8 px-4">
 
                 <motion.div

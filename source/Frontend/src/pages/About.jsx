@@ -39,7 +39,7 @@ function About() {
                     initial="hidden"
                     animate="show"
                     variants={fadeUp}
-                    className="mb-14 rounded-[32px] border border-cyan-100 bg-gradient-to-br from-[#03163d] via-[#06245f] to-[#0e4a82] p-10 text-center text-white shadow-2xl"
+                    className="mb-14 rounded-[32px] border border-cyan-100 bg-[var(--brand-navy)] p-10 text-center text-white shadow-2xl"
                 >
                     <span className="font-bold text-sm uppercase tracking-[0.18em] text-cyan-200">
                         ABOUT US

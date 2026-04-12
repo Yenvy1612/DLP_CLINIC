@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiSend, FiUser, FiEdit3, FiCheck } from "react-icons/fi";
 import { getUserRole } from "../utils/authUtils";
 import logo from "../assets/images/logo/clinic.png";
-import { geminiService } from "../api/services";
+import { geminiService } from "../api";
 
 function Chatbot() {
     const [isOpen, setIsOpen] = useState(false);
@@ -160,7 +160,7 @@ function Chatbot() {
                                 >
                                     <div className={`flex gap-2 max-w-[80%] ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
                                         {/* Avatar */}
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${msg.role === "user" ? "bg-sky-500" : "bg-gradient-to-br from-[#00278D] to-sky-500"}`}>
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${msg.role === "user" ? "bg-[var(--brand-600)]" : "bg-[var(--brand-navy)]"}`}>
                                             {msg.role === "user" ? (
                                                 <FiUser className="text-white text-sm" />
                                             ) : (
@@ -170,7 +170,7 @@ function Chatbot() {
 
                                         <div className="flex flex-col gap-1">
                                             {/* Message bubble */}
-                                            <div className={`rounded-2xl px-4 py-2 ${msg.role === "user" ? "bg-sky-500 text-white" : "bg-white text-slate-800 shadow-sm"}`}>
+                                            <div className={`rounded-2xl px-4 py-2 ${msg.role === "user" ? "bg-[var(--brand-600)] text-white" : "bg-white text-slate-800 shadow-sm"}`}>
                                                 <p className="text-sm leading-relaxed whitespace-pre-wrap">
                                                     {msg.content}
                                                 </p>
@@ -186,7 +186,7 @@ function Chatbot() {
                                     className="flex justify-start"
                                 >
                                     <div className="flex gap-2 items-end">
-                                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00278D] to-sky-500 flex items-center justify-center">
+                                        <div className="w-8 h-8 rounded-full bg-[var(--brand-navy)] flex items-center justify-center">
                                             <img src={logo} alt="bot" className="w-6 h-6 object-contain rounded-full" />
                                         </div>
                                         <div className="bg-white rounded-2xl px-4 py-3 shadow-sm">
@@ -210,13 +210,13 @@ function Chatbot() {
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
                                     placeholder="Nhập câu hỏi của bạn..."
-                                    className="flex-1 text-[#00278D] px-4 py-2 rounded-full border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm"
+                                    className="flex-1 text-[var(--brand-navy)] px-4 py-2 rounded-full border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--brand-200)] text-sm"
                                     disabled={isLoading}
                                 />
                                 <button
                                     type="submit"
                                     disabled={isLoading || !input.trim()}
-                                    className="w-10 h-10 rounded-full bg-gradient-to-br from-[#00278D] to-sky-500 hover:from-[#003bb5] hover:to-sky-400 disabled:opacity-50 disabled:cursor-not-allowed text-white flex items-center justify-center transition-all"
+                                    className="w-10 h-10 rounded-full bg-[var(--brand-600)] hover:bg-[var(--brand-700)] disabled:opacity-50 disabled:cursor-not-allowed text-white flex items-center justify-center transition-all"
                                 >
                                     <FiSend className="text-lg" />
                                 </button>

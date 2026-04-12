@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FiEye, FiEdit2, FiTrash2 } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";import { FiSearch } from "react-icons/fi";
-import { motion } from "framer-motion";
-import { serviceService } from "../../../api/services";
+import { useNavigate } from "react-router-dom";
+import { FiSearch } from "react-icons/fi";
+import { serviceService } from "../../../api";
+import ActionModal from "../../../components/ActionModal";
+import { animatePageEnter } from "../../../utils/animeAnimations";
 
 function AdminServiceManagement() {
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const pageRef = useRef(null);
 
     // State cho search
     const [searchParams, setSearchParams] = useState({
@@ -15,6 +18,21 @@ function AdminServiceManagement() {
         minPrice: '',
         maxPrice: ''
     });
+    const [deleteTargetId, setDeleteTargetId] = useState(null);
+    const [deleting, setDeleting] = useState(false);
+    const [noticeModal, setNoticeModal] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        tone: "info",
+    });
+
+    useEffect(() => {
+        const animation = animatePageEnter(pageRef.current);
+        return () => {
+            animation?.pause?.();
+        };
+    }, []);
 
     // Lấy danh sách user
     useEffect(() => {
@@ -75,42 +93,51 @@ function AdminServiceManagement() {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (confirm("Xác nhận xóa dịch vụ?")) {
-            try {
-                const response = await serviceService.remove(id);
-            }
-            catch (error) {
-                alert("Lỗi xóa dịch vụ");
-            }
+    const handleDelete = (id) => {
+        setDeleteTargetId(id);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!deleteTargetId) return;
+
+        setDeleting(true);
+        try {
+            await serviceService.remove(deleteTargetId);
+            setServices((prev) => prev.filter((service) => service.id !== deleteTargetId));
+            setNoticeModal({
+                isOpen: true,
+                title: "Đã xóa dịch vụ",
+                message: "Dịch vụ đã được xóa thành công.",
+                tone: "success",
+            });
+        }
+        catch (error) {
+            setNoticeModal({
+                isOpen: true,
+                title: "Xóa thất bại",
+                message: error?.message || "Không thể xóa dịch vụ. Vui lòng thử lại.",
+                tone: "warning",
+            });
+        }
+        finally {
+            setDeleting(false);
+            setDeleteTargetId(null);
         }
     };
 
     return (
-        <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="min-h-screen bg-gradient-to-tl from-sky-50 via-white to-sky-500 px-6 py-8"
+        <div
+            ref={pageRef}
+            className="min-h-screen bg-[var(--surface)] px-6 py-8"
         >
             <div className="max-w-6xl mx-auto">
-                <motion.div 
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                    className="flex items-center justify-between"
-                >
+                <div className="flex items-center justify-between">
                     <h1 className="text-3xl font-bold text-[#00278D] mb-6 p-2 bg-white rounded-xl shadow-xl">Danh sách dịch vụ</h1>
                     <button onClick={() => navigate("/admin/add-service")} className="flex items-center text-sm mb-6 bg-sky-500 text-white p-2 rounded-xl hover:shadow-xl hover:bg-sky-700 transition duration-300 cursor-pointer"> + Thêm dịch vụ</button>
-                </motion.div>
+                </div>
 
                 {/* Thanh tìm kiếm */}
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                    className="bg-white rounded-2xl shadow-xl p-6 mb-6"
-                >
+                <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
                     <div className="flex items-center gap-2 mb-4">
                         <FiSearch className="text-[#00278D]" size={20} />
                         <h2 className="text-lg font-semibold text-[#00278D]">Tìm kiếm dịch vụ</h2>
@@ -181,14 +208,9 @@ function AdminServiceManagement() {
                             Đặt lại
                         </button>
                     </div>
-                </motion.div>
+                </div>
 
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.6 }}
-                    className="bg-white border border-slate-200 rounded-3xl shadow-xl overflow-hidden"
-                >
+                <div className="bg-white border border-slate-200 rounded-3xl shadow-xl overflow-hidden">
                     <table className="min-w-full text-sm">
                         <thead className="bg-sky-50 text-[#00278D]">
                             <tr>
@@ -247,9 +269,36 @@ function AdminServiceManagement() {
                             )}
                         </tbody>
                     </table>
-                </motion.div>
+                </div>
             </div>
-        </motion.div>
+
+            <ActionModal
+                isOpen={deleteTargetId !== null}
+                title="Xác nhận xóa dịch vụ"
+                message="Thao tác này không thể hoàn tác. Bạn có chắc chắn muốn xóa dịch vụ này?"
+                tone="warning"
+                confirmText="Xóa"
+                cancelText="Hủy"
+                showCancel
+                loading={deleting}
+                onConfirm={handleConfirmDelete}
+                onClose={() => {
+                    if (deleting) return;
+                    setDeleteTargetId(null);
+                }}
+                closeOnBackdrop={!deleting}
+            />
+
+            <ActionModal
+                isOpen={noticeModal.isOpen}
+                title={noticeModal.title}
+                message={noticeModal.message}
+                tone={noticeModal.tone}
+                confirmText="Đã hiểu"
+                onConfirm={() => setNoticeModal((prev) => ({ ...prev, isOpen: false }))}
+                onClose={() => setNoticeModal((prev) => ({ ...prev, isOpen: false }))}
+            />
+        </div>
     );
 }
 

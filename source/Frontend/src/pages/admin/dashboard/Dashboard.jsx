@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import DashboardReportTable from "./DashboardReportTable";
 import { motion } from "framer-motion";
-import { activityService, appointmentService, serviceService, userService } from "../../../api/services";
+import { NavLink } from "react-router-dom";
+import { FiUsers, FiActivity, FiCalendar, FiBarChart2 } from "react-icons/fi";
+import { activityService, appointmentService, serviceService, userService } from "../../../api";
 
 function Dashboard() {
 
@@ -75,7 +77,11 @@ function Dashboard() {
                 const data = await appointmentService.doneThisMonth();
                 var sum = 0;
                 for (const a of data) {
-                    const serviceId = parseInt(a.note);
+                    const rawServiceId = a.serviceId ?? a.note;
+                    const serviceId = Number.parseInt(rawServiceId, 10);
+                    if (Number.isNaN(serviceId)) {
+                        continue;
+                    }
                     const service = await serviceService.getById(serviceId);
                     sum += service.price;
                 }
@@ -111,7 +117,7 @@ function Dashboard() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="min-h-screen bg-gradient-to-tl from-sky-50 via-white to-sky-500 text-slate-800"
+            className="min-h-screen bg-[var(--surface)] text-slate-800"
         >
             {/* HEADER */}
             <motion.div 
@@ -144,7 +150,7 @@ function Dashboard() {
                             >
                                 <div className="absolute inset-0"></div>
                                 <div className="relative z-10">
-                                    <div className="rounded-xl w-12 h-12 flex items-center justify-center bg-gradient-to-br from-sky-500 to-sky-400 text-white rounded-2xl shadow-md text-xl">
+                                    <div className="rounded-xl w-12 h-12 flex items-center justify-center bg-[var(--brand-600)] text-white rounded-2xl shadow-md text-xl">
                                         {s.icon}
                                     </div>
                                     <div className="mt-5">

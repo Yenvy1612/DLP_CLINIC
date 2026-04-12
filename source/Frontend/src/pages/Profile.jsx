@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { getUserId, getUserRole } from "../utils/authUtils";
+import { getRoleEditPath, getUserRole } from "../utils/authUtils";
 import { useNavigate } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { motion } from "framer-motion";
 import doctorImg from "../assets/images/doctor/doctor.jpg";
 import patientImg from "../assets/images/doctor/patient.jpg";
-import { userService } from "../api/services";
+import adminImg from "../assets/images/doctor/admin.jpg";
+import { authService } from "../api";
 
 const container = {
     hidden: { opacity: 0, y: 20 },
@@ -24,20 +25,17 @@ function Profile() {
 
     const navigate = useNavigate();
     const role = getUserRole();
-    const id = getUserId();
     const [profile, setProfile] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const roleLabel = role === "ADMIN" ? "quản trị viên" : role === "PATIENT" ? "bệnh nhân" : "bác sĩ";
+    const roleTag = role === "ADMIN" ? "Admin" : role === "PATIENT" ? "Bệnh nhân" : "Bác sĩ";
+    const roleAvatar = role === "ADMIN" ? adminImg : role === "DOCTOR" ? doctorImg : patientImg;
 
     useEffect(() => {
-        if (!id) {
-            setLoading(false);
-            return;
-        }
-
         const fetchUser = async () => {
             try {
-                const data = await userService.getById(id);
+                const data = await authService.me();
                 setProfile(data);
             }
             catch (err) {
@@ -48,7 +46,7 @@ function Profile() {
             }
         }
         fetchUser();
-    }, [id]);
+    }, []);
 
     if (loading) return <div className="loading-profile text-center p-4">Đang tải hồ sơ người dùng ... </div>
     if (error) return <div className="text-center text-red-500 p-4">{error}</div>;
@@ -72,7 +70,7 @@ function Profile() {
                         <motion.div variants={item} className="flex md:block justify-center">
                             <div className="relative">
                                 <motion.img
-                                    src={role == "DOCTOR" ? doctorImg : patientImg}
+                                    src={roleAvatar}
                                     alt="anh nguoi dung"
                                     className="user-image w-40 h-40 rounded-full object-cover ring-4 ring-white shadow-md border border-sky-200"
                                     initial={{ scale: 0.9, opacity: 0 }}
@@ -85,7 +83,7 @@ function Profile() {
                                     transition={{ type: "spring", stiffness: 180, damping: 25, delay: 0.2 }}
                                     className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 text-xs rounded-full bg-sky-500 text-white shadow"
                                 >
-                                    {role === "PATIENT" ? "Bệnh nhân" : "Bác sĩ"}
+                                    {roleTag}
                                 </motion.div>
                             </div>
                         </motion.div>
@@ -93,7 +91,7 @@ function Profile() {
                         {/* Thông tin */}
                         <div className="space-y-6">
                             <motion.h1 variants={item} className="text-2xl font-semibold tracking-tight text-[#00278D]">
-                                Tên {role === "PATIENT" ? "bệnh nhân" : "bác sĩ"}:{" "}
+                                Tên {roleLabel}:{" "}
                                 <span className="text-[#00278D]">{profile.fullName}</span>
                             </motion.h1>
 
@@ -116,7 +114,7 @@ function Profile() {
                                 <motion.div variants={item} className="flex gap-3">
                                     <div className="w-32 shrink-0 text-slate-500">Vai trò</div>
                                     <div className="font-medium">
-                                        {role === "ADMIN" ? "Admin" : role === "PATIENT" ? "Bệnh nhân" : "Bác sĩ"}
+                                        {roleTag}
                                     </div>
                                 </motion.div>
 
@@ -144,7 +142,7 @@ function Profile() {
 
                             <motion.div variants={item} className="pt-2">
                                 <motion.button
-                                    onClick={() => navigate(role === "PATIENT" ? "/patient/edit" : "/doctor/edit")}
+                                    onClick={() => navigate(getRoleEditPath(role))}
                                     whileHover={{ y: -3, boxShadow: "0px 6px 12px rgba(0,0,0,0.15)" }}
                                     whileTap={{ scale: 0.97 }}
                                     transition={{ type: "spring", stiffness: 180, damping: 20 }}

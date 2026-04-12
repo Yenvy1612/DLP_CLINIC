@@ -1,39 +1,27 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { appointmentService, roomService, userService } from "../../../api/services";
+import { useEffect, useRef, useState } from "react";
+import { appointmentService } from "../../../api";
+import CustomDropdown from "../../../components/CustomDropdown";
+import AppointmentLine from "./AppointmentLine";
+import { animatePageEnter } from "../../../utils/animeAnimations";
 
 function AdminAppointmentManagement() {
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [doctors, setDoctors] = useState([]);
-    const [rooms, setRooms] = useState([]);
-    const navigate = useNavigate();
+    const pageRef = useRef(null);
 
     // State cho filter
     const [filters, setFilters] = useState({
         doctorName: '',
         patientName: '',
         appointmentDate: '',
-        status: '',
-        roomName: ''
+        status: ''
     });
 
-    // Lấy danh sách doctors và rooms cho dropdown
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [doctorsData, roomsData] = await Promise.all([
-                    userService.getDoctors(),
-                    roomService.getAll()
-                ]);
-                setDoctors(doctorsData || []);
-                setRooms(roomsData || []);
-            } catch (err) {
-                console.error("Error fetching data:", err);
-            }
+        const animation = animatePageEnter(pageRef.current);
+        return () => {
+            animation?.pause?.();
         };
-        fetchData();
     }, []);
 
     // Lấy danh sách appointments
@@ -84,8 +72,7 @@ function AdminAppointmentManagement() {
             doctorName: '',
             patientName: '',
             appointmentDate: '',
-            status: '',
-            roomName: ''
+            status: ''
         });
         setLoading(true);
         try {
@@ -100,29 +87,17 @@ function AdminAppointmentManagement() {
         }
     };
     return (
-        <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="min-h-screen bg-gradient-to-tl from-sky-50 via-white to-sky-500 px-6 py-8"
+        <div
+            ref={pageRef}
+            className="min-h-screen bg-[var(--surface)] px-6 py-8"
         >
             <div className="max-w-9xl mx-auto">
-                <motion.div 
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                    className="flex items-center justify-between"
-                >
+                <div className="flex items-center justify-between">
                     <h1 className="text-3xl font-bold text-[#00278D] mb-6 p-2 bg-white rounded-xl shadow-xl">Danh sách lịch hẹn</h1>
-                </motion.div>
+                </div>
 
                 {/* Thanh tìm kiếm / Filter */}
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                    className="bg-white rounded-2xl shadow-xl p-6 mb-6"
-                >
+                <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
                     <h2 className="text-lg font-semibold text-[#00278D] mb-4">Tìm kiếm lịch hẹn</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {/* Tên bác sĩ */}
@@ -136,7 +111,7 @@ function AdminAppointmentManagement() {
                                 value={filters.doctorName}
                                 onChange={handleFilterChange}
                                 placeholder="Nhập tên bác sĩ..."
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00278D] focus:border-transparent"
                             />
                         </div>
 
@@ -151,7 +126,7 @@ function AdminAppointmentManagement() {
                                 value={filters.patientName}
                                 onChange={handleFilterChange}
                                 placeholder="Nhập tên bệnh nhân..."
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00278D] focus:border-transparent"
                             />
                         </div>
 
@@ -165,7 +140,7 @@ function AdminAppointmentManagement() {
                                 name="appointmentDate"
                                 value={filters.appointmentDate}
                                 onChange={handleFilterChange}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00278D] focus:border-transparent"
                             />
                         </div>
 
@@ -174,31 +149,17 @@ function AdminAppointmentManagement() {
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Trạng thái
                             </label>
-                            <select
+                            <CustomDropdown
                                 name="status"
                                 value={filters.status}
                                 onChange={handleFilterChange}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
-                            >
-                                <option value="">Tất cả trạng thái</option>
-                                <option value="PENDING">Chờ xác nhận</option>
-                                <option value="DONE">Hoàn thành</option>
-                                <option value="CANCELLED">Đã hủy</option>
-                            </select>
-                        </div>
-
-                        {/* Tên phòng */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Tên phòng
-                            </label>
-                            <input
-                                type="text"
-                                name="roomName"
-                                value={filters.roomName}
-                                onChange={handleFilterChange}
-                                placeholder="Nhập tên phòng..."
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                                options={[
+                                    { value: "", label: "Tất cả trạng thái" },
+                                    { value: "PENDING", label: "Chờ xác nhận" },
+                                    { value: "DONE", label: "Hoàn thành" },
+                                    { value: "CANCELLED", label: "Đã hủy" },
+                                ]}
+                                placeholder="Tất cả trạng thái"
                             />
                         </div>
 
@@ -206,33 +167,27 @@ function AdminAppointmentManagement() {
                         <div className="flex items-end gap-2">
                             <button
                                 onClick={handleSearch}
-                                className="flex-1 bg-[#00278D] text-white px-6 py-2 rounded-lg hover:bg-sky-700 transition-colors font-medium"
+                                className="flex-1 bg-[#00278D] text-white px-6 py-2 rounded-lg hover:bg-[#001f5f] transition-colors font-medium"
                             >
                                 Tìm kiếm
                             </button>
                             <button
                                 onClick={handleReset}
-                                className="flex-1 bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors font-medium"
+                                className="flex-1 bg-slate-700 text-white px-6 py-2 rounded-lg hover:bg-slate-800 transition-colors font-medium"
                             >
                                 Đặt lại
                             </button>
                         </div>
                     </div>
-                </motion.div>
+                </div>
 
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.6 }}
-                    className="bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden"
-                >
+                <div className="bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden">
                     <table className="min-w-full text-sm">
-                        <thead className="bg-sky-50 text-[#00278D]">
+                        <thead className="bg-slate-100 text-[#00278D]">
                             <tr>
                                 <th className="px-6 py-3 text-left font-semibold">STT</th>
                                 <th className="px-6 py-3 text-left font-semibold">Tên bác sĩ</th>
                                 <th className="px-6 py-3 text-left font-semibold">Tên bệnh nhân</th>
-                                <th className="px-6 py-3 text-center font-semibold">Phòng</th>
                                 <th className="px-6 py-3 text-center font-semibold">Dịch vụ</th>
                                 <th className="px-6 py-3 text-center font-semibold">Thời gian</th>
                                 <th className="px-6 py-3 text-center font-semibold">Ngày tạo</th>
@@ -243,13 +198,13 @@ function AdminAppointmentManagement() {
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan="5" className="px-6 py-6 text-center text-slate-500">
+                                    <td colSpan="7" className="px-6 py-6 text-center text-slate-500">
                                         Đang tải danh sách lịch hẹn...
                                     </td>
                                 </tr>
                             ) : appointments.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" className="px-6 py-6 text-center text-slate-500">
+                                    <td colSpan="7" className="px-6 py-6 text-center text-slate-500">
                                         Không có lịch hẹn nào.
                                     </td>
                                 </tr>
@@ -260,9 +215,9 @@ function AdminAppointmentManagement() {
                             )}
                         </tbody>
                     </table>
-                </motion.div>
+                </div>
             </div>
-        </motion.div>
+        </div>
     );
 }
 

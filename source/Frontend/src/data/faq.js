@@ -1,7 +1,7 @@
 export const faqs = [
         {
             category: "Đặt lịch khám",
-            color: "from-sky-400 to-blue-500",
+            color: "bg-[var(--brand-500)]",
             questions: [
                 {
                     q: "Làm thế nào để đặt lịch khám?",
@@ -27,7 +27,7 @@ export const faqs = [
         },
         {
             category: "Tài khoản",
-            color: "from-purple-400 to-pink-500",
+            color: "bg-[var(--brand-600)]",
             questions: [
                 {
                     q: "Làm thế nào để đăng ký tài khoản?",
@@ -49,7 +49,7 @@ export const faqs = [
         },
         {
             category: "Dịch vụ & Chi phí",
-            color: "from-green-400 to-teal-500",
+            color: "bg-[var(--brand-700)]",
             questions: [
                 {
                     q: "Phòng khám có những dịch vụ nào?",
@@ -71,7 +71,7 @@ export const faqs = [
         },
         {
             category: "Bác sĩ & Phòng khám",
-            color: "from-orange-400 to-red-500",
+            color: "bg-[var(--brand-800)]",
             questions: [
                 {
                     q: "Làm sao để chọn bác sĩ phù hợp?",
@@ -93,7 +93,7 @@ export const faqs = [
         },
         {
             category: "Tính năng hệ thống",
-            color: "from-cyan-400 to-blue-500",
+            color: "bg-[var(--brand-600)]",
             questions: [
                 {
                     q: "Admin có quyền gì trong hệ thống?",
@@ -111,7 +111,7 @@ export const faqs = [
         },
         {
             category: "Khác",
-            color: "from-pink-400 to-rose-500",
+            color: "bg-[var(--brand-500)]",
             questions: [
                 {
                     q: "Giờ làm việc của phòng khám?",

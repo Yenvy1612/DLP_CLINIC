@@ -1,9 +1,12 @@
-import { useState } from "react";import { NavLink, useNavigate } from "react-router-dom";
-import { authService } from "../../api/services";
+import { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { authService } from "../../api";
+import { getRoleHomePath, resolveUserRole, setCurrentUser } from "../../utils/authUtils";
 
 export default function Login() {
-    const [role, setRole] = useState("user");
     const [form, setForm] = useState({ email: "", password: "" });
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState("");
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -12,101 +15,94 @@ export default function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const data = { 
-                email: form.email, 
-                password: form.password 
-            }
-            const res = await authService.login(data);
-            
-            console.log("Login OK:", res);
-            const serverRole = res.roles[0].toLowerCase();
-            const selectedRole = role.toLowerCase();    
 
-            if (serverRole !== selectedRole) {
-                alert("Tài khoản không đúng vai trò đã chọn!");
-                return;
-            }
-
-            // Lưu token và điều hướng
-            localStorage.setItem("auth", JSON.stringify(res));
-            navigate("/");
+        if (submitting) {
+            return;
         }
-        catch (err) {
-            console.error("Login FAIL:", err.message);
-            alert(err.message);
+
+        try {
+            setSubmitting(true);
+            setError("");
+
+            const loginResponse = await authService.login({
+                email: form.email,
+                password: form.password,
+            });
+
+            // Login now relies on httpOnly cookies for auth, local snapshot is only for UI role rendering.
+            let authPayload = loginResponse;
+
+            if (!authPayload?.id || !resolveUserRole(authPayload)) {
+                try {
+                    const profile = await authService.me();
+                    authPayload = {
+                        ...authPayload,
+                        ...profile,
+                        originalRole: profile?.role || resolveUserRole(authPayload),
+                    };
+                } catch {
+                    // Keep login payload if profile endpoint is temporarily unavailable.
+                }
+            }
+
+            setCurrentUser(authPayload);
+
+            const role = resolveUserRole(authPayload);
+            navigate(getRoleHomePath(role), { replace: true });
+        } catch (err) {
+            setError(err.message || "Đăng nhập thất bại");
+        } finally {
+            setSubmitting(false);
         }
     };
 
     return (
-        <section className="flex min-h-screen items-center justify-center bg-gradient-to-tl from-sky-50 via-white to-sky-500" >
-            <div className="bg-white p-10 rounded-3xl shadow-2xl/100 shadow-sky-800 w-full max-w-md">
-                <h1 className="text-3xl font-bold text-center text-blue-900 mb-6">
-                    <span className="text-[#00278D]">Đăng nhập A<sup className="text-[#FEB802]">*</sup></span>
-                    <span className="text-sky-500">Care</span>
+        <section className="mx-auto flex min-h-[calc(100vh-8rem)] w-full max-w-7xl items-center justify-center px-4 py-10">
+            <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-8 shadow-lg md:p-10">
+                <h1 className="mb-2 text-center text-3xl font-bold text-[var(--brand-navy)]">
+                    Đăng nhập A<sup className="text-[var(--brand-600)]">*</sup>Care
                 </h1>
+                <p className="mb-8 text-center text-sm text-slate-500">Truy cập hệ thống theo đúng vai trò tài khoản của bạn.</p>
 
-                {/* --- chọn vai trò --- */}
-                <div className="flex justify-center mb-6 gap-4">
-                    <button
-                        onClick={() => setRole("user")}
-                        className={`px-5 py-2 rounded-full transition ${role === "user"
-                            ? "bg-sky-500 text-white"
-                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                            }`}
-                    >
-                        Người dùng
-                    </button>
-                    <button
-                        onClick={() => setRole("admin")}
-                        className={`px-5 py-2 rounded-full transition ${role === "admin"
-                            ? "bg-sky-500 text-white"
-                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                            }`}
-                    >
-                        Quản trị viên
-                    </button>
-                </div>
-
-                {/* --- form đăng nhập --- */}
-                <form onSubmit={handleSubmit} className="space-y-4 ">
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-slate-700 mb-1">Email</label>
+                        <label className="mb-1 block text-slate-700">Email</label>
                         <input
                             type="email"
                             name="email"
                             value={form.email}
                             onChange={handleChange}
-                            placeholder="Nhập email..."
-                            className="w-full px-4 py-2 transition duration-200 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-400 outline-none"
+                            placeholder="Nhap email"
+                            className="w-full rounded-lg border border-slate-300 px-4 py-2 outline-none transition focus:border-[var(--brand-500)] focus:ring-2 focus:ring-[var(--brand-200)]"
                             required
                         />
                     </div>
                     <div>
-                        <label className="block text-slate-700 mb-1">Mật khẩu</label>
+                        <label className="mb-1 block text-slate-700">Mật khẩu</label>
                         <input
                             type="password"
                             name="password"
                             value={form.password}
                             onChange={handleChange}
-                            placeholder="Nhập mật khẩu..."
-                            className="w-full px-4 py-2 transition duration-200 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-400 outline-none"
+                            placeholder="Nhap mat khau"
+                            className="w-full rounded-lg border border-slate-300 px-4 py-2 outline-none transition focus:border-[var(--brand-500)] focus:ring-2 focus:ring-[var(--brand-200)]"
                             required
                         />
                     </div>
 
+                    {error ? <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p> : null}
+
                     <button
                         type="submit"
-                        className="cursor-pointer w-full bg-sky-500 hover:bg-sky-500 mt-5 text-white font-semibold py-2.5 rounded-lg transition"
+                        disabled={submitting}
+                        className="mt-2 w-full cursor-pointer rounded-lg bg-[var(--brand-600)] py-2.5 font-semibold text-white transition hover:bg-[var(--brand-700)] disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                        Đăng nhập
+                        {submitting ? "Đang xử lý..." : "Đăng nhập"}
                     </button>
                 </form>
 
-                <div className="text-center text-slate-500 mt-6 text-md font-bold">
-                    {role === "user"
-                        ? <div>Bạn chưa có tài khoản? <NavLink to={"/register"} className="hover:text-sky-500">Đăng ký.</NavLink></div>
-                        : "Chỉ dành cho quản trị viên hệ thống."}
+                <div className="mt-6 text-center text-sm font-medium text-slate-500">
+                    Bạn chưa có tài khoản? <NavLink to="/register" className="text-[var(--brand-600)] hover:underline">Đăng ký</NavLink>
                 </div>
             </div>
         </section>
