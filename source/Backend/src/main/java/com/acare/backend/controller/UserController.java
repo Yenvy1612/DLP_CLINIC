@@ -1,6 +1,7 @@
 package com.acare.backend.controller;
 
 import com.acare.backend.dto.ApiResponse;
+import com.acare.backend.dto.user.UserCreateRequest;
 import com.acare.backend.entity.User;
 import com.acare.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 import java.util.Comparator;
 import java.util.List;
 
@@ -26,7 +29,19 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<User>> getUsers(
+            @RequestParam(required = false) String fullName,
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false) String email) {
+
+        if ((fullName != null && !fullName.isBlank())
+                || (role != null && !role.isBlank())
+                || (email != null && !email.isBlank())) {
+            List<User> users = userService.searchUsers(fullName, role, email);
+            users.sort(Comparator.comparing(User::getRole));
+            return ResponseEntity.ok(users);
+        }
+
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
@@ -50,9 +65,14 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(id, updateUser));
     }
 
+    @PostMapping
+    public ResponseEntity<ApiResponse<User>> createUser(@Valid @RequestBody UserCreateRequest request) {
+        return ResponseEntity.ok(userService.register(request));
+    }
+
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<User>> addUser(@RequestBody User user) {
-        return ResponseEntity.ok(userService.register(user));
+    public ResponseEntity<ApiResponse<User>> addUser(@Valid @RequestBody UserCreateRequest request) {
+        return createUser(request);
     }
 
     @DeleteMapping("/{id}")
@@ -65,9 +85,6 @@ public class UserController {
             @RequestParam(required = false) String fullName,
             @RequestParam(required = false) String role,
             @RequestParam(required = false) String email) {
-        
-        List<User> users = userService.searchUsers(fullName, role, email);
-        users.sort(Comparator.comparing(User::getRole));
-        return ResponseEntity.ok(users);
+        return getUsers(fullName, role, email);
     }
 }

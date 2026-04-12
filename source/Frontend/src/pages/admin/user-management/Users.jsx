@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
-import { FiEye, FiEdit2, FiTrash2 } from "react-icons/fi";import { useNavigate } from "react-router-dom";import { IoMdPersonAdd } from "react-icons/io";
-import { FiSearch } from "react-icons/fi";
-import { motion } from "framer-motion";
-import { userService } from "../../../api/services";
+import { useEffect, useRef, useState } from "react";
+import { FiEye, FiEdit2, FiTrash2, FiSearch, FiUserPlus } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import { userService } from "../../../api";
+import CustomDropdown from "../../../components/CustomDropdown";
+import ActionModal from "../../../components/ActionModal";
+import { animatePageEnter } from "../../../utils/animeAnimations";
 
 function AdminUserManagement() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const pageRef = useRef(null);
     
     // State cho search
     const [searchParams, setSearchParams] = useState({
@@ -15,6 +18,21 @@ function AdminUserManagement() {
         role: '',
         email: ''
     });
+    const [deleteTargetId, setDeleteTargetId] = useState(null);
+    const [deleting, setDeleting] = useState(false);
+    const [noticeModal, setNoticeModal] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        tone: "info",
+    });
+
+    useEffect(() => {
+        const animation = animatePageEnter(pageRef.current);
+        return () => {
+            animation?.pause?.();
+        };
+    }, []);
 
     // Lấy danh sách user
     useEffect(() => {
@@ -75,42 +93,54 @@ function AdminUserManagement() {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (confirm("Xác nhận xóa người dùng?")) {
-            try {
-                const response = await userService.remove(id);
-            }
-            catch (error) {
-                alert("Lỗi xóa người dùng");
-            }
+    const handleDelete = (id) => {
+        setDeleteTargetId(id);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!deleteTargetId) return;
+
+        setDeleting(true);
+        try {
+            await userService.remove(deleteTargetId);
+            setUsers((prev) => prev.filter((user) => user.id !== deleteTargetId));
+            setNoticeModal({
+                isOpen: true,
+                title: "Đã xóa người dùng",
+                message: "Người dùng đã được xóa thành công.",
+                tone: "success",
+            });
+        }
+        catch (error) {
+            setNoticeModal({
+                isOpen: true,
+                title: "Xóa thất bại",
+                message: error?.message || "Không thể xóa người dùng. Vui lòng thử lại.",
+                tone: "warning",
+            });
+        }
+        finally {
+            setDeleting(false);
+            setDeleteTargetId(null);
         }
     };
 
     return (
-        <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="min-h-screen bg-gradient-to-tl from-sky-50 via-white to-sky-500 px-6 py-8"
+        <div
+            ref={pageRef}
+            className="min-h-screen bg-[var(--surface)] px-6 py-8"
         >
             <div className="max-w-6xl mx-auto">
-                <motion.div 
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                    className="flex items-center justify-between"
-                >
+                <div className="flex items-center justify-between">
                     <h1 className="text-3xl font-bold text-[#00278D] mb-6 p-2 bg-white rounded-xl shadow-xl">Danh sách người dùng</h1>
-                    <button onClick={() => navigate("/admin/add-user")} className="flex items-center text-sm mb-6 bg-sky-500 text-white p-2 rounded-xl hover:shadow-xl hover:bg-sky-700 transition duration-300 cursor-pointer"> <IoMdPersonAdd />Thêm người dùng</button>
-                </motion.div>
+                    <button onClick={() => navigate("/admin/add-user")} className="flex items-center gap-2 text-sm mb-6 bg-[#00278D] text-white p-2 rounded-xl hover:shadow-xl hover:bg-[#001f5f] transition duration-300 cursor-pointer">
+                        <FiUserPlus />
+                        Thêm người dùng
+                    </button>
+                </div>
 
                 {/* Thanh tìm kiếm */}
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                    className="bg-white rounded-2xl shadow-xl p-6 mb-6"
-                >
+                <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
                     <div className="flex items-center gap-2 mb-4">
                         <FiSearch className="text-[#00278D]" size={20} />
                         <h2 className="text-lg font-semibold text-[#00278D]">Tìm kiếm người dùng</h2>
@@ -127,7 +157,7 @@ function AdminUserManagement() {
                                 value={searchParams.fullName}
                                 onChange={handleSearchChange}
                                 placeholder="Nhập tên người dùng..."
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00278D] focus:border-transparent"
                             />
                         </div>
 
@@ -142,7 +172,7 @@ function AdminUserManagement() {
                                 value={searchParams.email}
                                 onChange={handleSearchChange}
                                 placeholder="Nhập email..."
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00278D] focus:border-transparent"
                             />
                         </div>
 
@@ -151,18 +181,19 @@ function AdminUserManagement() {
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Vai trò
                             </label>
-                            <select
+                            <CustomDropdown
                                 name="role"
                                 value={searchParams.role}
                                 onChange={handleSearchChange}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
-                            >
-                                <option value="">Tất cả vai trò</option>
-                                <option value="ADMIN">Admin</option>
-                                <option value="DOCTOR">Bác sĩ</option>
-                                <option value="PATIENT">Bệnh nhân</option>
-                                <option value="STAFF">Nhân viên</option>
-                            </select>
+                                options={[
+                                    { value: "", label: "Tất cả vai trò" },
+                                    { value: "ADMIN", label: "Admin" },
+                                    { value: "DOCTOR", label: "Bác sĩ" },
+                                    { value: "PATIENT", label: "Bệnh nhân" },
+                                    { value: "STAFF", label: "Nhân viên" },
+                                ]}
+                                placeholder="Tất cả vai trò"
+                            />
                         </div>
                     </div>
 
@@ -170,28 +201,23 @@ function AdminUserManagement() {
                     <div className="flex gap-3 mt-4">
                         <button
                             onClick={handleSearch}
-                            className="bg-[#00278D] text-white px-6 py-2 rounded-lg hover:bg-sky-700 transition-colors font-medium flex items-center gap-2"
+                            className="bg-[#00278D] text-white px-6 py-2 rounded-lg hover:bg-[#001f5f] transition-colors font-medium flex items-center gap-2"
                         >
                             <FiSearch size={16} />
                             Tìm kiếm
                         </button>
                         <button
                             onClick={handleReset}
-                            className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors font-medium"
+                            className="bg-slate-700 text-white px-6 py-2 rounded-lg hover:bg-slate-800 transition-colors font-medium"
                         >
                             Đặt lại
                         </button>
                     </div>
-                </motion.div>
+                </div>
 
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.6 }}
-                    className="bg-white border border-slate-200 rounded-3xl shadow-xl overflow-hidden"
-                >
+                <div className="bg-white border border-slate-200 rounded-3xl shadow-xl overflow-hidden">
                     <table className="min-w-full text-sm">
-                        <thead className="bg-sky-50 text-[#00278D]">
+                        <thead className="bg-slate-100 text-[#00278D]">
                             <tr>
                                 <th className="px-6 py-3 text-left font-semibold">STT</th>
                                 <th className="px-6 py-3 text-left font-semibold">Email</th>
@@ -218,7 +244,7 @@ function AdminUserManagement() {
                                 users.map((u, idx) => (
                                     <tr
                                         key={u.id ?? idx}
-                                        className={`hover:bg-sky-50 transition ${idx % 2 === 0 ? "bg-white" : "bg-slate-50/60"
+                                        className={`hover:bg-slate-100 transition ${idx % 2 === 0 ? "bg-white" : "bg-slate-50/60"
                                             }`}
                                     >
                                         <td className="px-6 py-3 text-slate-800">{idx + 1}</td>
@@ -227,10 +253,10 @@ function AdminUserManagement() {
                                         <td className="px-6 py-3">
                                             <span
                                                 className={`px-2 py-1 rounded-full text-xs font-medium ${u.role === "ADMIN"
-                                                    ? "bg-red-50 text-red-600"
+                                                    ? "bg-slate-200 text-slate-800"
                                                     : u.role === "DOCTOR" || u.role === "STAFF"
-                                                        ? "bg-emerald-50 text-emerald-600"
-                                                        : "bg-sky-50 text-[#00278D]"
+                                                        ? "bg-[#001f5f]/10 text-[#001f5f]"
+                                                        : "bg-slate-100 text-slate-700"
                                                     }`}
                                             >
                                                 {u.role || "USER"}
@@ -239,19 +265,19 @@ function AdminUserManagement() {
                                         <td className="px-6 py-3 text-right flex justify-end gap-2">
                                             <button
                                                 onClick={() => navigate(`/admin/show-user/${u.id}`)}
-                                                className="px-3 py-1.5 rounded-xl border border-sky-300 border-2 cursor-pointer text-[#00278D] hover:bg-sky-50 flex items-center gap-1 text-xs transition"
+                                                className="px-3 py-1.5 rounded-xl border border-[#00278D]/40 border-2 cursor-pointer text-[#00278D] hover:bg-slate-100 flex items-center gap-1 text-xs transition"
                                             >
                                                 <FiEye size={14} /> Xem
                                             </button>
                                             <button
                                                 onClick={() => navigate(`/admin/edit-user/${u.id}`)}
-                                                className="px-3 py-1.5 rounded-xl border border-emerald-300 border-2 cursor-pointer text-emerald-600 hover:bg-emerald-50 flex items-center gap-1 text-xs transition"
+                                                className="px-3 py-1.5 rounded-xl border border-slate-400 border-2 cursor-pointer text-slate-700 hover:bg-slate-100 flex items-center gap-1 text-xs transition"
                                             >
                                                 <FiEdit2 size={14} /> Sửa
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(u.id)}
-                                                className="px-3 py-1.5 rounded-xl border border-red-300 border-2 cursor-pointer text-red-500 hover:bg-red-50 flex items-center gap-1 text-xs transition"
+                                                className="px-3 py-1.5 rounded-xl border border-slate-500 border-2 cursor-pointer text-slate-800 hover:bg-slate-200 flex items-center gap-1 text-xs transition"
                                             >
                                                 <FiTrash2 size={14} /> Xóa
                                             </button>
@@ -261,9 +287,36 @@ function AdminUserManagement() {
                             )}
                         </tbody>
                     </table>
-                </motion.div>
+                </div>
             </div>
-        </motion.div>
+
+            <ActionModal
+                isOpen={deleteTargetId !== null}
+                title="Xác nhận xóa người dùng"
+                message="Thao tác này không thể hoàn tác. Bạn có chắc chắn muốn xóa người dùng này?"
+                tone="warning"
+                confirmText="Xóa"
+                cancelText="Hủy"
+                showCancel
+                loading={deleting}
+                onConfirm={handleConfirmDelete}
+                onClose={() => {
+                    if (deleting) return;
+                    setDeleteTargetId(null);
+                }}
+                closeOnBackdrop={!deleting}
+            />
+
+            <ActionModal
+                isOpen={noticeModal.isOpen}
+                title={noticeModal.title}
+                message={noticeModal.message}
+                tone={noticeModal.tone}
+                confirmText="Đã hiểu"
+                onConfirm={() => setNoticeModal((prev) => ({ ...prev, isOpen: false }))}
+                onClose={() => setNoticeModal((prev) => ({ ...prev, isOpen: false }))}
+            />
+        </div>
     );
 }
 

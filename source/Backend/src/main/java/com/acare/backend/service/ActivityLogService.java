@@ -1,6 +1,5 @@
 package com.acare.backend.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -18,8 +17,7 @@ public class ActivityLogService {
     private final ActivityLogRepository repo;
 
     public void add(String type, String message) {
-        ActivityLog al = new ActivityLog(null, type, message, LocalDateTime.now());
-        repo.save(al);
+        repo.save(ActivityLog.of(type, message));
     }
 
     public List<ActivityLog> getRecent() {

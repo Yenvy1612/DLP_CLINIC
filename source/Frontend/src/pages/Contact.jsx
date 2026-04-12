@@ -38,25 +38,25 @@ function Contact() {
             icon: <FiMapPin size={28} />,
             title: "Địa chỉ",
             content: "96A Đ. Trần Phú, P. Mộ Lao, Hà Đông, Hà Nội",
-            color: "bg-sky-500"
+            color: "bg-[var(--brand-700)]"
         },
         {
             icon: <FiPhone size={28} />,
             title: "Điện thoại",
             content: "0379-330-721",
-            color: "bg-green-500"
+            color: "bg-[var(--brand-600)]"
         },
         {
             icon: <FiMail size={28} />,
             title: "Email",
             content: "darkisknight126@gmail.com",
-            color: "bg-purple-500"
+            color: "bg-[var(--brand-800)]"
         },
         {
             icon: <FiClock size={28} />,
             title: "Giờ làm việc",
             content: "T2-T6: 7:00-19:00 | T7: 7:00-17:00 | CN: 8:00-12:00",
-            color: "bg-orange-500"
+            color: "bg-[var(--brand-500)]"
         }
     ];
 
@@ -117,7 +117,7 @@ function Contact() {
                     initial="hidden"
                     animate="show"
                     variants={fadeUp}
-                    className="mb-14 rounded-[28px] bg-gradient-to-br from-[#03163d] via-[#06245f] to-[#0e4a82] p-10 text-center text-white shadow-2xl"
+                    className="mb-14 rounded-[28px] bg-[var(--brand-navy)] p-10 text-center text-white shadow-2xl"
                 >
                     <span className="font-bold text-sm uppercase tracking-[0.18em] text-cyan-200">
                         GET IN TOUCH
@@ -144,7 +144,7 @@ function Contact() {
                             variants={fadeUp}
                             className="rounded-2xl border border-cyan-100 bg-white p-6 text-center shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
                         >
-                            <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${item.color} flex items-center justify-center text-white mx-auto mb-4 shadow-lg`}>
+                            <div className={`w-16 h-16 rounded-full ${item.color} flex items-center justify-center text-white mx-auto mb-4 shadow-lg`}>
                                 {item.icon}
                             </div>
                             <h3 className="text-lg font-bold text-[#00278D] mb-2">

@@ -53,20 +53,33 @@ BƯỚC 2: IMPORT DATABASE
 BƯỚC 3: CHẠY BACKEND
 ================================================================================
 
-1. Sửa password MySQL:
-   - Mở file: Backend/src/main/resources/application.properties
-   - Tìm dòng: spring.datasource.password=123456
-   - Đổi 123456 thành root password MySQL của bạn
-   - Lưu file (Ctrl+S)
+1. Tạo file secrets JSON (cùng cấp với thư mục source):
+   - Tạo file: secrets.json
+   - Nội dung mẫu:
+     {
+       "APP_SECURITY_JWT_SECRET": "thay-secret-dai-it-nhat-32-ky-tu",
+       "DB_USERNAME": "root",
+       "DB_PASSWORD": "mat_khau_mysql",
+       "CORS_ALLOWED_ORIGINS": "http://localhost:5173",
+       "BOOTSTRAP_ADMIN_ENABLED": true,
+       "BOOTSTRAP_ADMIN_FULL_NAME": "System Administrator",
+       "BOOTSTRAP_ADMIN_EMAIL": "admin@acare.local",
+       "BOOTSTRAP_ADMIN_PHONE": "0900000001",
+       "BOOTSTRAP_ADMIN_ID_NUMBER": "ADMIN-0001",
+       "BOOTSTRAP_ADMIN_ADDRESS": "Astar Care Clinic",
+       "BOOTSTRAP_ADMIN_PASSWORD": "ChangeMe@123"
+     }
 
-2. Mở Terminal trong thư mục Backend:
+2. Đảm bảo file secrets.json KHÔNG đưa lên Git.
+
+3. Mở Terminal trong thư mục Backend:
    Cách 1: Shift + Chuột phải trong thư mục Backend → "Open PowerShell window here"
    Cách 2: Mở CMD/PowerShell → gõ: cd đường\dẫn\đến\Backend
 
-3. Chạy lệnh:
+4. Chạy lệnh:
    .\mvnw.cmd spring-boot:run
 
-4. Đợi thấy: "Started BackendApplication in X.XXX seconds"
+5. Đợi thấy: "Started BackendApplication in X.XXX seconds"
 
 GIỮ CỬA SỔ NÀY MỞ! KHÔNG TẮT!
 

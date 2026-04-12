@@ -5,10 +5,10 @@ import NotFound from "../pages/NotFound";
 import Login from "../pages/auth/Login";
 import Services from "../pages/Services";
 import Booking from "../pages/patient/Booking";
-import Profile from "../pages/Profile";
+import Payment from "../pages/patient/Payment";
 import EditProfile from "../pages/EditProfile";
 import Cart from "../pages/patient/Cart";
-import { getUserRole } from "../utils/authUtils";
+import { getRoleHomePath } from "../utils/authUtils";
 import HistoryPage from "../pages/patient/HistoryPage";
 import EditAppointment from "../pages/patient/EditAppointment";
 import Register from "../pages/auth/Register";
@@ -21,23 +21,30 @@ import AdminEditProfile from "../pages/admin/user-management/UpdateUser";
 import AdminShowProfile from "../pages/admin/user-management/ShowUser";
 import AdminServiceManagement from "../pages/admin/service-management/Services";
 import AddUser from "../pages/admin/user-management/AddUser";
-import AdminShowService from "../pages/admin/service-management/showService";
+import AdminShowService from "../pages/admin/service-management/ShowService";
 import AdminEditService from "../pages/admin/service-management/UpdateService";
 import AddService from "../pages/admin/service-management/AddService";
-import AdminRoomManagement from "../pages/admin/room-management/Rooms";
-import AddRoom from "../pages/admin/room-management/AddRoom";
-import EditRoom from "../pages/admin/room-management/UpdateRoom";
 import AdminAppointmentManagement from "../pages/admin/appointment-management/Appointments";
 import About from "../pages/About";
 import Instruction from "../pages/Instruction";
 import FAQ from "../pages/FAQ";
 import Contact from "../pages/Contact";
+import Forbidden from "../pages/Forbidden";
+import useAuthSnapshot from "../hooks/useAuthSnapshot";
+
+function PublicOnlyRoute() {
+    const { role, isLoggedIn } = useAuthSnapshot();
+    if (isLoggedIn) {
+        return <Navigate to={getRoleHomePath(role)} replace />;
+    }
+    return <Outlet />
+}
 
 function RequiredRole({ allowed }) {
-    const role = getUserRole();
-    if (!role) return <Navigate to="/login" replace />
-    if (allowed != role) return <Navigate to="/403" replace />
-    return <Outlet />
+    const { role, isLoggedIn } = useAuthSnapshot();
+    if (!isLoggedIn) return <Navigate to="/login" replace />;
+    if (!allowed.includes(role)) return <Navigate to="/403" replace />;
+    return <Outlet />;
 }
 
 const router = createBrowserRouter([
@@ -52,13 +59,14 @@ const router = createBrowserRouter([
             { path: "/contact", element: <Contact /> },
             //   { path: "/contact", element: <Contact /> },
             {
-                element: <RequiredRole allowed={"PATIENT"} />,
+                element: <RequiredRole allowed={["PATIENT"]} />,
                 children: [
                     {
                         path: "/patient", element: <Home />,
                         children: [
                             { path: "book", element: <Booking /> },
-                            { path: "profile", element: <Profile /> },
+                            { path: "payment", element: <Payment /> },
+                            { path: "profile", element: <EditProfile /> },
                             { path: "edit", element: <EditProfile /> },
                             { path: "cart", element: <Cart />, },
                             { path: "history", element: <HistoryPage /> },
@@ -68,12 +76,12 @@ const router = createBrowserRouter([
                 ]
             },
             {
-                element: <RequiredRole allowed={"DOCTOR"} />,
+                element: <RequiredRole allowed={["DOCTOR"]} />,
                 children: [
                     {
                         path: "/doctor", element: <Home />,
                         children: [
-                            { path: "profile", element: <Profile /> },
+                            { path: "profile", element: <EditProfile /> },
                             { path: "edit", element: <EditProfile /> },
                             { path: "schedule", element: <Schedule /> },
                             { path: "reports", element: <Statistic /> },
@@ -83,12 +91,14 @@ const router = createBrowserRouter([
                 ]
             },
             {
-                element: <RequiredRole allowed={"ADMIN"} />,
+                element: <RequiredRole allowed={["ADMIN"]} />,
                 children: [
                     {
                         path: "admin", element: <Home />,
                         children: [
                             { path: "dashboard", element: <Dashboard /> },
+                            { path: "profile", element: <AdminEditProfile /> },
+                            { path: "edit", element: <Navigate to="/admin/profile" replace /> },
                             { path: "users", element: <AdminUserManagement /> },
                             { path: "edit-user/:id", element: <AdminEditProfile /> },
                             { path: "show-user/:id", element: <AdminShowProfile /> },
@@ -96,9 +106,6 @@ const router = createBrowserRouter([
                             { path: "services", element: <AdminServiceManagement /> },
                             { path: "edit-service/:id", element: <AdminEditService /> },
                             { path: "add-service", element: <AddService /> },
-                            { path: "rooms", element: <AdminRoomManagement /> },
-                            { path: "add-room", element: <AddRoom /> },
-                            { path: "edit-room/:id", element: <EditRoom /> },
                             { path: "appointments", element: <AdminAppointmentManagement /> }
                         ]
                     }
@@ -107,8 +114,14 @@ const router = createBrowserRouter([
             { path: "show-service/:id", element: <AdminShowService /> },
         ],
     },
-    { path: "/login", element: <Login /> },
-    { path: "/register", element: <Register /> },
+    {
+        element: <PublicOnlyRoute />,
+        children: [
+            { path: "/login", element: <Login /> },
+            { path: "/register", element: <Register /> },
+        ],
+    },
+    { path: "/403", element: <Forbidden /> },
     { path: "*", element: <NotFound /> },
 ]);
 

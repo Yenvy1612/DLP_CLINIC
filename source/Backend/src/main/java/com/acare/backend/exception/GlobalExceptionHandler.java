@@ -1,11 +1,12 @@
 package com.acare.backend.exception;
 
-import com.acare.backend.dto.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.acare.backend.dto.ApiResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -20,6 +21,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleBadRequest(BadRequestException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.fail(400, ex.getMessage(), null));
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ApiResponse<Object>> handleConflict(ConflictException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.fail(409, ex.getMessage(), null));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

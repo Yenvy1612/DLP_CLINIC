@@ -30,8 +30,7 @@ const adminMenu = [
     { id: 1, to: "/admin/dashboard", name: "BẢNG ĐIỀU KHIỂN", hasArrow: false },
     { id: 2, to: "/admin/users", name: "NGƯỜI DÙNG", hasArrow: false },
     { id: 3, to: "/admin/services", name: "DỊCH VỤ", hasArrow: false },
-    { id: 4, to: "/admin/rooms", name: "PHÒNG", hasArrow: false },
-    { id: 5, to: "/admin/appointments", name: "LỊCH HẸN", hasArrow: false },
+    { id: 4, to: "/admin/appointments", name: "LỊCH HẸN", hasArrow: false },
 ];
 
 // Menu cho DOCTOR

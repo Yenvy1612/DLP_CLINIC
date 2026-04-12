@@ -1,8 +1,13 @@
 package com.acare.backend.config;
 
-import com.nimbusds.jose.jwk.source.ImmutableSecret;
-import com.nimbusds.jose.util.Base64;
-import lombok.RequiredArgsConstructor;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,19 +20,23 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
+import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.util.WebUtils;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import com.nimbusds.jose.util.Base64;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
@@ -44,14 +53,36 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/error", "/actuator/health", "/api/auth/login", "/api/users/register").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/services/**", "/api/rooms/**", "/api/activities/recent").permitAll()
+                    .requestMatchers("/error", "/actuator/health", "/api/auth/login", "/api/auth/register", "/api/auth/refresh", "/api/auth/logout").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/services/**", "/api/activities/recent", "/api/specialties/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole("ADMIN", "DOCTOR", "PATIENT")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/users/**").hasAnyRole("ADMIN", "DOCTOR", "PATIENT")
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
                         .requestMatchers("/api/appointments/**").hasAnyRole("ADMIN", "DOCTOR", "PATIENT")
+                        .requestMatchers("/api/medical-records/**").hasAnyRole("ADMIN", "DOCTOR", "PATIENT")
+                        .requestMatchers("/api/billing/**").hasAnyRole("ADMIN", "DOCTOR", "PATIENT")
                         .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .bearerTokenResolver(bearerTokenResolver())
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
         return http.build();
+    }
+
+    @Bean
+    public BearerTokenResolver bearerTokenResolver() {
+        DefaultBearerTokenResolver defaultResolver = new DefaultBearerTokenResolver();
+        defaultResolver.setAllowUriQueryParameter(false);
+
+        return request -> {
+            String cookieName = props.getCookie().getAccessTokenName();
+            if (cookieName != null && !cookieName.isBlank()) {
+                var cookie = WebUtils.getCookie(request, cookieName);
+                if (cookie != null && cookie.getValue() != null && !cookie.getValue().isBlank()) {
+                    return cookie.getValue();
+                }
+            }
+            return defaultResolver.resolve(request);
+        };
     }
 
     @Bean

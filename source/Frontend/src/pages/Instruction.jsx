@@ -248,7 +248,7 @@ function Instruction() {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="mx-auto mb-14 max-w-6xl rounded-[28px] bg-gradient-to-br from-[#03163d] via-[#06245f] to-[#0e4a82] p-10 text-center text-white shadow-2xl"
+                className="mx-auto mb-14 max-w-6xl rounded-[28px] bg-[var(--brand-navy)] p-10 text-center text-white shadow-2xl"
             >
                 <span className="font-bold text-sm uppercase tracking-[0.18em] text-cyan-200">
                     INSTRUCTION

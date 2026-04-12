@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 
@@ -25,9 +26,18 @@ public class ServiceController {
 
     private final ServiceService serviceService;
 
-    @GetMapping /* tạo đường dẫn, phương thức GET */
-    public ResponseEntity<List<Service>> getService() {
-        List<Service> services = serviceService.getAllServices();
+    @GetMapping
+    public ResponseEntity<List<Service>> getService(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice) {
+        List<Service> services;
+        if ((name != null && !name.isBlank()) || minPrice != null || maxPrice != null) {
+            services = serviceService.searchServices(name, minPrice, maxPrice);
+            services.sort(Comparator.comparing(Service::getPrice).reversed());
+        } else {
+            services = serviceService.getAllServices();
+        }
         return ResponseEntity.ok(services);
     }
 
@@ -54,10 +64,8 @@ public class ServiceController {
     @GetMapping("/search")
     public ResponseEntity<List<Service>> searchService(
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice) {
-        List<Service> services = serviceService.searchServices(name, minPrice, maxPrice);
-        services.sort(Comparator.comparing((Service s) -> s.getPrice()).reversed());
-        return ResponseEntity.ok(services);
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice) {
+        return getService(name, minPrice, maxPrice);
     }
 }

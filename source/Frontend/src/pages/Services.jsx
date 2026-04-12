@@ -3,7 +3,9 @@ import { motion } from "framer-motion";
 import { HiOutlineArrowRight } from "react-icons/hi";
 import { FiSearch } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { serviceService } from "../api/services";
+import { serviceService } from "../api";
+import ActionModal from "../components/ActionModal";
+import { getUserRole, isLoggedIn } from "../utils/authUtils";
 
 const container = {
     hidden: { opacity: 0 },
@@ -30,6 +32,16 @@ function Services() {
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [actionModal, setActionModal] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        tone: "info",
+        confirmText: "Đóng",
+        cancelText: "Hủy",
+        showCancel: false,
+        onConfirm: null,
+    });
     const navigate = useNavigate();
 
     // State cho search
@@ -100,6 +112,46 @@ function Services() {
         }
     };
 
+    const closeActionModal = () => {
+        setActionModal((prev) => ({ ...prev, isOpen: false, onConfirm: null }));
+    };
+
+    const handleBookService = (serviceId) => {
+        const role = getUserRole();
+
+        if (!isLoggedIn()) {
+            setActionModal({
+                isOpen: true,
+                title: "Cần đăng nhập",
+                message: "Bạn cần đăng nhập tài khoản bệnh nhân trước khi đặt lịch hẹn.",
+                tone: "warning",
+                confirmText: "Đăng nhập",
+                cancelText: "Để sau",
+                showCancel: true,
+                onConfirm: () => navigate("/login"),
+            });
+            return;
+        }
+
+        if (role !== "PATIENT") {
+            setActionModal({
+                isOpen: true,
+                title: "Không thể đặt lịch",
+                message: "Chỉ tài khoản bệnh nhân mới có thể đặt lịch hẹn từ trang dịch vụ.",
+                tone: "warning",
+                confirmText: "Đã hiểu",
+                cancelText: "Hủy",
+                showCancel: false,
+                onConfirm: null,
+            });
+            return;
+        }
+
+        navigate("/patient/book", {
+            state: { preselectedServiceId: String(serviceId) },
+        });
+    };
+
     if (loading) return (
         <div className="min-h-screen bg-[var(--surface)] flex items-center justify-center">
             <div className="text-center p-4 text-slate-600">Đang tải dịch vụ...</div>
@@ -124,7 +176,7 @@ function Services() {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="mx-auto mb-8 max-w-6xl rounded-[28px] bg-gradient-to-br from-[#03163d] via-[#06245f] to-[#0e4a82] p-8 text-center text-4xl font-semibold text-white shadow-2xl"
+                className="mx-auto mb-8 max-w-6xl rounded-[28px] bg-[var(--brand-navy)] p-8 text-center text-4xl font-semibold text-white shadow-2xl"
             >
                 Danh mục dịch vụ
             </motion.h1>
@@ -222,7 +274,7 @@ function Services() {
                             variants={item}
                             className="group flex flex-col justify-between rounded-2xl border border-cyan-100 bg-white p-8 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
                         >
-                            <div className="mb-8 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tl from-sky-400 via-sky-600 to-sky-500 text-3xl text-white">
+                            <div className="mb-8 flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--brand-600)] text-3xl text-white">
                                 {s.icon || (s.name || "S").charAt(0)}
                             </div>
 
@@ -232,11 +284,22 @@ function Services() {
 
                             <p className="text-lg leading-snug text-slate-500 mb-4">Giá dịch vụ: {s.price.toLocaleString("vi-VN")} ₫</p>
 
-                            <div
-                                onClick={() => navigate(`/show-service/${s.id}`)}
-                                className="flex h-12 cursor-pointer items-center justify-center rounded-xl bg-cyan-50 text-sky-700 transition-all duration-300 hover:bg-[var(--brand-navy)] hover:text-white"
-                            >
-                                Read more <HiOutlineArrowRight className="ml-2 h-5 w-5" />
+                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                <button
+                                    type="button"
+                                    onClick={() => navigate(`/show-service/${s.id}`)}
+                                    className="flex h-12 cursor-pointer items-center justify-center rounded-xl bg-cyan-50 text-sky-700 transition-all duration-300 hover:bg-[var(--brand-navy)] hover:text-white"
+                                >
+                                    Read more <HiOutlineArrowRight className="ml-2 h-5 w-5" />
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => handleBookService(s.id)}
+                                    className="flex h-12 cursor-pointer items-center justify-center rounded-xl bg-[#00278D] text-white transition-all duration-300 hover:bg-[#001f5f]"
+                                >
+                                    Đặt lịch hẹn
+                                </button>
                             </div>
                         </motion.div>
                     ))}
@@ -246,6 +309,18 @@ function Services() {
                     Không có dịch vụ nào
                 </p>
             )}
+
+            <ActionModal
+                isOpen={actionModal.isOpen}
+                title={actionModal.title}
+                message={actionModal.message}
+                tone={actionModal.tone}
+                confirmText={actionModal.confirmText}
+                cancelText={actionModal.cancelText}
+                showCancel={actionModal.showCancel}
+                onClose={closeActionModal}
+                onConfirm={actionModal.onConfirm || closeActionModal}
+            />
         </motion.div>
     );
 }

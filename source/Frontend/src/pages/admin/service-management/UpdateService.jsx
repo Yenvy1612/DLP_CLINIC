@@ -1,43 +1,60 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { serviceService } from "../../../api/services";
-
-const container = {
-    hidden: { opacity: 0, y: 20 },
-    show: {
-        opacity: 1, y: 0,
-        transition: { duration: 0.2, ease: "easeOut", when: "beforeChildren", staggerChildren: 0.05 }
-    }
-};
-const item = {
-    hidden: { opacity: 0, y: 14 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } }
-};
+import { serviceService, specialtyService } from "../../../api";
+import CustomDropdown from "../../../components/CustomDropdown";
+import ActionModal from "../../../components/ActionModal";
+import { animatePageEnter } from "../../../utils/animeAnimations";
 
 
 function AdminEditService() {
     const navigate = useNavigate();
     const { id } = useParams();
+    const pageRef = useRef(null);
 
     const [form, setForm] = useState({
         name: "",
         price: "",
-        description: ""
+        description: "",
+        specialtyId: "",
+        durationMin: 30,
     });
 
+    const [specialties, setSpecialties] = useState([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [pendingUpdate, setPendingUpdate] = useState(null);
+    const [resultModal, setResultModal] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        tone: "info",
+        nextAction: "none",
+    });
+
+    useEffect(() => {
+        const animation = animatePageEnter(pageRef.current);
+        return () => {
+            animation?.pause?.();
+        };
+    }, []);
 
     useEffect(() => {
         (async () => {
             try {
-                const data = await serviceService.getById(id);
+                const [data, specialtyData] = await Promise.all([
+                    serviceService.getById(id),
+                    specialtyService.getAll(),
+                ]);
+
+                setSpecialties(Array.isArray(specialtyData) ? specialtyData : []);
                 setForm({
                     name: data?.name,
                     price: data?.price,
-                    description: data?.description
+                    description: data?.description,
+                    specialtyId: data?.specialtyId ? String(data.specialtyId) : "",
+                    durationMin: data?.durationMin || 30,
                 })
             }
             catch (e) {
@@ -58,113 +75,183 @@ function AdminEditService() {
 
     const onSubmit = async (e) => {
         e.preventDefault();
+        setError("");
+
+        if (!form.specialtyId) {
+            setError("Vui lòng chọn chuyên khoa");
+            return;
+        }
+
+        const data = {
+            name: form.name,
+            price: Number(form.price),
+            description: form.description,
+            specialtyId: Number(form.specialtyId),
+            durationMin: Number(form.durationMin),
+        };
+
+        setPendingUpdate(data);
+        setConfirmOpen(true);
+    };
+
+    const handleConfirmUpdate = async () => {
+        if (!pendingUpdate) return;
+
         setSaving(true);
         setError("");
         try {
-            const data = {
-                name: form.name,
-                price: form.price,
-                description: form.description
-            };
-
-            if (confirm("Xác nhận lưu thay đổi")) {
-                await serviceService.update(id, data);
-                navigate("/admin/services");
-            }
-
-        }
-        catch (e) {
+            await serviceService.update(id, pendingUpdate);
+            setConfirmOpen(false);
+            setResultModal({
+                isOpen: true,
+                title: "Lưu thành công",
+                message: "Thông tin dịch vụ đã được cập nhật.",
+                tone: "success",
+                nextAction: "back-services",
+            });
+        } catch (e) {
             setError(e?.message || "Cập nhật thất bại");
-        }
-        finally {
+            setConfirmOpen(false);
+        } finally {
             setSaving(false);
+            setPendingUpdate(null);
+        }
+    };
+
+    const closeConfirmModal = () => {
+        if (saving) return;
+        setConfirmOpen(false);
+        setPendingUpdate(null);
+    };
+
+    const closeResultModal = () => {
+        const { nextAction } = resultModal;
+        setResultModal((prev) => ({ ...prev, isOpen: false, nextAction: "none" }));
+
+        if (nextAction === "back-services") {
+            navigate("/admin/services");
         }
     };
 
     if (loading) return <div className="p-4 text-center">Đang tải...</div>;
     return (
-        <div className="bg-sky-500">
-            <motion.section
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.35, ease: "easeOut" }}
-                className="bg-gradient-to-tl from-sky-50 via-white to-sky-500 min-h-screen p-10"
-            >
-                <motion.div
-                    variants={container}
-                    initial="hidden"
-                    animate="show"
-                    className="w-[50vw] mx-auto p-6 rounded-4xl bg-white shadow-2xl"
-                >
-                    <motion.h1 variants={item} className="w-full p-3 rounded-xl text-3xl font-semibold mb-3 text-[#00278D]">
+        <div ref={pageRef} className="bg-slate-100">
+            <section className="bg-[var(--surface)] min-h-screen p-10">
+                <div className="w-[50vw] mx-auto p-6 rounded-4xl bg-white shadow-2xl">
+                    <h1 className="w-full p-3 rounded-xl text-3xl font-semibold mb-3 text-[#00278D]">
                         Chỉnh sửa dịch vụ
-                    </motion.h1>
+                    </h1>
 
                     {error && (
-                        <motion.div
-                            variants={item}
-                            className="mb-3 text-red-500"
-                            initial={{ opacity: 0, y: 6 }}
-                            animate={{ opacity: 1, y: 0 }}
-                        >
+                        <div className="mb-3 text-slate-700">
                             {error}
-                        </motion.div>
+                        </div>
                     )}
 
-                    <motion.form
+                    <form
                         onSubmit={onSubmit}
                         className="space-y-3 md:grid md:grid-cols-2 md:gap-5"
                     >
-                        <motion.div variants={item}>
+                        <div>
                             <label className="block text-slate-800 text-sm mb-1">Tên dịch vụ</label>
                             <input
                                 name="name" value={form.name} onChange={onChange} required
-                                className="w-full text-slate-800 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition duration-200"
+                                className="w-full text-slate-800 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00278D] focus:border-transparent transition duration-200"
                             />
-                        </motion.div>
+                        </div>
 
-                        <motion.div variants={item}>
+                        <div>
                             <label className="block text-slate-800 text-sm mb-1">Giá dịch vụ</label>
                             <input
+                                type="number"
+                                min="0"
+                                step="1000"
                                 name="price" value={form.price} onChange={onChange} required
-                                className="w-full text-slate-800 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition duration-200"
+                                className="w-full text-slate-800 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00278D] focus:border-transparent transition duration-200"
                             />
-                        </motion.div>
+                        </div>
 
-                        <motion.div variants={item}>
+                        <div>
+                            <label className="block text-slate-800 text-sm mb-1">Chuyên khoa dịch vụ</label>
+                            <CustomDropdown
+                                name="specialtyId"
+                                value={form.specialtyId}
+                                onChange={onChange}
+                                required
+                                options={specialties.map((specialty) => ({
+                                    value: String(specialty.id),
+                                    label: `${specialty.name} (${specialty.code})`,
+                                }))}
+                                placeholder="-- Chọn chuyên khoa --"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-slate-800 text-sm mb-1">Thời lượng khám (phút)</label>
+                            <input
+                                type="number"
+                                min="10"
+                                step="5"
+                                name="durationMin"
+                                value={form.durationMin}
+                                onChange={onChange}
+                                required
+                                className="w-full text-slate-800 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00278D] focus:border-transparent transition duration-200"
+                            />
+                        </div>
+
+                        <div>
                             <label className="block text-slate-800 text-sm mb-1">Thông tin dịch vụ</label>
                             <textarea
                                 name="description" value={form.description} onChange={onChange} required
-                                className="w-full text-slate-800 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition duration-200">
+                                className="w-full text-slate-800 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00278D] focus:border-transparent transition duration-200">
                             </textarea>
-                        </motion.div>
+                        </div>
 
-                        <motion.div variants={item} className="pt-2 flex gap-2 col-span-2">
-                            <motion.button
+                        <div className="pt-2 flex gap-2 col-span-2">
+                            <button
                                 type="submit"
                                 disabled={saving}
-                                whileHover={{ y: -2 }}
-                                whileTap={{ scale: 0.98 }}
-                                transition={{ type: "spring", stiffness: 180, damping: 20 }}
-                                className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white disabled:opacity-60 transition duration-400 cursor-pointer"
+                                className="px-4 py-2 rounded-xl bg-[#00278D] hover:bg-[#001f5f] text-white disabled:opacity-60 transition duration-400 cursor-pointer"
                             >
                                 {saving ? "Đang lưu..." : "Lưu thay đổi"}
-                            </motion.button>
+                            </button>
 
-                            <motion.button
+                            <button
                                 type="button"
                                 onClick={() => navigate("/admin/services")}
-                                whileHover={{ y: -2 }}
-                                whileTap={{ scale: 0.98 }}
-                                transition={{ type: "spring", stiffness: 180, damping: 20 }}
-                                className="px-4 py-2 cursor-pointer rounded-xl bg-rose-400 text-white hover:bg-rose-500 transition duration-400"
+                                className="px-4 py-2 cursor-pointer rounded-xl bg-slate-700 text-white hover:bg-slate-800 transition duration-400"
                             >
                                 Huỷ
-                            </motion.button>
-                        </motion.div>
-                    </motion.form>
-                </motion.div>
-            </motion.section>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <ActionModal
+                isOpen={confirmOpen}
+                title="Xác nhận lưu thay đổi"
+                message="Thông tin dịch vụ sẽ được cập nhật ngay sau khi xác nhận."
+                tone="warning"
+                confirmText="Lưu thay đổi"
+                cancelText="Hủy"
+                showCancel
+                loading={saving}
+                onConfirm={handleConfirmUpdate}
+                onClose={closeConfirmModal}
+                closeOnBackdrop={!saving}
+            />
+
+            <ActionModal
+                isOpen={resultModal.isOpen}
+                title={resultModal.title}
+                message={resultModal.message}
+                tone={resultModal.tone}
+                confirmText="Đã hiểu"
+                onConfirm={closeResultModal}
+                onClose={closeResultModal}
+            />
         </div>
     );
 }

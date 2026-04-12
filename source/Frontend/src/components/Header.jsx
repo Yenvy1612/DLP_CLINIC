@@ -6,45 +6,94 @@ import { headerListByRole } from "../data/headerList";
 import { useSidebarContext } from "../contexts/SideBarContext";
 import logo from "../assets/images/logo/logo_png.png";
 import { NavLink, useNavigate } from "react-router-dom";
-import { getUserId, getUserRole } from "../utils/authUtils";
-import { useEffect, useState } from "react";
-import { appointmentService } from "../api/services";
+import { useEffect, useRef, useState } from "react";
+import { appointmentService, authService } from "../api";
+import useAuthSnapshot from "../hooks/useAuthSnapshot";
+import { clearCurrentUser, getRoleLabel, getRoleProfilePath } from "../utils/authUtils";
 
 function Header() {
     const { toggleSidebar } = useSidebarContext();
+    const { role: currentRole, userId, isLoggedIn } = useAuthSnapshot();
 
     const navigate = useNavigate();
-    /* lấy role để load menu */
-    const role = getUserRole() || "GUEST";
-    const headerList = headerListByRole[role];
+    const role = currentRole || "GUEST";
+    const headerList = headerListByRole[role] || headerListByRole.GUEST;
     const [isFill, setIsFill] = useState(false);
+    const [showHamburger, setShowHamburger] = useState(false);
+    const containerRef = useRef(null);
+    const logoRef = useRef(null);
+    const navRef = useRef(null);
+    const rightRef = useRef(null);
 
-    /* kiểm tra xem giỏ hàng có trống không, nếu có icon rỗng, ngược lại là icon fill */
     useEffect(() => {
+        if (role !== "PATIENT" || !userId) {
+            setIsFill(false);
+            return;
+        }
+
         const getPendingAppointments = async () => {
             try {
-                const patientId = getUserId();
-                if (patientId != null) {
-                    const pendingAppointments = await appointmentService.pendingByPatientId(patientId);
-                    pendingAppointments.length >= 1 ? setIsFill(true) : setIsFill(false);
-                }
+                const pendingAppointments = await appointmentService.pendingByPatientId(userId);
+                setIsFill(pendingAppointments.length >= 1);
             }
             catch (err) {
-                console.log(err.message);
+                setIsFill(false);
             }
         }
         getPendingAppointments();
-    }, []);
+    }, [role, userId]);
+
+    useEffect(() => {
+        const updateLayout = () => {
+            if (typeof window === "undefined") return;
+
+            if (window.innerWidth < 768) {
+                setShowHamburger(true);
+                return;
+            }
+
+            const container = containerRef.current;
+            const logoNode = logoRef.current;
+            const navNode = navRef.current;
+            const rightNode = rightRef.current;
+
+            if (!container || !logoNode || !navNode || !rightNode) {
+                setShowHamburger(false);
+                return;
+            }
+
+            const availableWidth = container.clientWidth;
+            const requiredWidth = logoNode.scrollWidth + navNode.scrollWidth + rightNode.scrollWidth + 64;
+            setShowHamburger(requiredWidth > availableWidth);
+        };
+
+        updateLayout();
+        window.addEventListener("resize", updateLayout);
+        return () => window.removeEventListener("resize", updateLayout);
+    }, [isLoggedIn, role, isFill, headerList.length]);
+
+    const handleLogout = async () => {
+        try {
+            await authService.logout();
+        } catch {
+            // Continue local cleanup even if API logout fails.
+        } finally {
+            clearCurrentUser();
+            window.location.replace("/");
+        }
+    };
+
+    const roleProfilePath = getRoleProfilePath(role);
 
 
     return (
-        <header className="sticky top-0 z-20 border-b border-cyan-100 bg-white/95 backdrop-blur">
-            <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 md:px-8">
-            <img src={logo} alt="logo" className="logo h-28 w-44 bg-cover cursor-pointer object-contain" onClick={() => navigate("/")} />
-            <div className="header-menu hidden flex-wrap gap-x-8 text-[#00278D] md:flex">
+        <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
+            <div ref={containerRef} className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 md:px-8">
+            <img ref={logoRef} src={logo} alt="logo" className="logo h-28 w-44 bg-cover cursor-pointer object-contain" onClick={() => navigate("/")} />
+            <div ref={navRef} className={`header-menu ${showHamburger ? 'hidden' : 'hidden md:flex'} flex-wrap gap-x-8 text-[var(--brand-navy)]`}>
                 {headerList.map((item) => (
                     <div key={item.id} className="header-items relative group">
-                        <NavLink to={item.to} className={({ isActive }) => `${isActive ? 'text-sky-500' : ''} font-extrabold flex items-center gap-1 hover:text-sky-500 transition-colors font-bold`}>
+                        <NavLink to={item.to} className={({ isActive }) => `${isActive ? 'text-[var(--brand-600)]' : ''} font-semibold flex items-center gap-1 hover:text-[var(--brand-600)] transition-colors`}>
                             {item.name}
                             {item.hasArrow && (
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -74,8 +123,7 @@ function Header() {
                                         <li key={c.id} className="relative group/item">
                                             <NavLink
                                                 to={c.to}
-                                                className={({ isActive }) => `${isActive ? 'text-sky-500' : ''} font-extrabold flex items-center justify-between gap-3 px-4 py-2.5 text-[15px] text-[#00278D] transition-colors 
-                                                hover:text-sky-500 hover:bg-slate-100`}
+                                                    className={({ isActive }) => `${isActive ? 'text-[var(--brand-600)]' : ''} font-medium flex items-center justify-between gap-3 px-4 py-2.5 text-[15px] text-[var(--brand-navy)] transition-colors hover:text-[var(--brand-600)] hover:bg-slate-100`}
                                                 role="menuitem"
                                             >
                                                 {c.label}
@@ -94,18 +142,44 @@ function Header() {
                     </div>
                 ))}
             </div>
-            <div className="other-header-items flex items-center gap-x-4 text-sky-500">
+            <div ref={rightRef} className="other-header-items flex items-center gap-x-4 text-[var(--brand-600)]">
                 {role == "PATIENT" ? (<div className="hidden cursor-pointer text-xl md:block"><NavLink to={"/patient/cart"}>{!isFill ? <FiShoppingCart /> : <BsFillCartCheckFill />}</NavLink></div>) : ""}
                 <div className="phone gap-x-2 hidden md:flex">
-                    <div className="text-xl w-11 h-11 flex justify-center items-center rounded-full p-3 border border-cyan-200 bg-cyan-50 text-sky-500">
+                    <div className="text-xl w-11 h-11 flex justify-center items-center rounded-full p-3 border border-slate-200 bg-slate-100 text-[var(--brand-600)]">
                         <TbPhone />
                     </div>
                     <div className="flex flex-col pr-2">
                         <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Emergency Line</p>
-                        <a href="tel:0379330721" className="text-lg font-bold text-[#00278D] cursor-pointer">+84-379-330-721</a>
+                        <a href="tel:0379330721" className="text-lg font-bold text-[var(--brand-navy)] cursor-pointer">+84-379-330-721</a>
                     </div>
                 </div>
-                <button onClick={toggleSidebar} className="text-2xl border border-gray-300 rounded-sm p-2 cursor-pointer hover:border-sky-500 transition duration-500 ease-in-out">
+                <div className="hidden items-center gap-2 md:flex">
+                    {isLoggedIn ? (
+                        <>
+                            <button
+                                onClick={() => navigate(roleProfilePath)}
+                                className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-semibold text-[var(--brand-navy)] hover:border-[var(--brand-500)] hover:text-[var(--brand-600)]"
+                            >
+                                {getRoleLabel(role)}
+                            </button>
+                            <button
+                                onClick={handleLogout}
+                                className="rounded-lg bg-[var(--brand-600)] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[var(--brand-700)]"
+                            >
+                                Đăng xuất
+                            </button>
+                        </>
+                    ) : (
+                        <button
+                            onClick={() => navigate("/login")}
+                            className="rounded-lg bg-[var(--brand-600)] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[var(--brand-700)]"
+                        >
+                            Đăng nhập
+                        </button>
+                    )}
+                </div>
+
+                <button onClick={toggleSidebar} className={`${showHamburger ? 'inline-flex' : 'hidden'} text-2xl border border-gray-300 rounded-sm p-2 cursor-pointer hover:border-[var(--brand-500)] transition duration-500 ease-in-out`}>
                     <RiMenuFill />
                 </button>
             </div>

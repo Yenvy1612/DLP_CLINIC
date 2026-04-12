@@ -1,11 +1,21 @@
 import { useState, useEffect } from "react";
 import { FaChartSimple } from "react-icons/fa6";
 import { FaTableCells } from "react-icons/fa6";
-import { appointmentService, serviceService } from "../../../api/services";
+import {
+    ResponsiveContainer,
+    LineChart,
+    CartesianGrid,
+    XAxis,
+    YAxis,
+    Tooltip,
+    Legend,
+    Line,
+} from "recharts";
+import { appointmentService, serviceService } from "../../../api";
 
 function DashboardReportTable() {
     const [data, setData] = useState([]);
-    const [viewMode, setViewMode] = useState('chart'); // 'chart' hoặc 'table'
+    const [viewMode, setViewMode] = useState('chart');
     const [loading, setLoading] = useState(true);
     const [month, setMonth] = useState("--");
     const [year, setYear] = useState("--");
@@ -45,8 +55,9 @@ function DashboardReportTable() {
                         
                         // Lấy giá dịch vụ
                         try {
-                            const serviceId = parseInt(apt.note);
-                            if (!isNaN(serviceId)) {
+                            const rawServiceId = apt.serviceId ?? apt.note;
+                            const serviceId = Number.parseInt(rawServiceId, 10);
+                            if (!Number.isNaN(serviceId)) {
                                 const service = await serviceService.getById(serviceId);
                                 if (service && service.price) {
                                     dailyStats[dateKey].revenue += service.price;

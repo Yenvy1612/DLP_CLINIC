@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { roomService, serviceService, userService } from "../../../api/services";
+import { serviceService, userService } from "../../../api";
 
 function AppointmentLine({ a, idx }) {
 
     const [doctor, setDoctor] = useState({});
     const [patient, setPatient] = useState({});
     const [service, setService] = useState({});
-    const [room, setRoom] = useState({});
 
     const convertTimeFormat = (a) => {
         var res = "";
@@ -24,18 +23,16 @@ function AppointmentLine({ a, idx }) {
 
         const fetchRelated = async () => {
             try {
-                const serviceId = Number.parseInt(a.note, 10);
-                const [doctorData, patientData, roomData, serviceData] = await Promise.all([
+                const serviceId = Number.parseInt(a.serviceId ?? a.note, 10);
+                const [doctorData, patientData, serviceData] = await Promise.all([
                     userService.getById(a.doctorId),
                     userService.getById(a.patientId),
-                    roomService.getById(a.roomId),
                     Number.isNaN(serviceId) ? Promise.resolve(null) : serviceService.getById(serviceId),
                 ]);
 
                 if (!mounted) return;
                 setDoctor(doctorData || {});
                 setPatient(patientData || {});
-                setRoom(roomData || {});
                 setService(serviceData || {});
             } catch (error) {
                 console.log(error.message);
@@ -47,7 +44,7 @@ function AppointmentLine({ a, idx }) {
         return () => {
             mounted = false;
         };
-    }, [a.doctorId, a.patientId, a.roomId, a.note]);
+    }, [a.doctorId, a.patientId, a.serviceId, a.note]);
     return (
         <>
             <tr
@@ -58,7 +55,6 @@ function AppointmentLine({ a, idx }) {
                 <td className="px-6 py-3 text-slate-800">{idx + 1}</td>
                 <td className="px-6 py-3 text-slate-700">{doctor.fullName}</td>
                 <td className="px-6 py-3 text-left text-slate-700">{patient.fullName}</td>
-                <td className="px-6 py-3 text-left text-slate-700">{room.name}</td>
                 <td className="px-6 py-3 text-left text-slate-700">{service.name}</td>
                 <td className="px-6 py-3 text-left text-slate-700">{convertTimeFormat(a.startTime)}</td>
                 <td className="px-6 py-3 text-left text-slate-700">{convertTimeFormat(a.createdAt)}</td>

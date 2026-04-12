@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { MdOutlineCancel } from "react-icons/md";
 import { getUserId } from "../../utils/authUtils";
-import { appointmentService, userService } from "../../api/services";
+import { appointmentService, userService } from "../../api";
+import CustomDropdown from "../../components/CustomDropdown";
 
 const container = {
     hidden: { opacity: 0, y: 16 },
@@ -31,7 +31,7 @@ function PatientCard({ p }) {
             className="bg-white rounded-2xl border border-slate-100 shadow-md hover:shadow-lg transition duration-200 p-5"
         >
             <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center font-bold">
+                <div className="w-10 h-10 rounded-full bg-slate-200 text-[#00278D] flex items-center justify-center font-bold">
                     {p.fullName?.charAt(0) ?? "?"}
                 </div>
                 <h3 className="text-lg font-semibold text-[#00278D]">{p.fullName || "—"}</h3>
@@ -140,7 +140,7 @@ function Patients() {
     }, [patients, q, sortBy]);
 
     return (
-        <div className="bg-gradient-to-tl from-sky-50 via-white to-sky-500 min-h-screen p-6 md:p-10">
+        <div className="bg-[var(--surface)] min-h-screen p-6 md:p-10">
             <div className="max-w-7xl mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: -8 }}
@@ -164,20 +164,21 @@ function Patients() {
                         value={q}
                         onChange={(e) => setQ(e.target.value)}
                         placeholder="Tìm theo tên / CCCD / SĐT…"
-                        className="w-full border border-slate-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00278D]"
                     />
                 </motion.div>
                 <motion.div variants={item} className="flex items-center gap-2">
                     <span className="text-slate-600 text-sm">Sắp xếp:</span>
-                    <select
+                    <CustomDropdown
                         value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                        className="border border-slate-200 text-slate-600 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                    >
-                        <option value="name" >Theo tên</option>
-                        <option value="dob">Theo ngày sinh</option>
-                        <option value="id">Theo CCCD</option>
-                    </select>
+                        onValueChange={setSortBy}
+                        options={[
+                            { value: "name", label: "Theo tên" },
+                            { value: "dob", label: "Theo ngày sinh" },
+                            { value: "id", label: "Theo CCCD" },
+                        ]}
+                        className="min-w-48"
+                    />
                 </motion.div>
             </motion.div>
 
@@ -187,7 +188,7 @@ function Patients() {
                     {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
                 </div>
             ) : err ? (
-                <div className="text-red-600">{err}</div>
+                <div className="text-slate-700">{err}</div>
             ) : filtered.length ? (
                 <motion.div
                     variants={container}

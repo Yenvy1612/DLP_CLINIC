@@ -15,9 +15,10 @@ import java.util.List;
 public class JwtService {
 
     private final JwtEncoder jwtEncoder;
+    private final JwtDecoder jwtDecoder;
     private final AppSecurityProperties securityProperties;
 
-    public String generateToken(String subject, List<String> roles) {
+    public String generateAccessToken(String subject, List<String> roles) {
         Instant now = Instant.now();
         Instant expiresAt = now.plus(securityProperties.getJwt().getExpirationMinutes(), ChronoUnit.MINUTES);
 
@@ -27,13 +28,39 @@ public class JwtService {
                 .expiresAt(expiresAt)
                 .subject(subject)
                 .claim("roles", roles)
+                .claim("token_type", "ACCESS")
                 .build();
 
         JwsHeader headers = JwsHeader.with(MacAlgorithm.HS256).build();
         return jwtEncoder.encode(JwtEncoderParameters.from(headers, claims)).getTokenValue();
     }
 
-    public long getExpirationSeconds() {
+    public String generateRefreshToken(String subject, Long userId) {
+        Instant now = Instant.now();
+        Instant expiresAt = now.plus(securityProperties.getJwt().getRefreshExpirationDays(), ChronoUnit.DAYS);
+
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("acare-backend")
+                .issuedAt(now)
+                .expiresAt(expiresAt)
+                .subject(subject)
+                .claim("user_id", userId)
+                .claim("token_type", "REFRESH")
+                .build();
+
+        JwsHeader headers = JwsHeader.with(MacAlgorithm.HS256).build();
+        return jwtEncoder.encode(JwtEncoderParameters.from(headers, claims)).getTokenValue();
+    }
+
+    public Jwt decode(String token) {
+        return jwtDecoder.decode(token);
+    }
+
+    public long getAccessExpirationSeconds() {
         return securityProperties.getJwt().getExpirationMinutes() * 60;
+    }
+
+    public long getRefreshExpirationSeconds() {
+        return securityProperties.getJwt().getRefreshExpirationDays() * 24 * 60 * 60;
     }
 }

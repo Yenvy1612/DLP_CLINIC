@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { motion, } from "framer-motion";
 import doctorImg from "../../../assets/images/doctor/doctor.jpg";
 import patientImg from "../../../assets/images/doctor/patient.jpg";
 import adminImg from "../../../assets/images/doctor/admin.jpg";
-import { userService } from "../../../api/services";
+import { userService } from "../../../api";
+import { getUserId } from "../../../utils/authUtils";
 
 const container = {
     hidden: { opacity: 0, y: 20 },
@@ -24,12 +26,21 @@ function AdminShowProfile() {
     const [profile, setProfile] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const { id } = useParams();
+    const { id: routeId } = useParams();
+    const currentUserId = getUserId();
+    const targetUserId = routeId || currentUserId;
+    const isSelfProfile = !routeId || String(routeId) === String(currentUserId);
 
     useEffect(() => {
+        if (!targetUserId) {
+            setError("Không xác định được hồ sơ người dùng.");
+            setLoading(false);
+            return;
+        }
+
         const fetchUser = async () => {
             try {
-                const data = await userService.getById(id);
+                const data = await userService.getById(targetUserId);
                 setProfile(data);
             }
             catch (err) {
@@ -41,7 +52,7 @@ function AdminShowProfile() {
             
         }
         fetchUser();
-    }, []);
+    }, [targetUserId]);
 
     if (loading) return <div className="loading-profile text-center p-4">Đang tải hồ sơ người dùng ... </div>
     if (error) return <div className="text-center text-red-500 p-4">{error}</div>;
@@ -114,13 +125,6 @@ function AdminShowProfile() {
                                 </motion.div>
 
                                 <motion.div variants={item} className="flex gap-3">
-                                    <div className="w-32 shrink-0 text-slate-500">Mật khẩu</div>
-                                    <div className="font-medium">
-                                        {profile.passwordHash}
-                                    </div>
-                                </motion.div>
-
-                                <motion.div variants={item} className="flex gap-3">
                                     <div className="w-32 shrink-0 text-slate-500">Giới tính</div>
                                     <div className="font-medium">
                                         {profile.gender === "MALE" ? "Nam" : profile.gender === "FEMALE" ? "Nữ" : "Khác"}
@@ -142,7 +146,24 @@ function AdminShowProfile() {
                                 <motion.div variants={item} className="pt-4 border-t border-slate-100 text-sm text-slate-600">
                                     Ngày tạo hồ sơ: <span className="font-medium">{profile.createdAt}</span>
                                 </motion.div>
-                                <motion.button variants={item} onClick={() => navigate("/admin/users")} className="mt-4 bg-[#00278D] text-white rounded-md p-2 px-5 cursor-pointer hover:bg-sky-500">Quay lại</motion.button>
+                                <div className="mt-4 flex items-center gap-2">
+                                    {isSelfProfile ? (
+                                        <motion.button
+                                            variants={item}
+                                            onClick={() => navigate("/admin/edit")}
+                                            className="bg-slate-700 text-white rounded-md p-2 px-5 cursor-pointer hover:bg-slate-800"
+                                        >
+                                            Chỉnh sửa hồ sơ
+                                        </motion.button>
+                                    ) : null}
+                                    <motion.button
+                                        variants={item}
+                                        onClick={() => navigate(isSelfProfile ? "/admin/dashboard" : "/admin/users")}
+                                        className="bg-[#00278D] text-white rounded-md p-2 px-5 cursor-pointer hover:bg-sky-500"
+                                    >
+                                        Quay lại
+                                    </motion.button>
+                                </div>
                             </motion.div>
                         </div>
                     </div>

@@ -20,7 +20,7 @@ function FAQ() {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="mx-auto mb-14 max-w-5xl rounded-[28px] bg-gradient-to-br from-[#03163d] via-[#06245f] to-[#0e4a82] p-10 text-center text-white shadow-2xl"
+                className="mx-auto mb-14 max-w-5xl rounded-[28px] bg-[var(--brand-navy)] p-10 text-center text-white shadow-2xl"
             >
                 <motion.div
                     initial={{ scale: 0 }}
@@ -52,7 +52,7 @@ function FAQ() {
                         >
                             {/* Category Header */}
                             <div className="flex items-center gap-3 mb-6">
-                                <div className={`w-1.5 h-8 rounded-full bg-gradient-to-b ${category.color}`} />
+                                <div className={`w-1.5 h-8 rounded-full ${category.color}`} />
                                 <h2 className="text-2xl font-bold text-[#00278D]">
                                     {category.category}
                                 </h2>
