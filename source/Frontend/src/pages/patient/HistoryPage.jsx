@@ -1,21 +1,30 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { getUserId } from "../../utils/authUtils";
-import AppointmentCard from "./AppointmentCard";
-import { appointmentService } from "../../api";
-import { animatePageEnter } from "../../utils/animeAnimations";
+import { appointmentService, serviceService, userService } from "../../api";
+
+const formatDateTime = (value) => {
+    if (!value) return "--/--/---- --:--";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value).replace("T", " ").slice(0, 16);
+    const dd = String(date.getDate()).padStart(2, "0");
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const yyyy = date.getFullYear();
+    const hh = String(date.getHours()).padStart(2, "0");
+    const min = String(date.getMinutes()).padStart(2, "0");
+    return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+};
+
+const statusLabel = (status) => (status === "DONE" ? "Đã khám" : "Chưa khám");
+const paymentMethodLabel = "Thanh toán tại quầy";
 
 function HistoryPage() {
     const id = getUserId();
-    const pageRef = useRef(null);
     const [loading, setLoading] = useState(true);
-    const [data, setData] = useState([]);
-
-    useEffect(() => {
-        const animation = animatePageEnter(pageRef.current);
-        return () => {
-            animation?.pause?.();
-        };
-    }, []);
+    const [appointments, setAppointments] = useState([]);
+    const [patientInfo, setPatientInfo] = useState(null);
+    const [doctorMap, setDoctorMap] = useState({});
+    const [serviceMap, setServiceMap] = useState({});
+    const [detailTarget, setDetailTarget] = useState(null);
 
     useEffect(() => {
         if (!id) {
@@ -25,8 +34,41 @@ function HistoryPage() {
 
         const getDoneAppointments = async () => {
             try {
-                const DoneAppointments = await appointmentService.notPendingByPatientId(id);
-                setData(DoneAppointments);
+                const doneAppointments = await appointmentService.notPendingByPatientId(id);
+                const normalized = (doneAppointments || [])
+                    .filter((item) => item?.status === "DONE")
+                    .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
+
+                setAppointments(normalized);
+
+                try {
+                    const patient = await userService.getById(id);
+                    setPatientInfo(patient || null);
+                } catch {
+                    setPatientInfo(null);
+                }
+
+                const doctorIds = [...new Set(normalized.map((item) => item.doctorId).filter(Boolean))];
+                const serviceIds = [...new Set(normalized.map((item) => Number(item.serviceId ?? item.note)).filter((value) => !Number.isNaN(value)))];
+
+                const [doctorResponses, serviceResponses] = await Promise.all([
+                    Promise.all(doctorIds.map((doctorId) => userService.getById(doctorId))),
+                    Promise.all(serviceIds.map((serviceId) => serviceService.getById(serviceId))),
+                ]);
+
+                setDoctorMap(
+                    doctorResponses.reduce((acc, doctor) => {
+                        if (doctor?.id) acc[doctor.id] = doctor;
+                        return acc;
+                    }, {})
+                );
+
+                setServiceMap(
+                    serviceResponses.reduce((acc, service) => {
+                        if (service?.id) acc[service.id] = service;
+                        return acc;
+                    }, {})
+                );
             }
             catch (err) {
                 console.log(err.message);
@@ -42,28 +84,129 @@ function HistoryPage() {
     if (loading) return <p className="text-center text-gray-500 py-10">Đang tải...</p>;
 
     return (
-        <div ref={pageRef} className="bg-[var(--surface)] min-h-[40vh]">
-            <div className="max-w-7xl mx-auto py-8 px-4">
+        <div className="bg-[var(--surface)] min-h-[40vh]">
+            <div className="max-w-6xl mx-auto py-8 px-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-8">
                     <div className="bg-white w-fit h-fit p-3 rounded-2xl shadow-lg">
-                        <h1 className="text-4xl font-bold text-[#00278D]">Lịch sử dịch vụ</h1>
+                        <h1 className="text-4xl font-bold text-[#00278D]">Lịch sử khám</h1>
                     </div>
                 </div>
-                {data.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {data.map((a, i) => (
-                            <div key={a.id} className="will-change-transform transform-gpu">
-                                <div className="transition-shadow duration-200 hover:shadow-xl rounded-xl">
-                                    <AppointmentCard appointment={a} />
+
+                {appointments.length > 0 ? (
+                    <div className="space-y-4">
+                        {appointments.map((appointment) => {
+                            const doctor = doctorMap[appointment.doctorId] || {};
+                            const serviceId = Number(appointment.serviceId ?? appointment.note);
+                            const service = serviceMap[serviceId] || {};
+
+                            return (
+                                <div key={appointment.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                                        <div className="md:col-span-4">
+                                            <p className="text-xs uppercase tracking-wide text-slate-500">Bác sĩ</p>
+                                            <p className="text-base font-semibold text-slate-800">{doctor.fullName || "Đang cập nhật"}</p>
+                                        </div>
+                                        <div className="md:col-span-3">
+                                            <p className="text-xs uppercase tracking-wide text-slate-500">Dịch vụ</p>
+                                            <p className="text-base font-semibold text-slate-800">{service.name || "Đang cập nhật"}</p>
+                                        </div>
+                                        <div className="md:col-span-3">
+                                            <p className="text-xs uppercase tracking-wide text-slate-500">Thời gian khám</p>
+                                            <p className="text-base font-semibold text-slate-800">{formatDateTime(appointment.startTime)}</p>
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <span className="inline-flex px-3 py-1 rounded-full text-sm border font-semibold bg-green-100 text-green-700 border-green-300">
+                                                Đã khám
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                                        <div className="text-sm text-slate-600">
+                                            <span className="font-semibold">Phương thức thanh toán:</span> {paymentMethodLabel}
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setDetailTarget({ appointment, doctor, service })}
+                                            className="px-3 py-1.5 text-sm rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100"
+                                        >
+                                            Chi tiết
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 ) : (
                     <p className="text-xl text-[#00278D]">
-                        {"Không có cuộc hẹn nào hoàn thành."}
+                        {"Chưa có lịch hẹn nào hoàn thành."}
                     </p>
                 )}
+
+                {detailTarget ? (
+                    <div className="fixed inset-0 z-[130] bg-black/40 p-4 flex items-center justify-center" onClick={() => setDetailTarget(null)}>
+                        <div className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl p-6" onClick={(event) => event.stopPropagation()}>
+                            <h3 className="text-2xl font-bold text-[#00278D]">Chi tiết lịch sử khám</h3>
+                            <p className="text-sm text-slate-500 mt-1">Mã lịch hẹn: #{detailTarget.appointment.id}</p>
+
+                            <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                    <p className="text-slate-500 mb-1">Tên bệnh nhân</p>
+                                    <p className="font-semibold text-slate-800">{patientInfo?.fullName || "Đang cập nhật"}</p>
+                                </div>
+                                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                    <p className="text-slate-500 mb-1">Số điện thoại bệnh nhân</p>
+                                    <p className="font-semibold text-slate-800">{patientInfo?.phone || "Đang cập nhật"}</p>
+                                </div>
+                                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                    <p className="text-slate-500 mb-1">Bác sĩ</p>
+                                    <p className="font-semibold text-slate-800">{detailTarget.doctor.fullName || "Đang cập nhật"}</p>
+                                </div>
+                                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                    <p className="text-slate-500 mb-1">Số điện thoại bác sĩ</p>
+                                    <p className="font-semibold text-slate-800">{detailTarget.doctor.phone || "Đang cập nhật"}</p>
+                                </div>
+                                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                    <p className="text-slate-500 mb-1">Dịch vụ</p>
+                                    <p className="font-semibold text-slate-800">{detailTarget.service.name || "Đang cập nhật"}</p>
+                                </div>
+                                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                    <p className="text-slate-500 mb-1">Thời gian khám</p>
+                                    <p className="font-semibold text-slate-800">{formatDateTime(detailTarget.appointment.startTime)}</p>
+                                </div>
+                                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                    <p className="text-slate-500 mb-1">Trạng thái</p>
+                                    <p className="font-semibold text-slate-800">{statusLabel(detailTarget.appointment.status)}</p>
+                                </div>
+                                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                    <p className="text-slate-500 mb-1">Phương thức thanh toán</p>
+                                    <p className="font-semibold text-slate-800">{paymentMethodLabel}</p>
+                                </div>
+                                <div className="rounded-xl border border-slate-200 bg-white p-4 md:col-span-2">
+                                    <p className="text-slate-500 mb-1">Ghi chú</p>
+                                    <p className="font-medium text-slate-700">{detailTarget.appointment.reason || detailTarget.appointment.note || "Không có"}</p>
+                                </div>
+                            </div>
+
+                            <div className="mt-4">
+                                <span className="inline-flex items-center rounded-md bg-green-100 border border-green-300 text-green-700 font-semibold text-sm px-3 py-1.5">
+                                    Đã thanh toán
+                                </span>
+                            </div>
+
+                            <div className="mt-5 border-t border-slate-200 pt-4 flex items-center justify-between">
+                                <span className="text-slate-600 font-medium">Tổng thanh toán</span>
+                                <span className="text-2xl font-extrabold text-[#001f5f]">{Number(detailTarget.service.price || 0).toLocaleString("vi-VN")} VND</span>
+                            </div>
+
+                            <div className="mt-5 flex justify-end">
+                                <button type="button" onClick={() => setDetailTarget(null)} className="px-5 py-2.5 rounded-lg bg-[#00278D] text-white hover:bg-[#001f5f]">
+                                    Đã hiểu
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ) : null}
             </div>
         </div>
     );

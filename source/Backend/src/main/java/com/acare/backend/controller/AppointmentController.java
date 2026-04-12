@@ -95,8 +95,9 @@ public class AppointmentController {
     public ResponseEntity<List<AppointmentAvailabilityOption>> getDoctorAvailability(
             @RequestParam Long doctorId,
             @RequestParam Long serviceId,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-        return ResponseEntity.ok(appointmentService.getDoctorAvailability(doctorId, serviceId, date));
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
+            @RequestParam(required = false) Long appointmentId) {
+        return ResponseEntity.ok(appointmentService.getDoctorAvailability(doctorId, serviceId, date, appointmentId));
     }
 
     @GetMapping("/doctors-by-service")
@@ -138,8 +139,11 @@ public class AppointmentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Object>> deleteAppointmentById(@PathVariable Long id) {
-        return ResponseEntity.ok(appointmentService.deleteById(id));
+    public ResponseEntity<ApiResponse<Object>> deleteAppointmentById(
+            @PathVariable Long id,
+            @RequestParam(required = false, defaultValue = "PATIENT") String cancelledBy,
+            @RequestParam(required = false) String cancelReason) {
+        return ResponseEntity.ok(appointmentService.deleteById(id, cancelledBy, cancelReason));
     }
 
     @PatchMapping("/done/{id}")

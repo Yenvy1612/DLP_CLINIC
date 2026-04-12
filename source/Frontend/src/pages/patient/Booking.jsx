@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FiArrowRight, FiCalendar, FiMapPin, FiUser } from "react-icons/fi";
+import { FiArrowRight, FiCalendar, FiChevronDown, FiChevronUp, FiMapPin, FiUser } from "react-icons/fi";
 import { useLocation, useNavigate } from "react-router-dom";
 import { appointmentService, serviceService } from "../../api";
 import { getCurrentUser, isLoggedIn } from "../../utils/authUtils";
@@ -13,27 +13,63 @@ export default function Booking() {
     const pageRef = useRef(null);
     
     const [doctors, setDoctors] = useState([]);
-    const [doctorSlots, setDoctorSlots] = useState({}); // { doctorId: slots }
+    const [doctorSlots, setDoctorSlots] = useState({});
     const [loadingSlotsId, setLoadingSlotsId] = useState(null);
     
-    // Lưu trữ ngày được chọn cho TỪNG Bác sĩ
-    const [doctorDates, setDoctorDates] = useState({}); // { doctorId: 'YYYY-MM-DD' }
+    const [doctorDates, setDoctorDates] = useState({}); 
     
-    // State cho việc đặt lịch
     const [selectedDoctorId, setSelectedDoctorId] = useState("");
     const [selectedTime, setSelectedTime] = useState("");
     const [reason, setReason] = useState("");
+    const [paymentMethod, setPaymentMethod] = useState("COUNTER");
     const [noticeModal, setNoticeModal] = useState({
         isOpen: false,
         title: "",
         message: "",
         tone: "info",
     });
+    const [isGuideOpen, setIsGuideOpen] = useState(false);
 
     const currentUser = useMemo(() => getCurrentUser(), []);
     const patientId = currentUser?.id || "";
     const navigate = useNavigate();
     const location = useLocation();
+
+    const weekdayOptions = useMemo(() => {
+        const result = [];
+        const cursor = new Date();
+        const todayIso = new Date().toISOString().split("T")[0];
+
+        while (result.length < 10) {
+            const day = cursor.getDay();
+            const isWeekend = day === 0 || day === 6;
+            if (!isWeekend) {
+                const dd = String(cursor.getDate()).padStart(2, "0");
+                const mm = String(cursor.getMonth() + 1).padStart(2, "0");
+                const value = cursor.toISOString().split("T")[0];
+                const label = value === todayIso ? `Hôm nay - ${dd}/${mm}` : `Thứ ${day + 1} - ${dd}/${mm}`;
+                result.push({ label, value, weekdayName: ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"][day] });
+            }
+            cursor.setDate(cursor.getDate() + 1);
+        }
+
+        return result;
+    }, []);
+
+    const getDoctorAllowedWorkingDays = (doctor) => {
+        const rawDays = String(doctor?.workingDays || "");
+        const parsed = rawDays
+            .split(",")
+            .map((item) => item.trim().toUpperCase())
+            .filter(Boolean)
+            .filter((item) => ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"].includes(item));
+        return new Set(parsed.length ? parsed : ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"]);
+    };
+
+    const getDateOptionsForDoctor = (doctor) => {
+        const allowedDays = getDoctorAllowedWorkingDays(doctor);
+        return weekdayOptions.filter((option) => allowedDays.has(option.weekdayName));
+    };
 
     useEffect(() => {
         const animation = animatePageEnter(pageRef.current);
@@ -54,6 +90,11 @@ export default function Booking() {
     useEffect(() => {
         const bookingResult = location.state?.bookingResult;
         const preselectedServiceId = location.state?.preselectedServiceId;
+        const openGuide = new URLSearchParams(location.search).get("guide") === "1";
+
+        if (openGuide) {
+            setIsGuideOpen(true);
+        }
 
         let shouldResetState = false;
 
@@ -94,6 +135,7 @@ export default function Booking() {
         setDoctorSlots({});
         setDoctorDates({});
         setReason("");
+        setPaymentMethod("COUNTER");
         
         const fetchDoctors = async () => {
             if (!selectedServiceId) {
@@ -103,12 +145,13 @@ export default function Booking() {
             try {
                 const data = await appointmentService.getDoctorsByService(selectedServiceId);
                 setDoctors(data || []);
-                
-                // Set default date for all doctors to today
+
+                // Set each doctor default date to the nearest allowed weekday in the future.
                 const today = new Date().toISOString().split('T')[0];
                 const initialDates = {};
                 (data || []).forEach(doc => {
-                    initialDates[doc.id] = today;
+                    const options = getDateOptionsForDoctor(doc);
+                    initialDates[doc.id] = options[0]?.value || today;
                 });
                 setDoctorDates(initialDates);
                 
@@ -159,23 +202,6 @@ export default function Booking() {
         fetchSlotsForDoctor(doctorId, newDate);
     };
 
-    // Get available dates (Next 7 days)
-    const getNextDays = () => {
-        let dates = [];
-        let cur = new Date();
-        for (let i = 0; i < 7; i++) {
-            const label = i === 0 ? "Hôm nay" : i === 1 ? "Ngày mai" : `Thứ ${cur.getDay() === 0 ? "CN" : cur.getDay() + 1}`;
-            const dd = String(cur.getDate()).padStart(2, '0');
-            const mm = String(cur.getMonth() + 1).padStart(2, '0');
-            const value = cur.toISOString().split('T')[0];
-            
-            dates.push({ label: `${label} - ${dd}/${mm}`, value });
-            cur.setDate(cur.getDate() + 1);
-        }
-        return dates;
-    };
-    const availableDates = getNextDays();
-
     const serviceOptions = useMemo(() => {
         return services.map((service) => ({
             value: String(service.id),
@@ -191,7 +217,7 @@ export default function Booking() {
     };
 
     // Xử lý Đặt lịch
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!isLoggedIn() || !patientId) {
@@ -227,30 +253,23 @@ export default function Booking() {
         }
 
         const startTime = `${date}T${selectedTime}`;
-        const paymentDraft = {
-            payload: {
+        try {
+            await appointmentService.bookForPatient({
                 patientId,
                 doctorId: Number(selectedDoctorId),
                 startTime,
                 serviceId: Number(selectedServiceId),
                 reason,
-            },
-            summary: {
-                patientName: currentUser?.fullName || "Đang cập nhật",
-                patientPhone: currentUser?.phone || "Đang cập nhật",
-                doctorName: selectedDoctor.fullName,
-                doctorPhone: selectedDoctor.phone || "Đang cập nhật",
-                clinicLocation: selectedDoctor.clinicLocation || "Đang cập nhật",
-                serviceName: selectedService.name,
-                price: Number(selectedService.price || 0),
-                date,
-                time: selectedTime.slice(0, 5),
-                reason,
-            },
-        };
-
-        sessionStorage.setItem("pendingBookingPayment", JSON.stringify(paymentDraft));
-        navigate("/patient/payment", { state: { bookingDraft: paymentDraft } });
+                paymentMethod,
+            });
+            window.location.assign("/patient/appointments");
+        } catch (error) {
+            showNoticeModal({
+                title: "Đặt lịch thất bại",
+                message: error?.message || "Không thể đặt lịch. Vui lòng thử lại.",
+                tone: "warning",
+            });
+        }
     };
 
     const closeNoticeModal = () => {
@@ -264,10 +283,45 @@ export default function Booking() {
                 <p className="text-slate-500 mt-2 max-w-2xl mx-auto">
                     Chọn dịch vụ, xem hồ sơ bác sĩ và chọn giờ khám phù hợp với bạn.
                 </p>
+                <div className="mt-4">
+                    <button
+                        type="button"
+                        onClick={() => setIsGuideOpen((prev) => !prev)}
+                        className="inline-flex items-center gap-2 rounded-lg border border-[#00278D] px-4 py-2 font-semibold text-[#00278D] hover:bg-[#00278D]/5 transition"
+                    >
+                        {isGuideOpen ? <FiChevronUp /> : <FiChevronDown />}
+                        {isGuideOpen ? "Ẩn hướng dẫn đặt khám" : "Xem hướng dẫn đặt khám"}
+                    </button>
+                </div>
                 <div className="h-1 w-32 bg-[#00278D] rounded-full mx-auto mt-4"></div>
             </header>
 
             <main className="max-w-5xl mx-auto px-4 space-y-6">
+                {isGuideOpen ? (
+                    <section className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h2 className="text-lg font-bold text-[#00278D] mb-4">Hướng dẫn đặt lịch khám</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-700">
+                            <div className="rounded-lg bg-slate-50 border border-slate-200 p-4">
+                                <p className="font-semibold mb-1">Bước 1</p>
+                                <p>Chọn dịch vụ khám phù hợp với nhu cầu.</p>
+                            </div>
+                            <div className="rounded-lg bg-slate-50 border border-slate-200 p-4">
+                                <p className="font-semibold mb-1">Bước 2</p>
+                                <p>Chọn bác sĩ và ngày khám mong muốn.</p>
+                            </div>
+                            <div className="rounded-lg bg-slate-50 border border-slate-200 p-4">
+                                <p className="font-semibold mb-1">Bước 3</p>
+                                <p>Chọn khung giờ còn trống và điền lý do khám (nếu có).</p>
+                            </div>
+                            <div className="rounded-lg bg-slate-50 border border-slate-200 p-4">
+                                <p className="font-semibold mb-1">Bước 4</p>
+                                <p>Nhấn xác nhận để lưu lịch hẹn. Thanh toán thực hiện tại quầy khi đến khám.</p>
+                            </div>
+                        </div>
+                        <p className="mt-4 text-sm text-slate-500">Mẹo: nếu bác sĩ đã kín lịch, hãy đổi sang ngày khác trong danh sách.</p>
+                    </section>
+                ) : null}
+
                 {/* 1. Chọn dịch vụ */}
                 <section className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 sticky top-0 z-10">
                     <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
@@ -298,6 +352,7 @@ export default function Booking() {
                                 const isLoading = loadingSlotsId === doc.id;
                                 const isSelectedDoctor = selectedDoctorId === doc.id;
                                 const currentDoctorDate = doctorDates[doc.id] || '';
+                                const doctorDateOptions = getDateOptionsForDoctor(doc);
 
                                 return (
                                     <div key={doc.id} className={`bg-white rounded-xl shadow-md border-2 transition-all overflow-hidden ${isSelectedDoctor && selectedTime ? 'border-[#001f5f] ring-2 ring-[#001f5f]/20' : 'border-slate-200'}`}>
@@ -332,7 +387,7 @@ export default function Booking() {
                                                     <CustomDropdown
                                                         value={currentDoctorDate}
                                                         onValueChange={(value) => handleDateChange(doc.id, value)}
-                                                        options={availableDates.map((date) => ({
+                                                        options={doctorDateOptions.map((date) => ({
                                                             value: date.value,
                                                             label: date.label,
                                                         }))}
@@ -405,6 +460,20 @@ export default function Booking() {
                                                                 placeholder="Mô tả triệu chứng để bác sĩ chuẩn bị tốt hơn..."
                                                                 className="w-full border border-slate-300 p-2 text-sm rounded-md focus:outline-none focus:border-[#001f5f] focus:ring-1 focus:ring-[#001f5f] bg-white"
                                                             />
+                                                        </div>
+                                                        <div className="mb-4 rounded-lg border border-slate-200 bg-white p-3">
+                                                            <p className="text-slate-700 font-medium mb-2 text-sm">Phương thức thanh toán</p>
+                                                            <label className="flex items-center gap-2 text-sm text-slate-800">
+                                                                <input
+                                                                    type="radio"
+                                                                    name="paymentMethod"
+                                                                    value="COUNTER"
+                                                                    checked={paymentMethod === "COUNTER"}
+                                                                    onChange={(event) => setPaymentMethod(event.target.value)}
+                                                                    className="h-4 w-4"
+                                                                />
+                                                                Thanh toán tại quầy
+                                                            </label>
                                                         </div>
                                                         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                                                             <div className="text-sm space-y-1">

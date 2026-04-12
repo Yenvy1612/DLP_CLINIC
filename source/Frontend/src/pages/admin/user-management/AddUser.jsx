@@ -208,7 +208,7 @@ function AddUser() {
         setResultModal((prev) => ({ ...prev, isOpen: false, nextAction: "none" }));
 
         if (nextAction === "back-users") {
-            navigate("/admin/users");
+            window.location.assign("/admin/users");
         }
     };
 
@@ -349,8 +349,7 @@ function AddUser() {
                                     {[
                                         { val: "MONDAY", label: "T2" }, { val: "TUESDAY", label: "T3" },
                                         { val: "WEDNESDAY", label: "T4" }, { val: "THURSDAY", label: "T5" },
-                                        { val: "FRIDAY", label: "T6" }, { val: "SATURDAY", label: "T7" },
-                                        { val: "SUNDAY", label: "CN" }
+                                        { val: "FRIDAY", label: "T6" }
                                     ].map(day => (
                                         <label key={day.val} className="flex items-center space-x-2 text-slate-600">
                                             <input type="checkbox" value={day.val} checked={form.workingDays.includes(day.val)} onChange={handleWorkingDaysChange} className="rounded text-[#00278D] focus:ring-[#00278D]" />

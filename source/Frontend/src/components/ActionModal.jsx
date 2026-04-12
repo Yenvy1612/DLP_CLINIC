@@ -1,6 +1,4 @@
-import { useEffect, useRef, useState } from "react";
 import { FiAlertTriangle, FiCheckCircle, FiInfo } from "react-icons/fi";
-import { animateModalIn, animateModalOut } from "../utils/animeAnimations";
 
 const toneMap = {
     info: {
@@ -33,62 +31,22 @@ export default function ActionModal({
     onClose,
     closeOnBackdrop = true,
 }) {
-    const [shouldRender, setShouldRender] = useState(isOpen);
-    const backdropRef = useRef(null);
-    const panelRef = useRef(null);
-
     const resolvedTone = toneMap[tone] || toneMap.info;
     const Icon = resolvedTone.icon;
-
-    useEffect(() => {
-        if (isOpen) {
-            setShouldRender(true);
-        }
-    }, [isOpen]);
-
-    useEffect(() => {
-        if (!shouldRender) return undefined;
-
-        if (isOpen) {
-            const animation = animateModalIn({
-                backdrop: backdropRef.current,
-                panel: panelRef.current,
-            });
-
-            return () => {
-                animation?.pause?.();
-            };
-        }
-
-        const outAnimation = animateModalOut({
-            backdrop: backdropRef.current,
-            panel: panelRef.current,
-            onComplete: () => setShouldRender(false),
-        });
-
-        return () => {
-            outAnimation?.backdropAnimation?.pause?.();
-            outAnimation?.panelAnimation?.pause?.();
-        };
-    }, [isOpen, shouldRender]);
 
     const handleBackdropClick = () => {
         if (!closeOnBackdrop || loading) return;
         onClose?.();
     };
 
-    if (!shouldRender) return null;
+    if (!isOpen) return null;
 
     return (
         <div
-            ref={backdropRef}
-            style={{ opacity: 0 }}
-            className="fixed inset-0 z-[120] bg-slate-950/45 backdrop-blur-[1px] flex items-center justify-center p-4"
+            className="fixed inset-0 z-[120] bg-slate-950/45 flex items-center justify-center p-4"
             onClick={handleBackdropClick}
         >
             <div
-                ref={panelRef}
-                style={{ opacity: 0 }}
                 className="w-full max-w-md bg-white border border-slate-200 shadow-2xl rounded-2xl p-5"
                 onClick={(event) => event.stopPropagation()}
                 role="dialog"

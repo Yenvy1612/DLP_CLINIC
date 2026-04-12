@@ -19,8 +19,8 @@ export const appointmentService = {
     async getAvailability(serviceId, date) {
         return httpGet(`/appointments/availability${toQueryString({ serviceId, date })}`);
     },
-    async getDoctorAvailability(doctorId, serviceId, date) {
-        return httpGet(`/appointments/doctor-availability${toQueryString({ doctorId, serviceId, date })}`);
+    async getDoctorAvailability(doctorId, serviceId, date, appointmentId) {
+        return httpGet(`/appointments/doctor-availability${toQueryString({ doctorId, serviceId, date, appointmentId })}`);
     },
     async getDoctorsByService(serviceId) {
         return httpGet(`/appointments/doctors-by-service${toQueryString({ serviceId })}`);
@@ -34,8 +34,8 @@ export const appointmentService = {
     async update(id, updated) {
         return httpPut(`/appointments/${id}`, updated);
     },
-    async remove(id) {
-        return httpDelete(`/appointments/${id}`);
+    async remove(id, cancelledBy = "PATIENT", cancelReason = "") {
+        return httpDelete(`/appointments/${id}${toQueryString({ cancelledBy, cancelReason })}`);
     },
     async markDone(id) {
         return httpPatch(`/appointments/${id}/status${toQueryString({ status: "DONE" })}`);

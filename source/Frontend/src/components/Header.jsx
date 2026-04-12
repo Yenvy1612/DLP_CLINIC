@@ -1,13 +1,12 @@
-import { FiShoppingCart } from "react-icons/fi";
-import { BsFillCartCheckFill } from "react-icons/bs";
-import { TbPhone } from "react-icons/tb";
-import { RiMenuFill } from "react-icons/ri";
-import { headerListByRole } from "../data/headerList";
-import { useSidebarContext } from "../contexts/SideBarContext";
-import logo from "../assets/images/logo/logo_png.png";
-import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { appointmentService, authService } from "../api";
+import { FiBell, FiTrash2 } from "react-icons/fi";
+import { RiMenuFill } from "react-icons/ri";
+import { TbPhone } from "react-icons/tb";
+import { NavLink, useNavigate } from "react-router-dom";
+import { activityService, appointmentService, authService } from "../api";
+import logo from "../assets/images/logo/logo_png.png";
+import { useSidebarContext } from "../contexts/SideBarContext";
+import { headerListByRole } from "../data/headerList";
 import useAuthSnapshot from "../hooks/useAuthSnapshot";
 import { clearCurrentUser, getRoleLabel, getRoleProfilePath } from "../utils/authUtils";
 
@@ -20,10 +19,33 @@ function Header() {
     const headerList = headerListByRole[role] || headerListByRole.GUEST;
     const [isFill, setIsFill] = useState(false);
     const [showHamburger, setShowHamburger] = useState(false);
+    const [notifications, setNotifications] = useState([]);
+    const [notificationCount, setNotificationCount] = useState(0);
+    const [isBellOpen, setIsBellOpen] = useState(false);
+    const [selectedNotification, setSelectedNotification] = useState(null);
+    const [deletingNotificationId, setDeletingNotificationId] = useState(null);
     const containerRef = useRef(null);
     const logoRef = useRef(null);
     const navRef = useRef(null);
     const rightRef = useRef(null);
+    const bellPanelRef = useRef(null);
+
+    const isNotificationEnabledRole = isLoggedIn && (role === "DOCTOR" || role === "PATIENT") && !!userId;
+    const notificationTitle = role === "DOCTOR" ? "Thông báo bác sĩ" : "Thông báo bệnh nhân";
+
+    const normalizeNoticeMessage = (raw) => String(raw || "").replace(/^\[USER:\d+\]\s*/, "");
+
+    const formatNoticeTime = (time) => {
+        if (!time) return "";
+        const value = new Date(time);
+        if (Number.isNaN(value.getTime())) return "";
+        const dd = String(value.getDate()).padStart(2, "0");
+        const mm = String(value.getMonth() + 1).padStart(2, "0");
+        const yyyy = value.getFullYear();
+        const hh = String(value.getHours()).padStart(2, "0");
+        const min = String(value.getMinutes()).padStart(2, "0");
+        return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+    };
 
     useEffect(() => {
         if (role !== "PATIENT" || !userId) {
@@ -71,6 +93,67 @@ function Header() {
         window.addEventListener("resize", updateLayout);
         return () => window.removeEventListener("resize", updateLayout);
     }, [isLoggedIn, role, isFill, headerList.length]);
+
+    useEffect(() => {
+        if (!isNotificationEnabledRole) {
+            setNotifications([]);
+            setNotificationCount(0);
+            setSelectedNotification(null);
+            setIsBellOpen(false);
+            return;
+        }
+
+        let isMounted = true;
+
+        const loadNotifications = async () => {
+            try {
+                const [list, count] = await Promise.all([
+                    activityService.getRecentByUser(userId),
+                    activityService.getCountByUser(userId),
+                ]);
+                if (!isMounted) return;
+
+                const normalizedList = Array.isArray(list) ? list : [];
+                setNotifications(normalizedList);
+                setNotificationCount(Number(count) || normalizedList.length);
+
+                if (normalizedList.length === 0) {
+                    setSelectedNotification(null);
+                    return;
+                }
+
+                setSelectedNotification((prev) => {
+                    if (!prev) return normalizedList[0];
+                    return normalizedList.find((item) => item.id === prev.id) || normalizedList[0];
+                });
+            } catch {
+                if (!isMounted) return;
+                setNotifications([]);
+                setNotificationCount(0);
+                setSelectedNotification(null);
+            }
+        };
+
+        loadNotifications();
+        const timer = setInterval(loadNotifications, 15000);
+        return () => {
+            isMounted = false;
+            clearInterval(timer);
+        };
+    }, [isNotificationEnabledRole, userId]);
+
+    useEffect(() => {
+        if (!isBellOpen) return undefined;
+
+        const handleClickOutside = (event) => {
+            if (!bellPanelRef.current?.contains(event.target)) {
+                setIsBellOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isBellOpen]);
 
     const handleLogout = async () => {
         try {
@@ -143,7 +226,6 @@ function Header() {
                 ))}
             </div>
             <div ref={rightRef} className="other-header-items flex items-center gap-x-4 text-[var(--brand-600)]">
-                {role == "PATIENT" ? (<div className="hidden cursor-pointer text-xl md:block"><NavLink to={"/patient/cart"}>{!isFill ? <FiShoppingCart /> : <BsFillCartCheckFill />}</NavLink></div>) : ""}
                 <div className="phone gap-x-2 hidden md:flex">
                     <div className="text-xl w-11 h-11 flex justify-center items-center rounded-full p-3 border border-slate-200 bg-slate-100 text-[var(--brand-600)]">
                         <TbPhone />
@@ -162,6 +244,96 @@ function Header() {
                             >
                                 {getRoleLabel(role)}
                             </button>
+
+                            {isNotificationEnabledRole ? (
+                                <div ref={bellPanelRef} className="relative">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsBellOpen((prev) => !prev)}
+                                        className="relative rounded-lg border border-slate-300 p-2 text-[var(--brand-navy)] hover:border-[var(--brand-500)] hover:text-[var(--brand-600)]"
+                                        aria-label="Thông báo"
+                                    >
+                                        <FiBell size={18} />
+                                        {notificationCount > 0 ? (
+                                            <span className="absolute -top-2 -right-2 min-w-[20px] h-5 px-1 rounded-full bg-rose-600 text-white text-[11px] leading-5 font-bold text-center">
+                                                {notificationCount > 5 ? "5+" : notificationCount}
+                                            </span>
+                                        ) : null}
+                                    </button>
+
+                                    {isBellOpen ? (
+                                        <div className="absolute right-0 mt-2 w-[380px] max-w-[90vw] rounded-xl border border-slate-200 bg-white shadow-2xl z-50 overflow-hidden">
+                                            <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+                                                <p className="text-sm font-bold text-slate-800">{notificationTitle}</p>
+                                                <span className="text-xs text-slate-500">{notificationCount > 5 ? "5+" : notificationCount}</span>
+                                            </div>
+
+                                            {notifications.length === 0 ? (
+                                                <p className="px-4 py-6 text-sm text-slate-500">Chưa có thông báo nào.</p>
+                                            ) : (
+                                                <div className="grid grid-cols-1 md:grid-cols-2">
+                                                    <div className="max-h-72 overflow-auto border-r border-slate-200">
+                                                        {notifications.map((notice) => (
+                                                            <button
+                                                                key={notice.id}
+                                                                type="button"
+                                                                onClick={() => setSelectedNotification(notice)}
+                                                                className={`w-full text-left px-3 py-2.5 border-b border-slate-100 hover:bg-slate-50 ${selectedNotification?.id === notice.id ? "bg-slate-100" : "bg-white"}`}
+                                                            >
+                                                                <p className="text-xs font-semibold text-slate-700 truncate">
+                                                                    {normalizeNoticeMessage(notice.message)}
+                                                                </p>
+                                                                <p className="text-[11px] text-slate-500 mt-1">{formatNoticeTime(notice.time)}</p>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+
+                                                    <div className="p-3 min-h-[160px] flex flex-col justify-between">
+                                                        <div>
+                                                            <p className="text-xs uppercase tracking-wide text-slate-500">Nội dung</p>
+                                                            <p className="text-sm text-slate-800 mt-2 leading-relaxed">
+                                                                {selectedNotification
+                                                                    ? normalizeNoticeMessage(selectedNotification.message)
+                                                                    : "Chọn một thông báo để xem chi tiết"}
+                                                            </p>
+                                                            {selectedNotification?.time ? (
+                                                                <p className="text-xs text-slate-500 mt-2">{formatNoticeTime(selectedNotification.time)}</p>
+                                                            ) : null}
+                                                        </div>
+
+                                                        <div className="pt-3 mt-3 border-t border-slate-200 flex justify-end">
+                                                            <button
+                                                                type="button"
+                                                                disabled={!selectedNotification || deletingNotificationId === selectedNotification?.id}
+                                                                onClick={async () => {
+                                                                    if (!selectedNotification) return;
+                                                                    setDeletingNotificationId(selectedNotification.id);
+                                                                    try {
+                                                                        await activityService.deleteByUser(userId, selectedNotification.id);
+                                                                        setNotifications((prev) => {
+                                                                            const next = prev.filter((item) => item.id !== selectedNotification.id);
+                                                                            setSelectedNotification(next[0] || null);
+                                                                            return next;
+                                                                        });
+                                                                        setNotificationCount((prev) => Math.max(0, Number(prev || 0) - 1));
+                                                                    } finally {
+                                                                        setDeletingNotificationId(null);
+                                                                    }
+                                                                }}
+                                                                className="inline-flex items-center gap-1 rounded-lg border border-rose-300 px-3 py-1.5 text-sm font-semibold text-rose-700 hover:bg-rose-50 disabled:opacity-60"
+                                                            >
+                                                                <FiTrash2 size={14} />
+                                                                Xóa
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : null}
+                                </div>
+                            ) : null}
+
                             <button
                                 onClick={handleLogout}
                                 className="rounded-lg bg-[var(--brand-600)] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[var(--brand-700)]"

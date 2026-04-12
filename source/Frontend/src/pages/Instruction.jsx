@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { FiUserPlus, FiCalendar, FiFileText, FiCheckCircle, FiUsers, FiActivity, FiSettings } from "react-icons/fi";
+import { Navigate } from "react-router-dom";
 import { getUserRole } from "../utils/authUtils";
 
 const fadeUp = {
@@ -17,6 +18,10 @@ const staggerContainer = {
 
 function Instruction() {
     const role = getUserRole() || "GUEST";
+
+    if (role === "PATIENT") {
+        return <Navigate to="/patient/book?guide=1" replace />;
+    }
 
     const getRoleTitle = () => {
         switch(role) {

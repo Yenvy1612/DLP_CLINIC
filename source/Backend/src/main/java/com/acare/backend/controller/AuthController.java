@@ -16,6 +16,8 @@ import com.acare.backend.dto.auth.LoginRequest;
 import com.acare.backend.dto.auth.RegisterRequest;
 import com.acare.backend.dto.auth.UpdateProfileRequest;
 import com.acare.backend.dto.auth.UserProfileResponse;
+import com.acare.backend.dto.user.DoctorProfileResponse;
+import com.acare.backend.dto.user.DoctorProfileUpdateRequest;
 import com.acare.backend.entity.User;
 import com.acare.backend.service.AuthService;
 
@@ -63,6 +65,19 @@ public class AuthController {
             @Valid @RequestBody UpdateProfileRequest request
     ) {
         return ResponseEntity.ok(authService.updateProfile(authentication.getName(), request));
+    }
+
+    @GetMapping("/me/doctor-profile")
+    public ResponseEntity<DoctorProfileResponse> meDoctorProfile(Authentication authentication) {
+        return ResponseEntity.ok(authService.getMyDoctorProfile(authentication.getName()));
+    }
+
+    @PutMapping("/me/doctor-profile")
+    public ResponseEntity<DoctorProfileResponse> updateMyDoctorProfile(
+            Authentication authentication,
+            @RequestBody DoctorProfileUpdateRequest request
+    ) {
+        return ResponseEntity.ok(authService.updateMyDoctorProfile(authentication.getName(), request));
     }
 
     @PutMapping("/change-password")

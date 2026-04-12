@@ -16,7 +16,6 @@ function AdminEditService() {
         price: "",
         description: "",
         specialtyId: "",
-        durationMin: 30,
     });
 
     const [specialties, setSpecialties] = useState([]);
@@ -54,7 +53,6 @@ function AdminEditService() {
                     price: data?.price,
                     description: data?.description,
                     specialtyId: data?.specialtyId ? String(data.specialtyId) : "",
-                    durationMin: data?.durationMin || 30,
                 })
             }
             catch (e) {
@@ -87,7 +85,6 @@ function AdminEditService() {
             price: Number(form.price),
             description: form.description,
             specialtyId: Number(form.specialtyId),
-            durationMin: Number(form.durationMin),
         };
 
         setPendingUpdate(data);
@@ -129,7 +126,7 @@ function AdminEditService() {
         setResultModal((prev) => ({ ...prev, isOpen: false, nextAction: "none" }));
 
         if (nextAction === "back-services") {
-            navigate("/admin/services");
+            window.location.assign("/admin/services");
         }
     };
 
@@ -183,20 +180,6 @@ function AdminEditService() {
                                     label: `${specialty.name} (${specialty.code})`,
                                 }))}
                                 placeholder="-- Chọn chuyên khoa --"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-slate-800 text-sm mb-1">Thời lượng khám (phút)</label>
-                            <input
-                                type="number"
-                                min="10"
-                                step="5"
-                                name="durationMin"
-                                value={form.durationMin}
-                                onChange={onChange}
-                                required
-                                className="w-full text-slate-800 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00278D] focus:border-transparent transition duration-200"
                             />
                         </div>
 

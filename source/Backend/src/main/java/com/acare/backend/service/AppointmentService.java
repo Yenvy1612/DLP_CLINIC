@@ -1,9 +1,9 @@
 package com.acare.backend.service;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.DayOfWeek;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -39,12 +39,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AppointmentService {
 
+    private static final int SLOT_DURATION_MINUTES = 25;
     private static final LocalTime BUSINESS_START = LocalTime.of(8, 0);
     private static final LocalTime BUSINESS_END = LocalTime.of(17, 0);
 
     private static final List<AppointmentStatus> ACTIVE_SCHEDULE_STATUSES = List.of(
             AppointmentStatus.PENDING,
-            AppointmentStatus.CONFIRMED
+            AppointmentStatus.DONE
     );
 
     private final AppointmentRepository appointmentRepository;
@@ -108,14 +109,12 @@ public class AppointmentService {
             throw new BadRequestException("Dich vu dang tam ngung hoat dong");
         }
 
-        if (service.getDurationMin() == null || service.getDurationMin() <= 0) {
-            throw new BadRequestException("Dich vu chua duoc cau hinh thoi gian kham hop le");
-        }
-
         Appointment working = appointment.toBuilder()
                 .serviceId(serviceId)
-                .endTime(appointment.getStartTime().plusMinutes(service.getDurationMin()))
+                .endTime(appointment.getStartTime().plusMinutes(SLOT_DURATION_MINUTES))
                 .build();
+
+        ensureNotInPast(working.getStartTime());
 
         ensureInBusinessHours(working.getStartTime(), working.getEndTime());
 
@@ -147,6 +146,14 @@ public class AppointmentService {
 
         User patient = userRepository.findById(saved.getPatientId())
                 .orElseThrow(() -> new ResourceNotFoundException("Khong tim thay benh nhan"));
+        User doctor = userRepository.findById(saved.getDoctorId())
+            .orElseThrow(() -> new ResourceNotFoundException("Khong tim thay bac si"));
+
+        String appointmentTime = saved.getStartTime() == null
+            ? ""
+            : " vào " + saved.getStartTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+        String messageToDoctor = "Bệnh nhân " + patient.getFullName() + " đã đặt lịch hẹn #" + saved.getId() + appointmentTime;
+        activityLogService.addNotification("APPOINTMENT_NOTICE", patient.getId(), doctor.getId(), saved.getId(), messageToDoctor);
         activityLogService.add("APPOINTMENT", "Benh nhan " + patient.getFullName() + " vua dat lich thanh cong");
 
         return saved;
@@ -260,11 +267,35 @@ public class AppointmentService {
     }
 
     public ApiResponse<Object> deleteById(Long id) {
+        return deleteById(id, "PATIENT", null);
+    }
+
+    public ApiResponse<Object> deleteById(Long id, String cancelledBy) {
+        return deleteById(id, cancelledBy, null);
+    }
+
+    public ApiResponse<Object> deleteById(Long id, String cancelledBy, String cancelReason) {
         Appointment appointment = getAppointmentById(id);
         User patient = userRepository.findById(appointment.getPatientId())
                 .orElseThrow(() -> new ResourceNotFoundException("Khong tim thay benh nhan"));
+        User doctor = userRepository.findById(appointment.getDoctorId())
+                .orElseThrow(() -> new ResourceNotFoundException("Khong tim thay bac si"));
+
+        String actor = normalizeCode(cancelledBy, "PATIENT");
+        String normalizedReason = normalizeCancelReason(cancelReason);
+        String reasonSuffix = normalizedReason.isBlank() ? "" : " | Lý do: " + normalizedReason;
         appointmentRepository.deleteById(id);
-        activityLogService.add("APPOINTMENT", "Benh nhan " + patient.getFullName() + " da huy lich hen " + id);
+
+        if ("DOCTOR".equals(actor)) {
+            String messageToPatient = "Bác sĩ " + doctor.getFullName() + " đã hủy lịch hẹn #" + id + reasonSuffix;
+            activityLogService.addNotification("APPOINTMENT_NOTICE", doctor.getId(), patient.getId(), id, messageToPatient);
+            activityLogService.add("APPOINTMENT", "Bac si " + doctor.getFullName() + " da huy lich hen " + id + reasonSuffix);
+        } else {
+            String messageToDoctor = "Bệnh nhân " + patient.getFullName() + " đã hủy lịch hẹn #" + id + reasonSuffix;
+            activityLogService.addNotification("APPOINTMENT_NOTICE", patient.getId(), doctor.getId(), id, messageToDoctor);
+            activityLogService.add("APPOINTMENT", "Benh nhan " + patient.getFullName() + " da huy lich hen " + id + reasonSuffix);
+        }
+
         return ApiResponse.ok("DELETE SUCCESSFULLY", null);
     }
 
@@ -272,6 +303,13 @@ public class AppointmentService {
         Appointment appointment = getAppointmentById(id).withStatus(AppointmentStatus.DONE);
         appointmentRepository.save(appointment);
         return ApiResponse.ok("UPDATE APPOINTMENT STATUS SUCCESSFULLY", null);
+    }
+
+    private String normalizeCancelReason(String cancelReason) {
+        if (cancelReason == null) {
+            return "";
+        }
+        return cancelReason.trim();
     }
 
     public ApiResponse<Object> updateStatusCancelled(Long id) {
@@ -288,6 +326,25 @@ public class AppointmentService {
 
         Appointment appointment = getAppointmentById(id).withStatus(nextStatus);
         appointmentRepository.save(appointment);
+
+        User patient = userRepository.findById(appointment.getPatientId())
+                .orElseThrow(() -> new ResourceNotFoundException("Khong tim thay benh nhan"));
+        User doctor = userRepository.findById(appointment.getDoctorId())
+                .orElseThrow(() -> new ResourceNotFoundException("Khong tim thay bac si"));
+
+        if (nextStatus == AppointmentStatus.DONE) {
+            String messageToPatient = "Bác sĩ " + doctor.getFullName() + " đã xác nhận lịch hẹn #" + id + " đã khám xong";
+            activityLogService.addNotification("APPOINTMENT_NOTICE", doctor.getId(), patient.getId(), id, messageToPatient);
+            activityLogService.add("APPOINTMENT", "Bac si " + doctor.getFullName() + " da danh dau lich hen " + id + " la DA KHAM");
+        }
+
+        if (nextStatus == AppointmentStatus.CANCELLED) {
+            String messageToPatient = "Lịch hẹn #" + id + " đã bị hủy";
+            activityLogService.addNotification("APPOINTMENT_NOTICE", null, patient.getId(), id, messageToPatient);
+            String messageToDoctor = "Lịch hẹn #" + id + " đã bị hủy";
+            activityLogService.addNotification("APPOINTMENT_NOTICE", null, doctor.getId(), id, messageToDoctor);
+        }
+
         return ApiResponse.ok("UPDATE APPOINTMENT STATUS SUCCESSFULLY", null);
     }
 
@@ -311,19 +368,17 @@ public class AppointmentService {
             throw new BadRequestException("Dich vu dang tam ngung hoat dong");
         }
 
-        if (service.getDurationMin() == null || service.getDurationMin() <= 0) {
-            throw new BadRequestException("Dich vu chua duoc cau hinh thoi gian kham hop le");
-        }
-
         appointment = appointment.toBuilder()
                 .serviceId(serviceId)
-                .endTime(appointment.getStartTime().plusMinutes(service.getDurationMin()))
+                .endTime(appointment.getStartTime().plusMinutes(SLOT_DURATION_MINUTES))
                 .build();
+
+        ensureNotInPast(appointment.getStartTime());
 
         appointment = validateAndNormalizeTimeRange(appointment);
         ensureInBusinessHours(appointment.getStartTime(), appointment.getEndTime());
         lockDoctorProfile(appointment.getDoctorId());
-        validateDoctorBySchedule(appointment.getDoctorId(), service, appointment.getStartTime(), appointment.getEndTime());
+        validateDoctorBySchedule(appointment.getDoctorId(), service, appointment.getStartTime(), appointment.getEndTime(), id);
         validateScheduleConflicts(id, appointment);
 
         try {
@@ -413,7 +468,7 @@ public class AppointmentService {
         return result;
     }
 
-    public List<AppointmentAvailabilityOption> getDoctorAvailability(Long doctorId, Long serviceId, LocalDate date) {
+    public List<AppointmentAvailabilityOption> getDoctorAvailability(Long doctorId, Long serviceId, LocalDate date, Long excludingAppointmentId) {
         if (date == null) {
             throw new BadRequestException("Ngay dat lich khong duoc de trong");
         }
@@ -421,19 +476,25 @@ public class AppointmentService {
         com.acare.backend.entity.Service service = serviceRepository.findById(serviceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Khong tim thay dich vu"));
 
-        int durationMinutes = resolveDurationMinutes(service);
+        int durationMinutes = resolveDurationMinutes();
         DoctorProfile profile = doctorProfileRepository.findByUserId(doctorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Khong tim thay bac si"));
+
+        if (!profile.worksOn(date.getDayOfWeek())) {
+            return List.of();
+        }
 
         List<AppointmentAvailabilityOption> options = new ArrayList<>();
         LocalTime cursor = BUSINESS_START;
         LocalTime lastStart = BUSINESS_END.minusMinutes(durationMinutes);
+        LocalDateTime now = LocalDateTime.now();
 
         while (!cursor.isAfter(lastStart)) {
             LocalDateTime start = date.atTime(cursor);
             LocalDateTime end = start.plusMinutes(durationMinutes);
 
-            boolean available = isDoctorAvailable(profile, service, start, end);
+            boolean inPast = start.isBefore(now);
+            boolean available = !inPast && isDoctorAvailable(profile, service, start, end, excludingAppointmentId);
             options.add(AppointmentAvailabilityOption.builder()
                     .time(cursor.toString())
                     .availableDoctors(available ? 1 : 0)
@@ -454,18 +515,22 @@ public class AppointmentService {
         com.acare.backend.entity.Service service = serviceRepository.findById(serviceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Khong tim thay dich vu"));
 
-        int durationMinutes = resolveDurationMinutes(service);
+        int durationMinutes = resolveDurationMinutes();
         List<DoctorProfile> doctorProfiles = getDoctorProfilesForService(service);
 
         List<AppointmentAvailabilityOption> options = new ArrayList<>();
         LocalTime cursor = BUSINESS_START;
         LocalTime lastStart = BUSINESS_END.minusMinutes(durationMinutes);
+        LocalDateTime now = LocalDateTime.now();
 
         while (!cursor.isAfter(lastStart)) {
             LocalDateTime start = date.atTime(cursor);
             LocalDateTime end = start.plusMinutes(durationMinutes);
 
-            int doctorCount = (int) doctorProfiles.stream()
+            boolean inPast = start.isBefore(now);
+            int doctorCount = inPast
+                ? 0
+                : (int) doctorProfiles.stream()
                     .filter(profile -> isDoctorAvailable(profile, service, start, end))
                     .count();
 
@@ -481,13 +546,8 @@ public class AppointmentService {
         return options;
     }
 
-    private int resolveDurationMinutes(com.acare.backend.entity.Service service) {
-        Integer duration = service.getDurationMin();
-        int durationMinutes = duration != null ? duration : 30;
-        if (durationMinutes <= 0) {
-            throw new BadRequestException("Dich vu co thoi luong khong hop le");
-        }
-        return durationMinutes;
+    private int resolveDurationMinutes() {
+        return SLOT_DURATION_MINUTES;
     }
 
     private AppointmentStatus parseStatus(String status) {
@@ -545,7 +605,7 @@ public class AppointmentService {
 
         LocalDateTime endTime = appointment.getEndTime() != null
                 ? appointment.getEndTime()
-                : appointment.getStartTime().plusMinutes(30);
+            : appointment.getStartTime().plusMinutes(SLOT_DURATION_MINUTES);
 
         if (!endTime.isAfter(appointment.getStartTime())) {
             throw new BadRequestException("End time phai lon hon start time");
@@ -555,18 +615,11 @@ public class AppointmentService {
     }
 
     private void validateScheduleConflicts(Long appointmentId, Appointment appointment) {
-        boolean doctorConflict = appointmentId == null
-                ? appointmentRepository.existsDoctorConflict(
-                        appointment.getDoctorId(),
-                        appointment.getStartTime(),
-                        appointment.getEndTime(),
-                        ACTIVE_SCHEDULE_STATUSES)
-                : appointmentRepository.existsDoctorConflictExcludingId(
-                        appointmentId,
-                        appointment.getDoctorId(),
-                        appointment.getStartTime(),
-                        appointment.getEndTime(),
-                        ACTIVE_SCHEDULE_STATUSES);
+        boolean doctorConflict = hasDoctorConflict(
+            appointment.getDoctorId(),
+            appointment.getStartTime(),
+            appointment.getEndTime(),
+            appointmentId);
 
         if (doctorConflict) {
             throw new ConflictException("Bac si da co lich hen trung khung gio");
@@ -593,6 +646,16 @@ public class AppointmentService {
         LocalTime et = end.toLocalTime();
         if (st.isBefore(BUSINESS_START) || et.isAfter(BUSINESS_END)) {
             throw new BadRequestException("Chi ho tro dat lich trong gio hanh chinh 08:00-17:00");
+        }
+    }
+
+    private void ensureNotInPast(LocalDateTime start) {
+        if (start == null) {
+            throw new BadRequestException("Thoi gian dat lich khong hop le");
+        }
+
+        if (start.isBefore(LocalDateTime.now())) {
+            throw new BadRequestException("Khong the dat hoac sua lich vao moc thoi gian da qua");
         }
     }
 
@@ -662,6 +725,15 @@ public class AppointmentService {
             com.acare.backend.entity.Service service,
             LocalDateTime start,
             LocalDateTime end) {
+        return isDoctorAvailable(profile, service, start, end, null);
+    }
+
+    private boolean isDoctorAvailable(
+            DoctorProfile profile,
+            com.acare.backend.entity.Service service,
+            LocalDateTime start,
+            LocalDateTime end,
+            Long excludingAppointmentId) {
         if (Boolean.TRUE.equals(profile.getOnLeave())) {
             return false;
         }
@@ -684,11 +756,29 @@ public class AppointmentService {
             return false;
         }
 
-        return !appointmentRepository.existsDoctorConflict(
-                profile.getUserId(),
-                start,
-                end,
-                ACTIVE_SCHEDULE_STATUSES);
+        boolean conflict = hasDoctorConflict(profile.getUserId(), start, end, excludingAppointmentId);
+
+        return !conflict;
+    }
+
+    private boolean hasDoctorConflict(
+            Long doctorId,
+            LocalDateTime start,
+            LocalDateTime end,
+            Long excludingAppointmentId) {
+        List<Appointment> doctorAppointments = appointmentRepository.findByDoctorId(doctorId);
+        return doctorAppointments.stream()
+                .filter(existing -> existing.getStatus() != null && ACTIVE_SCHEDULE_STATUSES.contains(existing.getStatus()))
+                .filter(existing -> excludingAppointmentId == null || !excludingAppointmentId.equals(existing.getId()))
+                .anyMatch(existing -> {
+                    LocalDateTime existingStart = existing.getStartTime();
+                    if (existingStart == null) {
+                        return false;
+                    }
+                    // Normalize all appointments to fixed 25-minute slots to avoid legacy end_time skew.
+                    LocalDateTime existingEnd = existingStart.plusMinutes(SLOT_DURATION_MINUTES);
+                    return start.isBefore(existingEnd) && end.isAfter(existingStart);
+                });
     }
 
     private void validateDoctorBySchedule(
@@ -696,10 +786,19 @@ public class AppointmentService {
             com.acare.backend.entity.Service service,
             LocalDateTime start,
             LocalDateTime end) {
+        validateDoctorBySchedule(doctorId, service, start, end, null);
+        }
+
+        private void validateDoctorBySchedule(
+            Long doctorId,
+            com.acare.backend.entity.Service service,
+            LocalDateTime start,
+            LocalDateTime end,
+            Long excludingAppointmentId) {
         DoctorProfile profile = doctorProfileRepository.findByUserId(doctorId)
                 .orElseThrow(() -> new BadRequestException("Bac si chua duoc cau hinh ho so lam viec"));
 
-        if (!isDoctorAvailable(profile, service, start, end)) {
+        if (!isDoctorAvailable(profile, service, start, end, excludingAppointmentId)) {
             throw new ConflictException("Bac si khong ranh trong khung gio dat lich");
         }
     }

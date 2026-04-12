@@ -41,9 +41,6 @@ public class ServiceService {
         if (normalized.getPrice() == null || normalized.getPrice().compareTo(BigDecimal.ZERO) < 0) {
             return ApiResponse.fail(400, "SERVICE PRICE IS INVALID", normalized);
         }
-        if (normalized.getDurationMin() == null || normalized.getDurationMin() <= 0) {
-            return ApiResponse.fail(400, "SERVICE DURATION IS INVALID", normalized);
-        }
         if (normalized.getSpecialtyId() == null) {
             return ApiResponse.fail(400, "SERVICE SPECIALTY IS REQUIRED", normalized);
         }

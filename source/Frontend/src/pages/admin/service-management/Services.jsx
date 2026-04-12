@@ -103,13 +103,7 @@ function AdminServiceManagement() {
         setDeleting(true);
         try {
             await serviceService.remove(deleteTargetId);
-            setServices((prev) => prev.filter((service) => service.id !== deleteTargetId));
-            setNoticeModal({
-                isOpen: true,
-                title: "Đã xóa dịch vụ",
-                message: "Dịch vụ đã được xóa thành công.",
-                tone: "success",
-            });
+            window.location.reload();
         }
         catch (error) {
             setNoticeModal({

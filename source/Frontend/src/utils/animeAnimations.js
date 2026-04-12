@@ -1,10 +1,9 @@
-import anime from "animejs";
+import { animate, createTimeline } from "animejs";
 
 export function animatePageEnter(target, options = {}) {
     if (!target) return null;
 
-    return anime({
-        targets: target,
+    return animate(target, {
         opacity: [0, 1],
         translateY: [16, 0],
         duration: 320,
@@ -16,18 +15,17 @@ export function animatePageEnter(target, options = {}) {
 export function animateModalIn({ backdrop, panel }) {
     if (!backdrop || !panel) return null;
 
-    return anime
-        .timeline({ easing: "easeOutCubic", duration: 220 })
+    return createTimeline({ easing: "easeOutCubic", duration: 220 })
         .add(
+            backdrop,
             {
-                targets: backdrop,
                 opacity: [0, 1],
             },
             0
         )
         .add(
+            panel,
             {
-                targets: panel,
                 opacity: [0, 1],
                 scale: [0.96, 1],
                 translateY: [14, 0],
@@ -42,15 +40,13 @@ export function animateModalOut({ backdrop, panel, onComplete }) {
         return null;
     }
 
-    const backdropAnimation = anime({
-        targets: backdrop,
+    const backdropAnimation = animate(backdrop, {
         opacity: [1, 0],
         duration: 160,
         easing: "easeInQuad",
     });
 
-    const panelAnimation = anime({
-        targets: panel,
+    const panelAnimation = animate(panel, {
         opacity: [1, 0],
         scale: [1, 0.96],
         translateY: [0, 8],
@@ -58,7 +54,7 @@ export function animateModalOut({ backdrop, panel, onComplete }) {
         easing: "easeInQuad",
     });
 
-    Promise.all([backdropAnimation.finished, panelAnimation.finished])
+    Promise.all([backdropAnimation, panelAnimation])
         .then(() => onComplete?.())
         .catch(() => onComplete?.());
 
