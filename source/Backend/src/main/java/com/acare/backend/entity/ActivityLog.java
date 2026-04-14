@@ -25,7 +25,7 @@ public class ActivityLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String type;         // "APPOINTMENT", "SERVICE", "USER", ...
+    private String type;  
     @Column String message;   
     @Column(name = "actor_user_id")
     private Long actorUserId;

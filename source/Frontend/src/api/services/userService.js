@@ -1,4 +1,4 @@
-import { httpDelete, httpGet, httpPost, httpPut, toQueryString } from "./http";
+import { httpDelete, httpGet, httpGetPublic, httpPost, httpPut, toQueryString } from "./http";
 
 export const userService = {
     async getAll() {
@@ -8,7 +8,7 @@ export const userService = {
         return httpGet(`/users/${id}`);
     },
     async getDoctors() {
-        return httpGet(`/users${toQueryString({ role: "DOCTOR" })}`);
+        return httpGetPublic("/users/doctor");
     },
     async getPatients() {
         return httpGet(`/users${toQueryString({ role: "PATIENT" })}`);

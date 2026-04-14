@@ -190,7 +190,6 @@ function AdminUserManagement() {
                                     { value: "ADMIN", label: "Admin" },
                                     { value: "DOCTOR", label: "Bác sĩ" },
                                     { value: "PATIENT", label: "Bệnh nhân" },
-                                    { value: "STAFF", label: "Nhân viên" },
                                 ]}
                                 placeholder="Tất cả vai trò"
                             />

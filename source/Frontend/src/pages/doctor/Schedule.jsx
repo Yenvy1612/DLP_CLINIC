@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getUserId } from "../../utils/authUtils";
 import { activityService, appointmentService, serviceService, userService } from "../../api";
+import { APPOINTMENT_CHANGED_EVENT } from "../../api/services/appointmentService";
 import ActionModal from "../../components/ActionModal";
 
 const cancelReasonOptions = [
@@ -25,6 +26,7 @@ const formatDateTime = (value) => {
 function Schedule() {
     const id = getUserId();
     const [loading, setLoading] = useState(true);
+    const [refreshKey, setRefreshKey] = useState(0);
     const [appointments, setAppointments] = useState([]);
     const [doctorInfo, setDoctorInfo] = useState(null);
     const [patientMap, setPatientMap] = useState({});
@@ -37,6 +39,15 @@ function Schedule() {
     const [selectedCancelReason, setSelectedCancelReason] = useState(cancelReasonOptions[0]);
     const [customCancelReason, setCustomCancelReason] = useState("");
     const [cancelFormError, setCancelFormError] = useState("");
+
+    useEffect(() => {
+        const handleAppointmentChanged = () => {
+            setRefreshKey((prev) => prev + 1);
+        };
+
+        window.addEventListener(APPOINTMENT_CHANGED_EVENT, handleAppointmentChanged);
+        return () => window.removeEventListener(APPOINTMENT_CHANGED_EVENT, handleAppointmentChanged);
+    }, []);
 
     useEffect(() => {
         if (!id) {
@@ -101,7 +112,7 @@ function Schedule() {
             }
         };
         fetchData();
-    }, [id]);
+    }, [id, refreshKey]);
 
     if (loading) {
         return <p className="py-10 text-center text-slate-500">Đang tải lịch hẹn...</p>;
@@ -307,7 +318,6 @@ function Schedule() {
                                     setProcessingId(target.id);
                                     try {
                                         await appointmentService.remove(target.id, "DOCTOR", reason);
-                                        window.location.reload();
                                     } finally {
                                         setCancelTarget(null);
                                         setProcessingId(null);
@@ -338,7 +348,7 @@ function Schedule() {
                     setProcessingId(doneTarget.id);
                     try {
                         await appointmentService.markDone(doneTarget.id);
-                        window.location.reload();
+                        setDoneTarget(null);
                     } finally {
                         setProcessingId(null);
                     }

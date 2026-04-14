@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.acare.backend.dto.ApiResponse;
+import com.acare.backend.dto.ApiResponseMapper;
 import com.acare.backend.dto.auth.AuthResponse;
 import com.acare.backend.dto.auth.ChangePasswordRequest;
 import com.acare.backend.dto.auth.LoginRequest;
@@ -18,7 +19,7 @@ import com.acare.backend.dto.auth.UpdateProfileRequest;
 import com.acare.backend.dto.auth.UserProfileResponse;
 import com.acare.backend.dto.user.DoctorProfileResponse;
 import com.acare.backend.dto.user.DoctorProfileUpdateRequest;
-import com.acare.backend.entity.User;
+import com.acare.backend.dto.user.UserResponse;
 import com.acare.backend.service.AuthService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,8 +43,8 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<User>> register(@Valid @RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authService.register(request));
+    public ResponseEntity<ApiResponse<UserResponse>> register(@Valid @RequestBody RegisterRequest request) {
+        return ResponseEntity.ok(ApiResponseMapper.map(authService.register(request), UserResponse::from));
     }
 
     @PostMapping("/refresh")

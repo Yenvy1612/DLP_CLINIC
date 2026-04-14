@@ -1,4 +1,5 @@
 export { activityService } from "./activityService";
+export { adminDashboardService } from "./adminDashboardService";
 export { appointmentService } from "./appointmentService";
 export { authService } from "./authService";
 export { geminiService } from "./geminiService";

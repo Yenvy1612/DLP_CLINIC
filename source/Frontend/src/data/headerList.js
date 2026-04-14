@@ -1,49 +1,52 @@
 // Menu mặc định cho khách
 const guestMenu = [
-    { id: 1, to: "/", name: "TRANG CHỦ", hasArrow: false },
+    { id: 1, to: "/", name: "Trang chủ", hasArrow: false },
 
     {
         id: 2,
-        to: "/services",
-        name: "DỊCH VỤ",
+        to: "/about",
+        name: "Giới thiệu",
         hasArrow: false,
     },
-
+    { id: 3, to: "/services", name: "Dịch vụ", hasArrow: false },
+    { id: 4, to: "/doctors", name: "Đội ngũ", hasArrow: false },
+    { id: 5, to: "/instruction", name: "Hướng dẫn", hasArrow: false },
     {
-        id: 3,
-        to: "/about",
-        name: "TRANG",
+        id: 6,
+        to: "#",
+        name: "Trang",
         hasArrow: true,
         children: [
-            { id: "p1", label: "GIỚI THIỆU", to: "/about" },
-            { id: "p2", label: "HƯỚNG DẪN", to: "/instruction" },
-            { id: "p3", label: "HỎI ĐÁP", to: "/faq" },
+            { id: "p1", label: "Liên hệ", to: "/contact" },
+            { id: "p2", label: "Hướng dẫn", to: "/instruction" },
+            { id: "p3", label: "Hỏi đáp", to: "/faq" },
         ],
     },
-
-    { id: 4, to: "/instruction", name: "HƯỚNG DẪN", hasArrow: false },
-    { id: 5, to: "/contact", name: "LIÊN HỆ", hasArrow: false },
 ];
 
 // Menu cho ADMIN
 const adminMenu = [
-    { id: 1, to: "/admin/dashboard", name: "BẢNG ĐIỀU KHIỂN", hasArrow: false },
-    { id: 2, to: "/admin/users", name: "NGƯỜI DÙNG", hasArrow: false },
-    { id: 3, to: "/admin/services", name: "DỊCH VỤ", hasArrow: false },
+    { id: 1, to: "/admin/dashboard", name: "Bảng điều khiển", hasArrow: false },
+    { id: 2, to: "/admin/users", name: "Người dùng", hasArrow: false },
+    { id: 3, to: "/admin/services", name: "Dịch vụ", hasArrow: false },
+    { id: 4, to: "/admin/statistics", name: "Thống kê", hasArrow: false },
 ];
 
 // Menu cho DOCTOR
 const doctorMenu = [
-    { id: 1, to: "/doctor/schedule", name: "LỊCH KHÁM", hasArrow: false },
-    { id: 2, to: "/doctor/reports", name: "THỐNG KÊ", hasArrow: false },
-    { id: 3, to: "/instruction", name: "HƯỚNG DẪN", hasArrow: false },
+    { id: 1, to: "/doctor/schedule", name: "Lịch khám", hasArrow: false },
+    { id: 2, to: "/doctor/reports", name: "Thống kê", hasArrow: false },
+    { id: 3, to: "/instruction", name: "Hướng dẫn", hasArrow: false },
 ];
 
 // Menu cho PATIENT
 const patientMenu = [
-    { id: 1, to: "/patient/book", name: "Đặt lịch", hasArrow: false },
-    { id: 2, to: "/patient/appointments", name: "Lịch hẹn", hasArrow: false },
-    { id: 3, to: "/patient/history", name: "Lịch sử", hasArrow: false },
+    { id: 1, to: "/", name: "Trang chủ", hasArrow: false },
+    { id: 2, to: "/services", name: "Dịch vụ", hasArrow: false },
+    { id: 3, to: "/doctors", name: "Bác sĩ", hasArrow: false },
+    { id: 4, to: "/patient/book", name: "Đặt lịch", hasArrow: false },
+    { id: 5, to: "/patient/appointments", name: "Lịch hẹn", hasArrow: false },
+    { id: 6, to: "/patient/history", name: "Lịch sử", hasArrow: false },
 ];
 
 // Export theo vai trò

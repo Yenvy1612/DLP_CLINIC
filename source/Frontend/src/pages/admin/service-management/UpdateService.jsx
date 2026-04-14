@@ -126,7 +126,7 @@ function AdminEditService() {
         setResultModal((prev) => ({ ...prev, isOpen: false, nextAction: "none" }));
 
         if (nextAction === "back-services") {
-            window.location.assign("/admin/services");
+            navigate("/admin/services");
         }
     };
 
@@ -205,7 +205,7 @@ function AdminEditService() {
                                 onClick={() => navigate("/admin/services")}
                                 className="px-4 py-2 cursor-pointer rounded-xl bg-slate-700 text-white hover:bg-slate-800 transition duration-400"
                             >
-                                Huỷ
+                                Hủy
                             </button>
                         </div>
                     </form>

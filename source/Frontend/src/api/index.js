@@ -1,5 +1,6 @@
 export {
     activityService,
+    adminDashboardService,
     appointmentService,
     authService,
     geminiService,

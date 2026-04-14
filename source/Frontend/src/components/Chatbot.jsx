@@ -6,8 +6,11 @@ import logo from "../assets/images/logo/clinic.png";
 import { geminiService } from "../api";
 
 function Chatbot() {
+    const role = getUserRole();
+    const isAdmin = role === "ADMIN";
+
     const [isOpen, setIsOpen] = useState(false);
-    const [showHint, setShowHint] = useState(true);
+    const [showHint, setShowHint] = useState(!isAdmin);
     const [messages, setMessages] = useState([
         {
             role: "assistant",
@@ -25,6 +28,12 @@ function Chatbot() {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    useEffect(() => {
+        if (isAdmin) {
+            setShowHint(false);
+        }
+    }, [isAdmin]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -83,7 +92,7 @@ function Chatbot() {
         <>
             {/* Hint Message Bubble */}
             <AnimatePresence>
-                {showHint && !isOpen && (
+                {!isAdmin && showHint && !isOpen && (
                     <motion.div
                         initial={{ opacity: 0, y: 20, scale: 0.8 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -114,8 +123,8 @@ function Chatbot() {
             <motion.button
                 onClick={() => setIsOpen(!isOpen)}
                 className="fixed bottom-24 right-6 z-50 h-14 w-14 rounded-full bg-[#00278D] hover:from-[#003bb5] hover:to-sky-400 text-white shadow-xl shadow-blue-900/30 flex items-center justify-center transition-all duration-300 p-2"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                whileHover={isAdmin ? undefined : { scale: 1.06 }}
+                whileTap={isAdmin ? undefined : { scale: 0.94 }}
                 aria-label="Open chatbot"
             >
                 {isOpen ? (

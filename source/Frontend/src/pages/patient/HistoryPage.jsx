@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getUserId } from "../../utils/authUtils";
 import { appointmentService, serviceService, userService } from "../../api";
+import { APPOINTMENT_CHANGED_EVENT } from "../../api/services/appointmentService";
 
 const formatDateTime = (value) => {
     if (!value) return "--/--/---- --:--";
@@ -20,11 +21,21 @@ const paymentMethodLabel = "Thanh toán tại quầy";
 function HistoryPage() {
     const id = getUserId();
     const [loading, setLoading] = useState(true);
+    const [refreshKey, setRefreshKey] = useState(0);
     const [appointments, setAppointments] = useState([]);
     const [patientInfo, setPatientInfo] = useState(null);
     const [doctorMap, setDoctorMap] = useState({});
     const [serviceMap, setServiceMap] = useState({});
     const [detailTarget, setDetailTarget] = useState(null);
+
+    useEffect(() => {
+        const handleAppointmentChanged = () => {
+            setRefreshKey((prev) => prev + 1);
+        };
+
+        window.addEventListener(APPOINTMENT_CHANGED_EVENT, handleAppointmentChanged);
+        return () => window.removeEventListener(APPOINTMENT_CHANGED_EVENT, handleAppointmentChanged);
+    }, []);
 
     useEffect(() => {
         if (!id) {
@@ -79,7 +90,7 @@ function HistoryPage() {
         };
         getDoneAppointments();
 
-    }, [id]);
+    }, [id, refreshKey]);
 
     if (loading) return <p className="text-center text-gray-500 py-10">Đang tải...</p>;
 
@@ -144,7 +155,7 @@ function HistoryPage() {
                 )}
 
                 {detailTarget ? (
-                    <div className="fixed inset-0 z-[130] bg-black/40 p-4 flex items-center justify-center" onClick={() => setDetailTarget(null)}>
+                    <div className="fixed inset-0 z-[10000] bg-black/40 p-4 flex items-center justify-center" onClick={() => setDetailTarget(null)}>
                         <div className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl p-6" onClick={(event) => event.stopPropagation()}>
                             <h3 className="text-2xl font-bold text-[#00278D]">Chi tiết lịch sử khám</h3>
                             <p className="text-sm text-slate-500 mt-1">Mã lịch hẹn: #{detailTarget.appointment.id}</p>

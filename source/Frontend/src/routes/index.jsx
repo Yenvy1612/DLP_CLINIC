@@ -4,6 +4,7 @@ import Home from "../pages/home/Home";
 import NotFound from "../pages/NotFound";
 import Login from "../pages/auth/Login";
 import Services from "../pages/Services";
+import Doctors from "../pages/Doctors";
 import Booking from "../pages/patient/Booking";
 import Payment from "../pages/patient/Payment";
 import EditProfile from "../pages/EditProfile";
@@ -19,11 +20,11 @@ import AdminUserManagement from "../pages/admin/user-management/Users";
 import AdminEditProfile from "../pages/admin/user-management/UpdateUser";
 import AdminShowProfile from "../pages/admin/user-management/ShowUser";
 import AdminServiceManagement from "../pages/admin/service-management/Services";
+import AdminStatistics from "../pages/admin/statistics/AdminStatistics";
 import AddUser from "../pages/admin/user-management/AddUser";
 import AdminShowService from "../pages/admin/service-management/ShowService";
 import AdminEditService from "../pages/admin/service-management/UpdateService";
 import AddService from "../pages/admin/service-management/AddService";
-import AdminAppointmentManagement from "../pages/admin/appointment-management/Appointments";
 import About from "../pages/About";
 import Instruction from "../pages/Instruction";
 import FAQ from "../pages/FAQ";
@@ -52,6 +53,7 @@ const router = createBrowserRouter([
         children: [
             { path: "/", element: <Home /> },
             { path: "/services", element: <Services /> },
+            { path: "/doctors", element: <Doctors /> },
             { path: "/about", element: <About /> },
             { path: "/instruction", element: <Instruction /> },
             { path: "/faq", element: <FAQ /> },
@@ -103,9 +105,9 @@ const router = createBrowserRouter([
                             { path: "show-user/:id", element: <AdminShowProfile /> },
                             { path: "add-user", element: <AddUser /> },
                             { path: "services", element: <AdminServiceManagement /> },
+                            { path: "statistics", element: <AdminStatistics /> },
                             { path: "edit-service/:id", element: <AdminEditService /> },
-                            { path: "add-service", element: <AddService /> },
-                            { path: "appointments", element: <AdminAppointmentManagement /> }
+                            { path: "add-service", element: <AddService /> }
                         ]
                     }
                 ]

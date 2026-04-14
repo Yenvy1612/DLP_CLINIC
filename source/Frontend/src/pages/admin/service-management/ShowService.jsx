@@ -49,6 +49,17 @@ function AdminShowService() {
     });
 
     useEffect(() => {
+        if (role === "ADMIN") {
+            navigate(`/admin/edit-service/${id}`, { replace: true });
+        }
+    }, [id, navigate, role]);
+
+    useEffect(() => {
+        if (role === "ADMIN") {
+            setLoading(false);
+            return;
+        }
+
         const fetchService = async () => {
             try {
                 const data = await serviceService.getById(id);
@@ -60,7 +71,7 @@ function AdminShowService() {
             }
         };
         fetchService();
-    }, [id]);
+    }, [id, role]);
 
     const closeActionModal = () => {
         setActionModal((prev) => ({ ...prev, isOpen: false, onConfirm: null }));
@@ -103,6 +114,8 @@ function AdminShowService() {
             state: { preselectedServiceId: String(service.id) },
         });
     };
+
+    if (role === "ADMIN") return null;
 
     if (loading)
         return (

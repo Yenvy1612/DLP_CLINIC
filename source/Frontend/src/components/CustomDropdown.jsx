@@ -64,8 +64,9 @@ export default function CustomDropdown({
                 disabled={disabled}
                 onClick={() => setOpen((prev) => !prev)}
                 className={cx(
-                    "w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-left text-slate-800 shadow-sm",
-                    "transition hover:border-[#001f5f] focus:outline-none focus:ring-2 focus:ring-[#001f5f]/30",
+                    "w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-left text-slate-800 shadow-sm",
+                    "transition focus:outline-none focus:ring-2 focus:ring-[#001f5f]/20",
+                    open ? "border-[#001f5f]/40" : "hover:border-slate-400",
                     disabled && "cursor-not-allowed bg-slate-100 text-slate-400 hover:border-slate-300",
                     buttonClassName,
                 )}
@@ -88,7 +89,7 @@ export default function CustomDropdown({
                 <ul
                     role="listbox"
                     className={cx(
-                        "absolute z-[70] mt-2 max-h-64 w-full overflow-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg",
+                        "absolute z-[70] mt-2 max-h-64 w-full overflow-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_18px_36px_rgba(15,23,42,0.16)]",
                         menuClassName,
                     )}
                 >
@@ -104,7 +105,7 @@ export default function CustomDropdown({
                                     disabled={optionDisabled}
                                     onClick={() => handleSelect(optionValue)}
                                     className={cx(
-                                        "w-full rounded-lg px-3 py-2 text-left text-sm transition",
+                                        "w-full rounded-xl px-3 py-2.5 text-left text-sm font-medium transition",
                                         selected
                                             ? "bg-[#001f5f] text-white"
                                             : "text-slate-700 hover:bg-slate-100",

@@ -1,5 +1,4 @@
 import axios from "axios";
-import { getCurrentUser } from "../utils/authUtils";
 
 export const apiClient = axios.create({
     baseURL: "http://localhost:8080/api",
@@ -39,10 +38,18 @@ const extractErrorMessage = (error) => {
 };
 
 apiClient.interceptors.request.use((config) => {
-    const auth = getCurrentUser();
-    const token = auth?.accessToken || auth?.token;
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+    const skipAuth = config?.headers?.["X-Skip-Auth"] === "true";
+    if (skipAuth) {
+        if (config.headers) {
+            delete config.headers.Authorization;
+            delete config.headers["X-Skip-Auth"];
+        }
+        return config;
+    }
+
+    // Auth now relies on HttpOnly cookies set by backend.
+    if (config.headers) {
+        delete config.headers.Authorization;
     }
     return config;
 });

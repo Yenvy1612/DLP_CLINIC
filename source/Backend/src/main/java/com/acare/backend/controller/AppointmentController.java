@@ -17,9 +17,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.acare.backend.dto.ApiResponse;
+import com.acare.backend.dto.ApiResponseMapper;
 import com.acare.backend.dto.appointment.AppointmentAvailabilityOption;
 import com.acare.backend.dto.appointment.AppointmentCreateRequest;
-import com.acare.backend.entity.Appointment;
+import com.acare.backend.dto.appointment.AppointmentResponse;
+import com.acare.backend.dto.appointment.AppointmentUpsertRequest;
+import com.acare.backend.dto.appointment.DoctorByServiceResponse;
 import com.acare.backend.service.AppointmentService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,17 +35,17 @@ public class AppointmentController {
     private final AppointmentService appointmentService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Appointment>> create(@RequestBody AppointmentCreateRequest request) {
-        return ResponseEntity.ok(appointmentService.createAppointment(request));
+    public ResponseEntity<ApiResponse<AppointmentResponse>> create(@RequestBody AppointmentCreateRequest request) {
+        return ResponseEntity.ok(ApiResponseMapper.map(appointmentService.createAppointment(request), AppointmentResponse::from));
     }
 
     @PostMapping("/book")
-    public ResponseEntity<ApiResponse<Appointment>> createAppointment(@RequestBody Appointment appointment) {
-        return ResponseEntity.ok(appointmentService.createAppointment(appointment));
+    public ResponseEntity<ApiResponse<AppointmentResponse>> createAppointment(@RequestBody AppointmentUpsertRequest request) {
+        return ResponseEntity.ok(ApiResponseMapper.map(appointmentService.createAppointment(request.toEntity()), AppointmentResponse::from));
     }
 
     @GetMapping
-    public List<Appointment> getAppointments(
+    public List<AppointmentResponse> getAppointments(
             @RequestParam(required = false) Long doctorId,
             @RequestParam(required = false) Long patientId,
             @RequestParam(required = false) Boolean pending,
@@ -61,27 +64,27 @@ public class AppointmentController {
                 doctorName,
                 patientName,
                 appointmentDate,
-                status);
+                status).stream().map(AppointmentResponse::from).toList();
     }
 
     @GetMapping("/today")
-    public ResponseEntity<List<Appointment>> getTodayAppointments() {
-            return ResponseEntity.ok(appointmentService.getTodayAppointments());
+    public ResponseEntity<List<AppointmentResponse>> getTodayAppointments() {
+            return ResponseEntity.ok(appointmentService.getTodayAppointments().stream().map(AppointmentResponse::from).toList());
     }
 
     @GetMapping("/today/pending")
-    public ResponseEntity<List<Appointment>> getTodayPendingAppointments() {
-        return ResponseEntity.ok(appointmentService.getTodayPendingAppointments());
+    public ResponseEntity<List<AppointmentResponse>> getTodayPendingAppointments() {
+        return ResponseEntity.ok(appointmentService.getTodayPendingAppointments().stream().map(AppointmentResponse::from).toList());
     }
 
     @GetMapping("/month/done")
-    public ResponseEntity<List<Appointment>> getMonthDoneAppointments() {
-        return ResponseEntity.ok(appointmentService.getMonthDoneAppointments());
+    public ResponseEntity<List<AppointmentResponse>> getMonthDoneAppointments() {
+        return ResponseEntity.ok(appointmentService.getMonthDoneAppointments().stream().map(AppointmentResponse::from).toList());
     }
 
     @GetMapping("/month/done/{doctorId}")
-    public ResponseEntity<List<Appointment>> getMonthDoneAppointmentsByDoctorId(@PathVariable Long doctorId) {
-        return ResponseEntity.ok(appointmentService.getMonthDoneAppointmentsByDoctorId(doctorId));
+    public ResponseEntity<List<AppointmentResponse>> getMonthDoneAppointmentsByDoctorId(@PathVariable Long doctorId) {
+        return ResponseEntity.ok(appointmentService.getMonthDoneAppointmentsByDoctorId(doctorId).stream().map(AppointmentResponse::from).toList());
     }
 
     @GetMapping("/availability")
@@ -101,34 +104,36 @@ public class AppointmentController {
     }
 
     @GetMapping("/doctors-by-service")
-    public ResponseEntity<List<java.util.Map<String, Object>>> getDoctorsByService(
+    public ResponseEntity<List<DoctorByServiceResponse>> getDoctorsByService(
             @RequestParam Long serviceId) {
-        return ResponseEntity.ok(appointmentService.getDoctorsByServiceId(serviceId));
+        return ResponseEntity.ok(appointmentService.getDoctorsByServiceId(serviceId).stream()
+                .map(DoctorByServiceResponse::fromMap)
+                .toList());
     }
 
     @GetMapping("/{id}")
-    public Appointment getAllAppointments(@PathVariable Long id) {
-        return appointmentService.getAppointmentById(id);
+    public AppointmentResponse getAllAppointments(@PathVariable Long id) {
+        return AppointmentResponse.from(appointmentService.getAppointmentById(id));
     }
 
     @GetMapping("/pending/patient/{patientId}")
-    public ResponseEntity<List<Appointment>> getPendingAppoinmentsByPatientId(@PathVariable Long patientId) {
-        return ResponseEntity.ok(appointmentService.getPendingByPatientId(patientId));
+    public ResponseEntity<List<AppointmentResponse>> getPendingAppoinmentsByPatientId(@PathVariable Long patientId) {
+        return ResponseEntity.ok(appointmentService.getPendingByPatientId(patientId).stream().map(AppointmentResponse::from).toList());
     }
 
     @GetMapping("/not-pending/patient/{patientId}")
-    public ResponseEntity<List<Appointment>> getDoneAppoinmentsByPatientId(@PathVariable Long patientId) {
-        return ResponseEntity.ok(appointmentService.getNotPendingByPatientId(patientId));
+    public ResponseEntity<List<AppointmentResponse>> getDoneAppoinmentsByPatientId(@PathVariable Long patientId) {
+        return ResponseEntity.ok(appointmentService.getNotPendingByPatientId(patientId).stream().map(AppointmentResponse::from).toList());
     }
 
     @GetMapping("/pending/doctor/{doctorId}")
-    public ResponseEntity<List<Appointment>> getPendingAppoinmentsByDoctorId(@PathVariable Long doctorId) {
-        return ResponseEntity.ok(appointmentService.getPendingByDoctorId(doctorId));
+    public ResponseEntity<List<AppointmentResponse>> getPendingAppoinmentsByDoctorId(@PathVariable Long doctorId) {
+        return ResponseEntity.ok(appointmentService.getPendingByDoctorId(doctorId).stream().map(AppointmentResponse::from).toList());
     }
 
     @GetMapping("/doctor/{doctorId}")
-    public ResponseEntity<List<Appointment>> getAllAppoinmentsByDoctorId(@PathVariable Long doctorId) {
-        return ResponseEntity.ok(appointmentService.getByDoctorId(doctorId));
+    public ResponseEntity<List<AppointmentResponse>> getAllAppoinmentsByDoctorId(@PathVariable Long doctorId) {
+        return ResponseEntity.ok(appointmentService.getByDoctorId(doctorId).stream().map(AppointmentResponse::from).toList());
     }
 
     @PatchMapping("/{id}/status")
@@ -157,12 +162,12 @@ public class AppointmentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Appointment> updateAppointment(@PathVariable Long id, @RequestBody Appointment update) {
-        return ResponseEntity.ok(appointmentService.updateAppointment(id, update));
+    public ResponseEntity<AppointmentResponse> updateAppointment(@PathVariable Long id, @RequestBody AppointmentUpsertRequest request) {
+        return ResponseEntity.ok(AppointmentResponse.from(appointmentService.updateAppointment(id, request.toEntity())));
     }
     
     @GetMapping("/filter")
-    public ResponseEntity<List<Appointment>> filterAppointments(
+    public ResponseEntity<List<AppointmentResponse>> filterAppointments(
             @RequestParam(required = false) String doctorName,
             @RequestParam(required = false) String patientName,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate appointmentDate,
@@ -171,6 +176,6 @@ public class AppointmentController {
             doctorName,
             patientName,
             appointmentDate,
-            status));
+            status).stream().map(AppointmentResponse::from).toList());
     }
 }

@@ -15,10 +15,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.acare.backend.dto.ApiResponse;
+import com.acare.backend.dto.ApiResponseMapper;
+import com.acare.backend.dto.user.DoctorPublicResponse;
 import com.acare.backend.dto.user.DoctorProfileResponse;
 import com.acare.backend.dto.user.DoctorProfileUpdateRequest;
 import com.acare.backend.dto.user.UserCreateRequest;
-import com.acare.backend.entity.User;
+import com.acare.backend.dto.user.UserResponse;
+import com.acare.backend.dto.user.UserUpdateRequest;
 import com.acare.backend.service.UserService;
 
 import jakarta.validation.Valid;
@@ -32,25 +35,35 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<User>> getUsers(
+    public ResponseEntity<List<UserResponse>> getUsers(
             @RequestParam(required = false) String fullName,
             @RequestParam(required = false) String role,
             @RequestParam(required = false) String email) {
 
+        List<UserResponse> responses;
+
         if ((fullName != null && !fullName.isBlank())
                 || (role != null && !role.isBlank())
                 || (email != null && !email.isBlank())) {
-            List<User> users = userService.searchUsers(fullName, role, email);
-            users.sort(Comparator.comparing(User::getRole));
-            return ResponseEntity.ok(users);
+            responses = userService.searchUsers(fullName, role, email).stream()
+                    .map(UserResponse::from)
+                    .toList();
+        } else {
+            responses = userService.getAllUsers().stream()
+                    .map(UserResponse::from)
+                    .toList();
         }
 
-        return ResponseEntity.ok(userService.getAllUsers());
+        responses = responses.stream()
+                .sorted(Comparator.comparing(UserResponse::getRole, Comparator.nullsLast(String::compareToIgnoreCase)))
+                .toList();
+
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(UserResponse.from(userService.getUserById(id)));
     }
 
     @GetMapping("/{id}/doctor-profile")
@@ -66,27 +79,27 @@ public class UserController {
     }
 
     @GetMapping("/doctor")
-    public ResponseEntity<List<User>> getDoctors() {
+    public ResponseEntity<List<DoctorPublicResponse>> getDoctors() {
         return ResponseEntity.ok(userService.getDoctors());
     }
 
     @GetMapping("/patient")
-    public ResponseEntity<List<User>> getPatients() {
-        return ResponseEntity.ok(userService.getPatients());
+    public ResponseEntity<List<UserResponse>> getPatients() {
+        return ResponseEntity.ok(userService.getPatients().stream().map(UserResponse::from).toList());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updateUser) {
-        return ResponseEntity.ok(userService.updateUser(id, updateUser));
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UserUpdateRequest request) {
+        return ResponseEntity.ok(UserResponse.from(userService.updateUser(id, request)));
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<User>> createUser(@Valid @RequestBody UserCreateRequest request) {
-        return ResponseEntity.ok(userService.register(request));
+    public ResponseEntity<ApiResponse<UserResponse>> createUser(@Valid @RequestBody UserCreateRequest request) {
+        return ResponseEntity.ok(ApiResponseMapper.map(userService.register(request), UserResponse::from));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<User>> addUser(@Valid @RequestBody UserCreateRequest request) {
+    public ResponseEntity<ApiResponse<UserResponse>> addUser(@Valid @RequestBody UserCreateRequest request) {
         return createUser(request);
     }
 
@@ -96,7 +109,7 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<User>> searchUsers(
+    public ResponseEntity<List<UserResponse>> searchUsers(
             @RequestParam(required = false) String fullName,
             @RequestParam(required = false) String role,
             @RequestParam(required = false) String email) {
