@@ -99,7 +99,7 @@ function HistoryPage() {
             <div className="max-w-6xl mx-auto py-8 px-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-8">
                     <div className="bg-white w-fit h-fit p-3 rounded-2xl shadow-lg">
-                        <h1 className="text-4xl font-bold text-[#00278D]">Lịch sử khám</h1>
+                        <h1 className="text-2xl font-bold text-[#00278D] sm:text-4xl">Lịch sử khám</h1>
                     </div>
                 </div>
 
@@ -139,7 +139,7 @@ function HistoryPage() {
                                         <button
                                             type="button"
                                             onClick={() => setDetailTarget({ appointment, doctor, service })}
-                                            className="px-3 py-1.5 text-sm rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100"
+                                            className="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100 sm:w-auto"
                                         >
                                             Chi tiết
                                         </button>
@@ -156,7 +156,7 @@ function HistoryPage() {
 
                 {detailTarget ? (
                     <div className="fixed inset-0 z-[10000] bg-black/40 p-4 flex items-center justify-center" onClick={() => setDetailTarget(null)}>
-                        <div className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl p-6" onClick={(event) => event.stopPropagation()}>
+                        <div className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl p-4 sm:p-6" onClick={(event) => event.stopPropagation()}>
                             <h3 className="text-2xl font-bold text-[#00278D]">Chi tiết lịch sử khám</h3>
                             <p className="text-sm text-slate-500 mt-1">Mã lịch hẹn: #{detailTarget.appointment.id}</p>
 
@@ -205,13 +205,13 @@ function HistoryPage() {
                                 </span>
                             </div>
 
-                            <div className="mt-5 border-t border-slate-200 pt-4 flex items-center justify-between">
+                            <div className="mt-5 flex flex-col gap-2 border-t border-slate-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
                                 <span className="text-slate-600 font-medium">Tổng thanh toán</span>
                                 <span className="text-2xl font-extrabold text-[#001f5f]">{Number(detailTarget.service.price || 0).toLocaleString("vi-VN")} VND</span>
                             </div>
 
                             <div className="mt-5 flex justify-end">
-                                <button type="button" onClick={() => setDetailTarget(null)} className="px-5 py-2.5 rounded-lg bg-[#00278D] text-white hover:bg-[#001f5f]">
+                                <button type="button" onClick={() => setDetailTarget(null)} className="w-full rounded-lg bg-[#00278D] px-5 py-2.5 text-white hover:bg-[#001f5f] sm:w-auto">
                                     Đã hiểu
                                 </button>
                             </div>

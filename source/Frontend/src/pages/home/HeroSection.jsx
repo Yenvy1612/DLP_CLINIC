@@ -9,7 +9,7 @@ export default function HeroSection() {
     const navigate = useNavigate();
     const role = getUserRole() || "GUEST";
     return (
-        <section className="relative overflow-hidden bg-[var(--brand-navy)] px-6 py-16 md:px-14 xl:px-24">
+        <section className="relative overflow-hidden bg-[var(--brand-navy)] px-4 py-12 sm:px-6 sm:py-14 md:px-14 xl:px-24">
 
             <div className="mx-auto grid w-full max-w-7xl items-center gap-10 lg:grid-cols-2">
                 <motion.div
@@ -23,7 +23,7 @@ export default function HeroSection() {
                     </p>
 
                     <motion.h1
-                        className="text-4xl font-bold leading-tight text-white md:text-5xl xl:text-6xl"
+                        className="text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl xl:text-6xl"
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3, duration: 0.8 }}
@@ -94,12 +94,12 @@ export default function HeroSection() {
                     <img
                         src={team}
                         alt="Đội ngũ bác sĩ A*Care Clinic"
-                        className="h-[520px] w-full rounded-[32px] object-cover shadow-2xl ring-1 ring-white/30"
+                        className="h-[280px] w-full rounded-[24px] object-cover shadow-2xl ring-1 ring-white/30 sm:h-[380px] sm:rounded-[28px] lg:h-[520px] lg:rounded-[32px]"
                     />
 
-                    <div className="absolute -bottom-6 left-6 rounded-2xl bg-white p-4 shadow-xl">
+                    <div className="absolute bottom-4 left-4 rounded-2xl bg-white p-3 shadow-xl sm:-bottom-6 sm:left-6 sm:p-4">
                         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-500">Rated Care</p>
-                        <p className="mt-1 text-lg font-bold text-[var(--brand-navy)]">4.9/5 từ 3.2k khách hàng</p>
+                        <p className="mt-1 text-base font-bold text-[var(--brand-navy)] sm:text-lg">4.9/5 từ 3.2k khách hàng</p>
                     </div>
                 </motion.div>
             </div>

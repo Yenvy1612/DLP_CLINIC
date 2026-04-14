@@ -38,20 +38,20 @@ function PatientCard({ p }) {
             </div>
 
             <ul className="text-slate-700 text-sm space-y-2">
-                <li className="flex">
-                    <span className="w-28 text-slate-500">CCCD/CMND</span>
+                <li className="flex flex-col sm:flex-row">
+                    <span className="text-slate-500 sm:w-28">CCCD/CMND</span>
                     <span className="font-medium break-all">{p.idNumber || "—"}</span>
                 </li>
-                <li className="flex">
-                    <span className="w-28 text-slate-500">Ngày sinh</span>
+                <li className="flex flex-col sm:flex-row">
+                    <span className="text-slate-500 sm:w-28">Ngày sinh</span>
                     <span className="font-medium">{p.birthDate || "—"}</span>
                 </li>
-                <li className="flex">
-                    <span className="w-28 text-slate-500">Điện thoại</span>
+                <li className="flex flex-col sm:flex-row">
+                    <span className="text-slate-500 sm:w-28">Điện thoại</span>
                     <span className="font-medium">{p.phone || "—"}</span>
                 </li>
-                <li className="flex">
-                    <span className="w-28 text-slate-500">Địa chỉ</span>
+                <li className="flex flex-col sm:flex-row">
+                    <span className="text-slate-500 sm:w-28">Địa chỉ</span>
                     <span className="font-medium line-clamp-2">{p.address || "—"}</span>
                 </li>
             </ul>
@@ -140,13 +140,13 @@ function Patients() {
     }, [patients, q, sortBy]);
 
     return (
-        <div className="bg-[var(--surface)] min-h-screen p-6 md:p-10">
+        <div className="min-h-screen bg-[var(--surface)] px-4 py-6 sm:px-6 md:p-10">
             <div className="max-w-7xl mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: -8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ type: "spring", stiffness: 180, damping: 22 }}
-                    className="flex justify-between items-center mb-6 bg-white w-fit h-fit px-4 py-3 rounded-2xl shadow-xl"
+                    className="mb-6 w-fit rounded-2xl bg-white px-4 py-3 shadow-xl"
                 >
                     <h1 className="text-2xl md:text-3xl font-bold text-[#00278D]">Danh sách bệnh nhân</h1>
                 </motion.div>
@@ -157,7 +157,7 @@ function Patients() {
                 variants={container}
                 initial="hidden"
                 animate="show"
-                className="bg-white rounded-2xl shadow p-4 mb-6 flex flex-col md:flex-row gap-3 md:items-center md:justify-between max-w-7xl mx-auto"
+                className="mx-auto mb-6 flex max-w-7xl flex-col gap-3 rounded-2xl bg-white p-4 shadow md:flex-row md:items-center md:justify-between"
             >
                 <motion.div variants={item} className="flex-1">
                     <input
@@ -177,7 +177,7 @@ function Patients() {
                             { value: "dob", label: "Theo ngày sinh" },
                             { value: "id", label: "Theo CCCD" },
                         ]}
-                        className="min-w-48"
+                        className="w-full sm:min-w-48"
                     />
                 </motion.div>
             </motion.div>

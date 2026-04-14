@@ -90,3 +90,66 @@ textarea:focus-visible {
     background: var(--surface-strong);
     box-shadow: 0 8px 28px rgba(15, 45, 82, 0.08);
 }
+
+/* Global responsive safeguards for tighter mobile layouts */
+@media (max-width: 640px) {
+    .page-wrap {
+        padding: 1rem;
+        min-height: calc(100svh - 7rem);
+    }
+
+    .page-title-chip {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+    }
+
+    .panel {
+        border-radius: 14px;
+    }
+
+    .text-5xl {
+        font-size: 2rem !important;
+        line-height: 1.1 !important;
+    }
+
+    .text-4xl {
+        font-size: 1.75rem !important;
+        line-height: 1.15 !important;
+    }
+
+    .text-3xl {
+        font-size: 1.5rem !important;
+        line-height: 1.2 !important;
+    }
+
+    .text-2xl {
+        font-size: 1.25rem !important;
+        line-height: 1.3 !important;
+    }
+
+    .p-10 {
+        padding: 1.25rem !important;
+    }
+
+    .p-8 {
+        padding: 1rem !important;
+    }
+
+    .px-10,
+    .px-8 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    .grid-cols-4,
+    .grid-cols-5 {
+        grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    .grid-cols-4,
+    .grid-cols-5 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}

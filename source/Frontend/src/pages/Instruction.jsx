@@ -125,12 +125,12 @@ function Instruction() {
                         viewport={{ once: true }}
                         className="max-w-6xl mx-auto"
                     >
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
                             {patientSteps.map((step, idx) => (
                                 <motion.div
                                     key={idx}
                                     variants={fadeUp}
-                                    className="rounded-2xl border border-cyan-100 bg-white p-8 shadow-lg transition-all hover:shadow-xl"
+                                    className="rounded-2xl border border-cyan-100 bg-white p-5 shadow-lg transition-all hover:shadow-xl sm:p-8"
                                 >
                                     <div className="text-sky-600 mb-4">{step.icon}</div>
                                     <h3 className="text-xl font-bold text-[#00278D] mb-3">
@@ -160,12 +160,12 @@ function Instruction() {
                         viewport={{ once: true }}
                         className="max-w-6xl mx-auto"
                     >
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
                             {doctorSteps.map((step, idx) => (
                                 <motion.div
                                     key={idx}
                                     variants={fadeUp}
-                                    className="rounded-2xl border border-cyan-100 bg-white p-8 text-center shadow-lg transition-all hover:shadow-xl"
+                                    className="rounded-2xl border border-cyan-100 bg-white p-5 text-center shadow-lg transition-all hover:shadow-xl sm:p-8"
                                 >
                                     <div className="text-sky-600 flex justify-center mb-4">
                                         {step.icon}
@@ -189,7 +189,7 @@ function Instruction() {
                         viewport={{ once: true }}
                         className="max-w-6xl mx-auto"
                     >
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
                             {adminFeatures.map((feature, idx) => (
                                 <motion.div
                                     key={idx}
@@ -216,12 +216,12 @@ function Instruction() {
                         viewport={{ once: true }}
                         className="max-w-4xl mx-auto"
                     >
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
                             {guestSteps.map((step, idx) => (
                                 <motion.div
                                     key={idx}
                                     variants={fadeUp}
-                                    className="rounded-2xl border border-cyan-100 bg-white p-8 text-center shadow-lg transition-all hover:shadow-xl"
+                                    className="rounded-2xl border border-cyan-100 bg-white p-5 text-center shadow-lg transition-all hover:shadow-xl sm:p-8"
                                 >
                                     <div className="text-sky-600 flex justify-center mb-4">
                                         {step.icon}
@@ -247,18 +247,18 @@ function Instruction() {
     };
 
     return (
-        <div className="min-h-screen bg-[var(--surface)] py-12 px-6">
+        <div className="min-h-screen bg-[var(--surface)] px-4 py-10 sm:px-6 sm:py-12">
             {/* Header */}
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="mx-auto mb-14 max-w-6xl rounded-[28px] bg-[var(--brand-navy)] p-10 text-center text-white shadow-2xl"
+                className="mx-auto mb-10 max-w-6xl rounded-[24px] bg-[var(--brand-navy)] p-6 text-center text-white shadow-2xl sm:mb-14 sm:rounded-[28px] sm:p-10"
             >
                 <span className="font-bold text-sm uppercase tracking-[0.18em] text-cyan-200">
                     INSTRUCTION
                 </span>
-                <h1 className="mt-4 mb-6 text-4xl font-bold md:text-5xl">
+                <h1 className="mt-4 mb-6 text-3xl font-bold sm:text-4xl md:text-5xl">
                     Nếu bạn là {getRoleTitle()}
                 </h1>
                 <p className="mx-auto max-w-3xl text-lg text-cyan-50/90">
@@ -278,9 +278,9 @@ function Instruction() {
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="mx-auto mt-16 max-w-4xl rounded-2xl border border-cyan-100 bg-white p-8 shadow-lg"
+                className="mx-auto mt-12 max-w-4xl rounded-2xl border border-cyan-100 bg-white p-5 shadow-lg sm:mt-16 sm:p-8"
             >
-                <h3 className="text-2xl font-bold text-[#00278D] mb-4">
+                <h3 className="mb-4 text-xl font-bold text-[#00278D] sm:text-2xl">
                     Lưu ý quan trọng
                 </h3>
                 <ul className="space-y-3 text-slate-600">

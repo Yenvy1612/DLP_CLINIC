@@ -73,19 +73,19 @@ function Dashboard() {
     return (
         <div className="min-h-screen bg-[var(--surface)] text-slate-800">
             {/* HEADER */}
-            <div className="max-w-7xl mx-auto px-6 pt-8">
-                <h1 className="inline-flex items-center rounded-2xl border border-slate-200 bg-white px-5 py-3 text-3xl font-bold text-[#00278D] shadow-[0_10px_26px_rgba(15,23,42,0.08)]">
+            <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 sm:pt-8">
+                <h1 className="inline-flex items-center rounded-2xl border border-slate-200 bg-white px-4 py-3 text-2xl font-bold text-[#00278D] shadow-[0_10px_26px_rgba(15,23,42,0.08)] sm:px-5 sm:text-3xl">
                     Xin chào! Quản trị viên A<sup className="text-yellow-500">*</sup><span className="text-sky-500">Care</span>
                 </h1>
             </div>
 
             {/* MAIN */}
-            <main className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+            <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:space-y-8 sm:px-6 sm:py-8">
                 {/* STATS */}
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                     {stats.map((s) => (
                         <NavLink key={s.id} to={s.to} className="block h-full">
-                            <div className="h-full min-h-[220px] cursor-pointer rounded-3xl border border-slate-200/90 bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.08)] transition-shadow duration-200 hover:shadow-[0_20px_38px_rgba(15,23,42,0.14)]">
+                            <div className="h-full min-h-[190px] cursor-pointer rounded-3xl border border-slate-200/90 bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] transition-shadow duration-200 hover:shadow-[0_20px_38px_rgba(15,23,42,0.14)] sm:min-h-[220px] sm:p-6">
                                 <div className="flex h-full flex-col">
                                     <div className="h-12 w-12 flex items-center justify-center rounded-2xl bg-[var(--brand-600)] text-xl text-white shadow-md">
                                         {s.icon}
@@ -108,7 +108,7 @@ function Dashboard() {
                 </div>
 
                 {/* CONTENT */}
-                <section className="rounded-3xl border border-slate-200/80 bg-white/95 p-8 shadow-[0_14px_34px_rgba(15,23,42,0.10)]">
+                <section className="rounded-3xl border border-slate-200/80 bg-white/95 p-5 shadow-[0_14px_34px_rgba(15,23,42,0.10)] sm:p-8">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                         <div>
                             <h2 className="text-2xl font-bold text-[#00278D]">Trang tổng quan đã được tối giản</h2>
@@ -119,7 +119,7 @@ function Dashboard() {
                         </div>
                         <NavLink
                             to="/admin/statistics"
-                            className="inline-flex w-fit items-center gap-2 rounded-xl border border-[#00278D]/20 bg-[var(--brand-600)] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[#00278D]/25 transition-colors duration-200 hover:bg-[var(--brand-700)]"
+                            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#00278D]/20 bg-[var(--brand-600)] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[#00278D]/25 transition-colors duration-200 hover:bg-[var(--brand-700)] sm:w-fit"
                         >
                             Mở trang thống kê admin
                             <FiArrowUpRight className="text-base" />

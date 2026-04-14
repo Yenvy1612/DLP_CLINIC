@@ -67,11 +67,11 @@ function Doctors() {
     }
 
     return (
-        <div className="min-h-screen bg-[var(--surface)] px-6 py-10">
+        <div className="min-h-screen bg-[var(--surface)] px-4 py-8 sm:px-6 sm:py-10">
             <div className="mx-auto max-w-7xl">
                 <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-[var(--brand-navy)]">Danh sách bác sĩ</h1>
+                        <h1 className="text-2xl font-bold text-[var(--brand-navy)] sm:text-3xl">Danh sách bác sĩ</h1>
                         <p className="mt-2 text-slate-600">
                             Xem thông tin chuyên môn và kinh nghiệm của đội ngũ bác sĩ tại A*Care.
                         </p>
@@ -96,7 +96,7 @@ function Doctors() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.25 }}
-                            className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5"
+                            className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                         >
                             {pagedDoctors.map((doctor) => (
                                 <DoctorCard key={doctor.id} doctor={doctor} />

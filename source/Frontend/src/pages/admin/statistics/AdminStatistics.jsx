@@ -305,17 +305,17 @@ function AdminStatistics() {
     };
 
     return (
-        <section className="min-h-screen bg-[var(--surface)] text-slate-800 px-6 py-10">
+        <section className="min-h-screen bg-[var(--surface)] px-4 py-8 text-slate-800 sm:px-6 sm:py-10">
             <div className="mx-auto max-w-7xl space-y-6">
                 <motion.div
                     initial={{ opacity: 0, y: -8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="rounded-3xl bg-white px-6 py-5 shadow-xl border border-slate-100"
+                    className="rounded-3xl border border-slate-100 bg-white px-4 py-4 shadow-xl sm:px-6 sm:py-5"
                 >
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-[#00278D]">Thống kê quản trị</h1>
+                            <h1 className="text-2xl font-bold text-[#00278D] sm:text-3xl">Thống kê quản trị</h1>
                             <p className="text-slate-600 mt-2">
                                 Theo dõi lượt khám và doanh thu theo ngày, hỗ trợ lọc theo dịch vụ hoặc bác sĩ.
                             </p>
@@ -324,7 +324,7 @@ function AdminStatistics() {
                             type="button"
                             onClick={() => loadData(true)}
                             disabled={refreshing}
-                            className="inline-flex w-fit items-center rounded-xl bg-[var(--brand-600)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--brand-700)] disabled:opacity-60"
+                            className="inline-flex w-full items-center justify-center rounded-xl bg-[var(--brand-600)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--brand-700)] disabled:opacity-60 sm:w-fit"
                         >
                             {refreshing ? "Dang lam moi..." : "Lam moi du lieu"}
                         </button>
@@ -335,7 +335,7 @@ function AdminStatistics() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.2, delay: 0.1 }}
-                    className="rounded-3xl bg-white p-6 shadow-xl border border-slate-100"
+                    className="rounded-3xl border border-slate-100 bg-white p-4 shadow-xl sm:p-6"
                 >
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="space-y-3">
@@ -462,7 +462,7 @@ function AdminStatistics() {
                     transition={{ duration: 0.2, delay: 0.2 }}
                     className="rounded-3xl bg-white shadow-xl border border-slate-100 overflow-hidden"
                 >
-                    <div className="border-b border-slate-100 px-6 py-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div className="flex flex-col gap-4 border-b border-slate-100 px-4 py-4 md:flex-row md:items-center md:justify-between sm:px-6">
                         <div>
                             <h2 className="text-lg font-semibold text-[#00278D]">Du lieu theo ngay</h2>
                             <p className="text-sm text-slate-500 mt-1">
@@ -478,11 +478,11 @@ function AdminStatistics() {
                             </div>
                         </div>
 
-                        <div className="flex gap-2">
+                        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
                             <button
                                 type="button"
                                 onClick={() => setViewMode("chart")}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium inline-flex items-center gap-2 ${
+                                className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium ${
                                     viewMode === "chart"
                                         ? "bg-[#00278D] text-white"
                                         : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -493,7 +493,7 @@ function AdminStatistics() {
                             <button
                                 type="button"
                                 onClick={() => setViewMode("table")}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium inline-flex items-center gap-2 ${
+                                className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium ${
                                     viewMode === "table"
                                         ? "bg-[#00278D] text-white"
                                         : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -580,12 +580,12 @@ function AdminStatistics() {
                                 </table>
                             </div>
 
-                            <div className="px-4 py-3 border-t border-slate-100 flex items-center justify-between">
+                            <div className="flex flex-col items-center justify-between gap-3 border-t border-slate-100 px-4 py-3 sm:flex-row">
                                 <button
                                     type="button"
                                     onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                                     disabled={currentPage === 1}
-                                    className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50"
+                                    className="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50 sm:w-auto"
                                 >
                                     Trang truoc
                                 </button>
@@ -596,7 +596,7 @@ function AdminStatistics() {
                                     type="button"
                                     onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                                     disabled={currentPage >= totalPages}
-                                    className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50"
+                                    className="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50 sm:w-auto"
                                 >
                                     Trang sau
                                 </button>

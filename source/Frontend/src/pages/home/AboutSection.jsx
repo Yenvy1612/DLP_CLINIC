@@ -17,8 +17,8 @@ const fadeUp = (d = 0) => ({
 function AboutSection() {
 
     return (
-        <section className="bg-[var(--surface)] px-6 py-20 md:px-12 lg:px-20">
-            <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 rounded-[32px] bg-white p-8 shadow-xl lg:grid-cols-2 lg:p-12">
+        <section className="bg-[var(--surface)] px-4 py-12 sm:px-6 sm:py-16 md:px-12 lg:px-20 lg:py-20">
+            <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 rounded-[28px] bg-white p-5 shadow-xl sm:p-8 lg:grid-cols-2 lg:p-12">
                 {/* LEFT */}
                 <motion.div
                     className="relative flex justify-center overflow-visible"
@@ -31,12 +31,12 @@ function AboutSection() {
                         className="absolute inset-0 -z-10 flex items-center justify-center"
                         variants={fadeUp(0.1)}
                     >
-                        <div className="h-[520px] w-[420px] rounded-[240px] bg-cyan-50" />
+                        <div className="h-[300px] w-[240px] rounded-[180px] bg-cyan-50 sm:h-[420px] sm:w-[320px] sm:rounded-[220px] lg:h-[520px] lg:w-[420px] lg:rounded-[240px]" />
                     </motion.div>
 
                     {/* Chấm bi bên phải */}
                     <motion.div
-                        className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 -z-10"
+                        className="absolute right-0 top-1/2 -z-10 hidden -translate-y-1/2 md:block"
                         variants={fadeUp(0.2)}
                     >
                         <div className="grid grid-cols-6 gap-3 opacity-40">
@@ -49,24 +49,24 @@ function AboutSection() {
                     <motion.img
                         src={doctorImg1}
                         alt="Bác sĩ A*Care Clinic"
-                        className="relative right-[-20px] top-[20px] h-[420px] w-[420px] rounded-full border-8 border-white bg-gray-100 object-cover shadow-2xl"
+                        className="relative right-0 top-[8px] h-[260px] w-[260px] rounded-full border-8 border-white bg-gray-100 object-cover shadow-2xl sm:right-[-20px] sm:top-[20px] sm:h-[340px] sm:w-[340px] lg:h-[420px] lg:w-[420px]"
                         variants={fadeLeft}
                         transition={{ duration: 0.9 }}
                         whileHover={{ scale: 1.03 }}
                     />
 
                     <motion.div
-                        className="absolute -bottom-5 left-8 z-20 rotate-[-8deg]"
+                        className="absolute -bottom-4 left-4 z-20 rotate-[-8deg] sm:-bottom-5 sm:left-8"
                         variants={fadeUp(0.3)}
                     >
-                        <div className="rounded-2xl border-4 border-white bg-[var(--brand-navy)] px-6 py-4 text-white shadow-2xl">
+                        <div className="rounded-2xl border-4 border-white bg-[var(--brand-navy)] px-4 py-3 text-white shadow-2xl sm:px-6 sm:py-4">
                             <div className="flex items-center gap-3">
                                 <svg width="28" height="28" viewBox="0 0 24 24" className="fill-white">
                                     <path d="M12 2c3.9 0 7 2.7 7 6.5 0 1.7-.6 3.4-1.6 4.7-.6.8-1.4 1.1-2.1.8-.6-.2-1.1-.9-1.3-1.6-.3-1-.5-1.5-1.2-1.5s-.9.5-1.2 1.5c-.2.7-.7 1.4-1.3 1.6-.8.3-1.6 0-2.1-.8C5.6 11.9 5 10.2 5 8.5 5 4.7 8.1 2 12 2z" />
                                 </svg>
                                 <div>
-                                    <p className="text-base font-semibold leading-tight">15+ Years Of</p>
-                                    <p className="text-lg font-bold leading-tight">Clinical Practice</p>
+                                    <p className="text-sm font-semibold leading-tight sm:text-base">15+ Years Of</p>
+                                    <p className="text-base font-bold leading-tight sm:text-lg">Clinical Practice</p>
                                 </div>
                             </div>
                         </div>
@@ -85,7 +85,7 @@ function AboutSection() {
                     </motion.p>
 
                     <motion.h2
-                        className="text-3xl md:text-4xl font-bold text-[#0b2b6b] leading-tight mb-4"
+                        className="mb-4 text-2xl font-bold leading-tight text-[#0b2b6b] sm:text-3xl md:text-4xl"
                         variants={fadeUp(0.1)}
                     >
                         Không chỉ điều trị,
@@ -97,12 +97,12 @@ function AboutSection() {
                         Mỗi bệnh nhân đều được tư vấn cá nhân hóa theo hồ sơ sức khỏe và mục tiêu điều trị thực tế.
                     </motion.p>
 
-                    <motion.div className="flex gap-4 items-stretch mb-6" variants={fadeUp(0.3)}>
+                    <motion.div className="mb-6 flex items-stretch gap-4" variants={fadeUp(0.3)}>
                         <div className="flex-1 border-l-3 rounded-lg border-sky-500 pl-4">
-                            <h3 className="text-xl font-semibold text-[#0b2b6b]">
+                            <h3 className="text-lg font-semibold text-[#0b2b6b] sm:text-xl">
                                 Lựa chọn đúng đắn cho dịch vụ y tế chất lượng
                             </h3>
-                            <ul className="mt-3 space-y-2 text-slate-700">
+                            <ul className="mt-3 space-y-2 text-sm text-slate-700 sm:text-base">
                                 <li className="flex items-start gap-2">
                                     <span className="mt-1 w-5 h-5 rounded-full bg-sky-100 flex items-center justify-center">
                                         <span className="w-2 h-2 rounded-full bg-sky-600"></span>

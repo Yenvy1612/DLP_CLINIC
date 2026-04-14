@@ -120,9 +120,9 @@ function Schedule() {
 
     return (
         <section className="bg-[var(--surface)] min-h-[40vh]">
-            <div className="max-w-6xl mx-auto py-8 px-4">
+            <div className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
                 <div className="bg-white w-fit h-fit p-3 rounded-2xl shadow-lg mb-6">
-                    <h1 className="text-4xl font-bold text-[#00278D]">Lịch khám bác sĩ</h1>
+                    <h1 className="text-2xl font-bold text-[#00278D] sm:text-4xl">Lịch khám bác sĩ</h1>
                 </div>
 
                 {notices.length > 0 ? (
@@ -165,11 +165,11 @@ function Schedule() {
                                         </div>
                                     </div>
 
-                                    <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
+                                    <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
                                         <button
                                             type="button"
                                             onClick={() => setDetailTarget({ appointment, patient, service })}
-                                            className="px-3 py-1.5 text-sm rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100"
+                                            className="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100 sm:w-auto"
                                         >
                                             Chi tiết
                                         </button>
@@ -177,7 +177,7 @@ function Schedule() {
                                             type="button"
                                             disabled={processingId === appointment.id}
                                             onClick={() => setDoneTarget(appointment)}
-                                            className="px-3 py-1.5 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60"
+                                            className="w-full rounded-lg bg-emerald-600 px-3 py-1.5 text-sm text-white hover:bg-emerald-700 disabled:opacity-60 sm:w-auto"
                                         >
                                             Khám xong
                                         </button>
@@ -185,7 +185,7 @@ function Schedule() {
                                             type="button"
                                             disabled={processingId === appointment.id}
                                             onClick={() => setCancelTarget(appointment)}
-                                            className="px-3 py-1.5 text-sm rounded-lg border border-rose-300 text-rose-700 hover:bg-rose-50 disabled:opacity-60"
+                                            className="w-full rounded-lg border border-rose-300 px-3 py-1.5 text-sm text-rose-700 hover:bg-rose-50 disabled:opacity-60 sm:w-auto"
                                         >
                                             Hủy lịch
                                         </button>
@@ -200,7 +200,7 @@ function Schedule() {
 
                 {detailTarget ? (
                     <div className="fixed inset-0 z-[130] bg-black/40 p-4 flex items-center justify-center" onClick={() => setDetailTarget(null)}>
-                        <div className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl p-6" onClick={(event) => event.stopPropagation()}>
+                        <div className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl p-4 sm:p-6" onClick={(event) => event.stopPropagation()}>
                             <h3 className="text-2xl font-bold text-[#00278D]">Chi tiết lịch hẹn</h3>
                             <p className="text-sm text-slate-500 mt-1">Mã lịch hẹn: #{detailTarget.appointment.id}</p>
 
@@ -235,13 +235,13 @@ function Schedule() {
                                 </div>
                             </div>
 
-                            <div className="mt-5 border-t border-slate-200 pt-4 flex items-center justify-between">
+                            <div className="mt-5 flex flex-col gap-2 border-t border-slate-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
                                 <span className="text-slate-600 font-medium">Tổng thanh toán</span>
                                 <span className="text-2xl font-extrabold text-[#001f5f]">{Number(detailTarget.service.price || 0).toLocaleString("vi-VN")} VND</span>
                             </div>
 
                             <div className="mt-5 flex justify-end">
-                                <button type="button" onClick={() => setDetailTarget(null)} className="px-5 py-2.5 rounded-lg bg-[#00278D] text-white hover:bg-[#001f5f]">
+                                <button type="button" onClick={() => setDetailTarget(null)} className="w-full rounded-lg bg-[#00278D] px-5 py-2.5 text-white hover:bg-[#001f5f] sm:w-auto">
                                     Đã hiểu
                                 </button>
                             </div>
@@ -291,12 +291,12 @@ function Schedule() {
 
                         {cancelFormError ? <p className="mt-2 text-sm text-rose-600">{cancelFormError}</p> : null}
 
-                        <div className="mt-5 flex justify-end gap-2">
+                        <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                             <button
                                 type="button"
                                 disabled={!!processingId}
                                 onClick={() => setCancelTarget(null)}
-                                className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 disabled:opacity-60"
+                                className="w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-100 disabled:opacity-60 sm:w-auto"
                             >
                                 Đóng
                             </button>
@@ -323,7 +323,7 @@ function Schedule() {
                                         setProcessingId(null);
                                     }
                                 }}
-                                className="px-4 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-700 disabled:opacity-60"
+                                className="w-full rounded-lg bg-rose-600 px-4 py-2 text-white hover:bg-rose-700 disabled:opacity-60 sm:w-auto"
                             >
                                 {processingId ? "Đang hủy..." : "Xác nhận hủy"}
                             </button>
