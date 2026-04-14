@@ -274,10 +274,6 @@ function Services() {
                             variants={item}
                             className="group flex flex-col justify-between rounded-2xl border border-cyan-100 bg-white p-8 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
                         >
-                            <div className="mb-8 flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--brand-600)] text-3xl text-white">
-                                {s.icon || (s.name || "S").charAt(0)}
-                            </div>
-
                             <h2 className="text-2xl font-semibold leading-snug text-[#00278D] mb-4">
                                 {s.name}
                             </h2>

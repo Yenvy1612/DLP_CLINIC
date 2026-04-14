@@ -2,6 +2,8 @@ package com.acare.backend.service;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.acare.backend.entity.ActivityLog;
@@ -14,12 +16,32 @@ import lombok.RequiredArgsConstructor;
 public class ActivityLogService {
 
     private static final String USER_TYPE_PREFIX = "USER_NOTICE_";
+    private static final String ADMIN_TYPE = "ADMIN";
     
     /* cho phép thêm log và trả về 10 log gần nhất */
     private final ActivityLogRepository repo;
 
     public void add(String type, String message) {
         repo.save(ActivityLog.of(type, message));
+    }
+
+    public void addAdmin(String message) {
+        repo.save(ActivityLog.of(ADMIN_TYPE, message));
+    }
+
+    public void addAdminIfCurrentUser(String message) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return;
+        }
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
+        if (!isAdmin) {
+            return;
+        }
+
+        addAdmin(message);
     }
 
     public void addNotification(String type, Long actorUserId, Long targetUserId, Long appointmentId, String message) {
@@ -58,6 +80,10 @@ public class ActivityLogService {
         return repo.findTop20ByMessageContainingOrderByTimeDesc(token);
     }
 
+    public List<ActivityLog> getRecentAdmin() {
+        return repo.findTop20ByTypeOrderByTimeDesc(ADMIN_TYPE);
+    }
+
     public long countForUser(Long userId) {
         if (userId == null) {
             return 0;
@@ -91,6 +117,20 @@ public class ActivityLogService {
         var fallback = repo.findById(notificationId)
                 .filter(log -> log.getMessage() != null && log.getMessage().contains(token));
         if (fallback.isPresent()) {
+            repo.deleteById(notificationId);
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean deleteRecent(Long notificationId) {
+        if (notificationId == null) {
+            return false;
+        }
+
+        var adminLog = repo.findByIdAndType(notificationId, ADMIN_TYPE);
+        if (adminLog.isPresent()) {
             repo.deleteById(notificationId);
             return true;
         }

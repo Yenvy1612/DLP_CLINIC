@@ -101,6 +101,7 @@ function AdminEditProfile() {
         workingDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
         shiftStart: "08:00",
         shiftEnd: "17:00",
+        yearsExperience: 0,
     });
     const [specialties, setSpecialties] = useState([]);
 
@@ -186,6 +187,7 @@ function AdminEditProfile() {
                     workingDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
                     shiftStart: "08:00",
                     shiftEnd: "17:00",
+                    yearsExperience: 0,
                 });
 
                 if (data?.role === "DOCTOR") {
@@ -197,6 +199,7 @@ function AdminEditProfile() {
                         workingDays: splitWorkingDays(doctorProfile?.workingDays),
                         shiftStart: String(doctorProfile?.shiftStart || "08:00").slice(0, 5),
                         shiftEnd: String(doctorProfile?.shiftEnd || "17:00").slice(0, 5),
+                        yearsExperience: Number(doctorProfile?.yearsExperience) || 0,
                     }));
                     setDoctorSpecialtyLabel(doctorProfile?.specialty || "");
                 }
@@ -236,6 +239,7 @@ function AdminEditProfile() {
                     workingDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
                     shiftStart: "08:00",
                     shiftEnd: "17:00",
+                    yearsExperience: 0,
                 }
                 : {}),
         });
@@ -294,8 +298,14 @@ function AdminEditProfile() {
                 return;
             }
 
+            if (Number(form.yearsExperience) < 0) {
+                setError("Số năm kinh nghiệm không hợp lệ.");
+                return;
+            }
+
             doctorPayload = {
                 specialtyId: Number(form.specialtyId),
+                yearsExperience: Number(form.yearsExperience || 0),
                 clinicLocation: form.clinicLocation.trim(),
                 workingDays: form.workingDays.join(","),
                 shiftStart: form.shiftStart,
@@ -555,6 +565,19 @@ function AdminEditProfile() {
                                         value={form.clinicLocation}
                                         onChange={onChange}
                                         placeholder="Ví dụ: Tòa A - Phòng 301"
+                                        className="w-full border text-slate-800 border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00278D] focus:border-transparent transition duration-200"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-slate-800 text-sm mb-1">Số năm kinh nghiệm</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        name="yearsExperience"
+                                        value={form.yearsExperience}
+                                        onChange={onChange}
+                                        placeholder="Ví dụ: 5"
                                         className="w-full border text-slate-800 border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00278D] focus:border-transparent transition duration-200"
                                     />
                                 </div>

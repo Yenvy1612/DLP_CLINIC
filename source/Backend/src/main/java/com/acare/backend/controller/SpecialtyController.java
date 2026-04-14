@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.acare.backend.entity.Specialty;
+import com.acare.backend.dto.specialty.SpecialtyResponse;
 import com.acare.backend.service.SpecialtyService;
 
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class SpecialtyController {
     private final SpecialtyService specialtyService;
 
     @GetMapping
-    public ResponseEntity<List<Specialty>> getActiveSpecialties() {
-        return ResponseEntity.ok(specialtyService.getActiveSpecialties());
+    public ResponseEntity<List<SpecialtyResponse>> getActiveSpecialties() {
+        return ResponseEntity.ok(specialtyService.getActiveSpecialties().stream().map(SpecialtyResponse::from).toList());
     }
 }

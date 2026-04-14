@@ -1,7 +1,9 @@
 package com.acare.backend.controller;
 
 import com.acare.backend.dto.ApiResponse;
-import com.acare.backend.entity.Service;
+import com.acare.backend.dto.ApiResponseMapper;
+import com.acare.backend.dto.service.ServiceRequest;
+import com.acare.backend.dto.service.ServiceResponse;
 import com.acare.backend.service.ServiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,42 +29,50 @@ public class ServiceController {
     private final ServiceService serviceService;
 
     @GetMapping
-    public ResponseEntity<List<Service>> getService(
+    public ResponseEntity<List<ServiceResponse>> getService(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice) {
-        List<Service> services;
+        List<ServiceResponse> services;
         if ((name != null && !name.isBlank()) || minPrice != null || maxPrice != null) {
-            services = serviceService.searchServices(name, minPrice, maxPrice);
-            services.sort(Comparator.comparing(Service::getPrice).reversed());
+            services = serviceService.searchServices(name, minPrice, maxPrice).stream()
+                    .map(ServiceResponse::from)
+                    .toList();
         } else {
-            services = serviceService.getAllServices();
+            services = serviceService.getAllServices().stream()
+                    .map(ServiceResponse::from)
+                    .toList();
         }
+
+        services = services.stream()
+                .sorted(Comparator.comparing(ServiceResponse::getPrice, Comparator.nullsLast(BigDecimal::compareTo)).reversed())
+                .toList();
+
         return ResponseEntity.ok(services);
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Service>> addService(@RequestBody Service addedService) {
-        return ResponseEntity.ok(serviceService.addService(addedService));
+    public ResponseEntity<ApiResponse<ServiceResponse>> addService(@RequestBody ServiceRequest request) {
+        return ResponseEntity.ok(ApiResponseMapper.map(serviceService.addService(request.toEntity()), ServiceResponse::from));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Service> getService(@PathVariable Long id) {
-        return ResponseEntity.ok(serviceService.getById(id));
+    public ResponseEntity<ServiceResponse> getService(@PathVariable Long id) {
+        return ResponseEntity.ok(ServiceResponse.from(serviceService.getById(id)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Service>> updateService(@PathVariable Long id, @RequestBody Service update) {
-        return ResponseEntity.ok(serviceService.updateService(id, update));
+    public ResponseEntity<ApiResponse<ServiceResponse>> updateService(@PathVariable Long id, @RequestBody ServiceRequest request) {
+        return ResponseEntity.ok(ApiResponseMapper.map(serviceService.updateService(id, request.toEntity()), ServiceResponse::from));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Service>> updateService(@PathVariable Long id) {
-        return ResponseEntity.ok(serviceService.deleteService(id));
+    public ResponseEntity<ApiResponse<ServiceResponse>> updateService(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponseMapper.map(serviceService.deleteService(id), ServiceResponse::from));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Service>> searchService(
+    public ResponseEntity<List<ServiceResponse>> searchService(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice) {

@@ -1,4 +1,5 @@
 const AUTH_KEY = "auth";
+const LEGACY_LOGGED_IN_KEY = "isLoggedIn";
 export const AUTH_CHANGED_EVENT = "auth-changed";
 
 const ROLE_HOME_MAP = {
@@ -35,13 +36,74 @@ function dispatchAuthChanged() {
     }
 }
 
+function sanitizeAuthPayload(authPayload) {
+    if (!authPayload || typeof authPayload !== "object") {
+        return null;
+    }
+
+    const resolvedRole = resolveUserRole(authPayload);
+    const normalizedRoles = Array.isArray(authPayload.roles)
+        ? authPayload.roles.map((role) => String(role).toUpperCase()).filter(Boolean)
+        : [];
+
+    const roles = normalizedRoles.length > 0
+        ? normalizedRoles
+        : (resolvedRole ? [String(resolvedRole).toUpperCase()] : []);
+
+    const idValue = authPayload.id;
+    const normalizedId = Number.isFinite(Number(idValue)) ? Number(idValue) : null;
+
+    return {
+        id: normalizedId,
+        role: resolvedRole || null,
+        originalRole: resolvedRole || null,
+        roles,
+        enabled: typeof authPayload.enabled === "boolean" ? authPayload.enabled : true,
+    };
+}
+
+function removeLegacyLocalAuth() {
+    if (typeof window === "undefined") {
+        return;
+    }
+
+    localStorage.removeItem(AUTH_KEY);
+    localStorage.removeItem(LEGACY_LOGGED_IN_KEY);
+}
+
 export function getCurrentUser() {
-    const auth = localStorage.getItem(AUTH_KEY);
-    if (!auth) return null;
+    const sessionAuth = sessionStorage.getItem(AUTH_KEY);
+    if (sessionAuth) {
+        try {
+            const parsed = JSON.parse(sessionAuth);
+            const sanitized = sanitizeAuthPayload(parsed);
+            if (!sanitized) {
+                sessionStorage.removeItem(AUTH_KEY);
+                return null;
+            }
+            return sanitized;
+        } catch {
+            sessionStorage.removeItem(AUTH_KEY);
+            return null;
+        }
+    }
+
+    const legacyAuth = localStorage.getItem(AUTH_KEY);
+    if (!legacyAuth) return null;
 
     try {
-        return JSON.parse(auth);
+        const parsedLegacy = JSON.parse(legacyAuth);
+        const sanitized = sanitizeAuthPayload(parsedLegacy);
+        if (!sanitized) {
+            removeLegacyLocalAuth();
+            return null;
+        }
+
+        sessionStorage.setItem(AUTH_KEY, JSON.stringify(sanitized));
+        removeLegacyLocalAuth();
+        return sanitized;
     } catch {
+        removeLegacyLocalAuth();
         return null;
     }
 }
@@ -52,15 +114,19 @@ export function resolveUserRole(user) {
 }
 
 export function setCurrentUser(authPayload) {
-    if (!authPayload) {
+    const sanitized = sanitizeAuthPayload(authPayload);
+    if (!sanitized) {
         return;
     }
-    localStorage.setItem(AUTH_KEY, JSON.stringify(authPayload));
+
+    sessionStorage.setItem(AUTH_KEY, JSON.stringify(sanitized));
+    removeLegacyLocalAuth();
     dispatchAuthChanged();
 }
 
 export function clearCurrentUser() {
-    localStorage.removeItem(AUTH_KEY);
+    sessionStorage.removeItem(AUTH_KEY);
+    removeLegacyLocalAuth();
     dispatchAuthChanged();
 }
 

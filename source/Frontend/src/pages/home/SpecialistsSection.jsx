@@ -1,17 +1,32 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { userService } from "../../api/services/userService";
+import { FiArrowRight } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import DoctorCard from "../../components/DoctorCard";
+import { getDoctorsWithProfiles } from "../../utils/doctorCatalog";
 
 export default function SpecialistsSection() {
     const [doctors, setDoctors] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch doctors and take the first 5
-        userService.getDoctors().then((res) => {
-            if (res && res.data) {
-                setDoctors(res.data.slice(0, 5));
+        let active = true;
+
+        const loadDoctors = async () => {
+            try {
+                const data = await getDoctorsWithProfiles(10);
+                if (!active) return;
+                setDoctors(data);
+            } catch {
+                if (!active) return;
+                setDoctors([]);
             }
-        }).catch(err => console.error(err));
+        };
+
+        loadDoctors();
+        return () => {
+            active = false;
+        };
     }, []);
 
     if (doctors.length === 0) return null;
@@ -21,14 +36,25 @@ export default function SpecialistsSection() {
             <div className="mx-auto max-w-7xl">
                 <div className="mb-10 text-center">
                     <h2 className="text-3xl font-bold text-[var(--brand-navy)] md:text-4xl">
-                        Đội ngũ chuyên gia
+                        Chuyên gia hàng đầu
                     </h2>
                     <p className="mx-auto mt-4 max-w-2xl text-slate-600">
-                        Các bác sĩ giỏi chuyên môn, giàu kinh nghiệm, tận tâm chăm sóc sức khỏe cho bạn và gia đình.
+                        10 bác sĩ đầu tiên đang công tác tại A*Care, hiển thị chuyên môn và số năm kinh nghiệm để bạn dễ lựa chọn.
                     </p>
                 </div>
 
-                <div className="flex overflow-x-auto pb-6 gap-6 md:grid md:grid-cols-5 md:overflow-visible">
+                <div className="mb-8 flex justify-center">
+                    <button
+                        type="button"
+                        onClick={() => navigate("/doctors")}
+                        className="inline-flex items-center gap-2 rounded-xl bg-[var(--brand-600)] px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-[var(--brand-700)]"
+                    >
+                        Xem danh sách bác sĩ
+                        <FiArrowRight className="h-4 w-4" />
+                    </button>
+                </div>
+
+                <div className="flex gap-6 overflow-x-auto pb-6 md:grid md:grid-cols-2 md:overflow-visible lg:grid-cols-5">
                     {doctors.map((doctor, idx) => (
                         <motion.div
                             key={doctor.id}
@@ -36,21 +62,9 @@ export default function SpecialistsSection() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: idx * 0.1, duration: 0.5 }}
-                            className="group flex flex-col items-center min-w-[200px]"
+                            className="min-w-[220px]"
                         >
-                            <div className="relative mb-4 h-32 w-32 overflow-hidden rounded-full border-4 border-slate-100 shadow-md">
-                                <img
-                                    src={`https://api.dicebear.com/7.x/notionists/svg?seed=${doctor.fullName}`}
-                                    alt={doctor.fullName}
-                                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 bg-slate-50"
-                                />
-                            </div>
-                            <h3 className="text-center text-[15px] font-bold text-slate-800 line-clamp-1">
-                                {doctor.fullName}
-                            </h3>
-                            <p className="mt-1 text-center text-[13px] font-medium text-slate-500 uppercase tracking-wide">
-                                Chuyên gia y tế
-                            </p>
+                            <DoctorCard doctor={doctor} />
                         </motion.div>
                     ))}
                 </div>

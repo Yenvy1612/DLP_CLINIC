@@ -4,8 +4,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -14,9 +16,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.acare.backend.dto.ApiResponse;
+import com.acare.backend.dto.user.DoctorPublicResponse;
 import com.acare.backend.dto.user.DoctorProfileResponse;
 import com.acare.backend.dto.user.DoctorProfileUpdateRequest;
 import com.acare.backend.dto.user.UserCreateRequest;
+import com.acare.backend.dto.user.UserUpdateRequest;
 import com.acare.backend.entity.DoctorProfile;
 import com.acare.backend.entity.PatientProfile;
 import com.acare.backend.entity.Specialty;
@@ -55,8 +59,21 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Khong tim thay nguoi dung voi id=" + id));
     }
 
-    public List<User> getDoctors() {
-        return userRepository.findByRole(UserRole.DOCTOR);
+    public List<DoctorPublicResponse> getDoctors() {
+        List<User> doctors = userRepository.findByRole(UserRole.DOCTOR);
+        if (doctors.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> userIds = doctors.stream().map(User::getId).toList();
+        Map<Long, DoctorProfile> profileByUserId = new HashMap<>();
+        doctorProfileRepository.findByUserIdIn(userIds)
+                .forEach(profile -> profileByUserId.put(profile.getUserId(), profile));
+
+        return doctors.stream()
+                .map(user -> DoctorPublicResponse.from(user, profileByUserId.get(user.getId())))
+                .sorted(Comparator.comparing(DoctorPublicResponse::getFullName, Comparator.nullsLast(String::compareToIgnoreCase)))
+                .toList();
     }
 
     public List<User> getPatients() {
@@ -90,7 +107,7 @@ public class UserService {
 
         User saved = userRepository.save(normalized);
         provisionProfileByRole(saved, doctorSpecialization, doctorClinicLocation, request);
-        activityLogService.add("USER MANAGEMENT", "Tao tai khoan moi cho " + saved.getFullName());
+        activityLogService.addAdminIfCurrentUser("ADMIN CREATE USER: " + saved.getFullName());
         return ApiResponse.created("SIGN UP SUCCESSFULLY", saved);
     }
 
@@ -102,14 +119,35 @@ public class UserService {
 
         User saved = userRepository.save(user);
         provisionProfileByRole(saved, null, null, null);
+        activityLogService.addAdminIfCurrentUser("ADMIN UPDATE USER: " + saved.getFullName());
 
         return saved;
+    }
+
+    public User updateUser(Long id, UserUpdateRequest request) {
+        if (request == null) {
+            throw new BadRequestException("Du lieu cap nhat khong hop le");
+        }
+
+        User update = User.builder()
+                .fullName(trimToNull(request.getFullName()))
+                .email(trimToNull(request.getEmail()))
+                .phone(trimToNull(request.getPhone()))
+                .gender(parseGenderOrNull(request.getGender()))
+                .birthDate(parseBirthDate(request.getBirthDate()))
+                .address(trimToNull(request.getAddress()))
+                .idNumber(trimToNull(request.getIdNumber()))
+                .role(parseRoleOrNull(request.getRole()))
+                .enabled(request.getEnabled())
+                .build();
+
+        return updateUser(id, update);
     }
 
     public ApiResponse<Object> deleteUser(Long id) {
         User user = getUserById(id);
         userRepository.deleteById(id);
-        activityLogService.add("USER MANAGEMENT", "Da xoa tai khoan nguoi dung " + user.getFullName());
+        activityLogService.addAdminIfCurrentUser("ADMIN DELETE USER: " + user.getFullName());
         return ApiResponse.ok("DELETED SUCCESSFULLY", null);
     }
 
@@ -169,6 +207,7 @@ public class UserService {
         String workingDays = normalizeWorkingDays(request.getWorkingDays(), profile.getWorkingDays());
         java.time.LocalTime shiftStart = parseShiftTimeOrDefault(request.getShiftStart(), profile.getShiftStart());
         java.time.LocalTime shiftEnd = parseShiftTimeOrDefault(request.getShiftEnd(), profile.getShiftEnd());
+        Integer yearsExperience = normalizeYearsExperience(request.getYearsExperience(), profile.getYearsExperience());
         DoctorSpecialization specialization = resolveDoctorSpecializationForProfileUpdate(request.getSpecialtyId(), profile.getSpecialtyId());
 
         if (!shiftEnd.isAfter(shiftStart)) {
@@ -183,7 +222,10 @@ public class UserService {
                 .workingDays(workingDays)
                 .shiftStart(shiftStart)
                 .shiftEnd(shiftEnd)
+                .yearsExperience(yearsExperience)
                 .build());
+
+        activityLogService.addAdminIfCurrentUser("ADMIN UPDATE DOCTOR PROFILE: " + user.getFullName());
 
         return DoctorProfileResponse.from(saved);
     }
@@ -194,6 +236,31 @@ public class UserService {
         } catch (Exception ex) {
             throw new BadRequestException("Role khong hop le");
         }
+    }
+
+    private UserRole parseRoleOrNull(String role) {
+        if (role == null || role.isBlank()) {
+            return null;
+        }
+
+        return parseRole(role);
+    }
+
+    private Gender parseGenderOrNull(String gender) {
+        if (gender == null || gender.isBlank()) {
+            return null;
+        }
+
+        return parseGenderOrDefault(gender);
+    }
+
+    private String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 
     private User normalizeDefaultValues(User user) {
@@ -265,6 +332,17 @@ public class UserService {
         } catch (DateTimeParseException ex) {
             throw new BadRequestException("Gio lam viec khong hop le (HH:mm)");
         }
+    }
+
+    private Integer normalizeYearsExperience(Integer incoming, Integer fallback) {
+        Integer value = incoming != null ? incoming : fallback;
+        if (value == null) {
+            value = 0;
+        }
+        if (value < 0) {
+            throw new BadRequestException("So nam kinh nghiem khong hop le");
+        }
+        return value;
     }
 
     private DoctorSpecialization resolveDoctorSpecializationForProfileUpdate(Long incomingSpecialtyId, Long fallbackSpecialtyId) {

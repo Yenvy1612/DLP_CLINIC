@@ -14,6 +14,7 @@ import jakarta.persistence.LockModeType;
 
 public interface DoctorProfileRepository extends JpaRepository<DoctorProfile, Long> {
     Optional<DoctorProfile> findByUserId(Long userId);
+    List<DoctorProfile> findByUserIdIn(List<Long> userIds);
     boolean existsByUserId(Long userId);
     List<DoctorProfile> findBySpecialtyIdAndOnLeaveFalse(Long specialtyId);
     List<DoctorProfile> findByDepartmentIgnoreCaseAndOnLeaveFalse(String department);

@@ -1,9 +1,9 @@
 package com.acare.backend.service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.DayOfWeek;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -155,6 +155,7 @@ public class AppointmentService {
         String messageToDoctor = "Bệnh nhân " + patient.getFullName() + " đã đặt lịch hẹn #" + saved.getId() + appointmentTime;
         activityLogService.addNotification("APPOINTMENT_NOTICE", patient.getId(), doctor.getId(), saved.getId(), messageToDoctor);
         activityLogService.add("APPOINTMENT", "Benh nhan " + patient.getFullName() + " vua dat lich thanh cong");
+        activityLogService.addAdminIfCurrentUser("ADMIN CREATE APPOINTMENT: #" + saved.getId());
 
         return saved;
     }
@@ -274,8 +275,21 @@ public class AppointmentService {
         return deleteById(id, cancelledBy, null);
     }
 
+    @Transactional
     public ApiResponse<Object> deleteById(Long id, String cancelledBy, String cancelReason) {
         Appointment appointment = getAppointmentById(id);
+
+        if (appointment.getStatus() == AppointmentStatus.CANCELLED) {
+            return ApiResponse.ok("APPOINTMENT ALREADY CANCELLED", null);
+        }
+
+        if (appointment.getStatus() == AppointmentStatus.DONE) {
+            throw new BadRequestException("Khong the huy lich hen da hoan thanh");
+        }
+
+        Appointment cancelledAppointment = appointment.withStatus(AppointmentStatus.CANCELLED);
+        appointmentRepository.save(cancelledAppointment);
+
         User patient = userRepository.findById(appointment.getPatientId())
                 .orElseThrow(() -> new ResourceNotFoundException("Khong tim thay benh nhan"));
         User doctor = userRepository.findById(appointment.getDoctorId())
@@ -284,7 +298,6 @@ public class AppointmentService {
         String actor = normalizeCode(cancelledBy, "PATIENT");
         String normalizedReason = normalizeCancelReason(cancelReason);
         String reasonSuffix = normalizedReason.isBlank() ? "" : " | Lý do: " + normalizedReason;
-        appointmentRepository.deleteById(id);
 
         if ("DOCTOR".equals(actor)) {
             String messageToPatient = "Bác sĩ " + doctor.getFullName() + " đã hủy lịch hẹn #" + id + reasonSuffix;
@@ -296,7 +309,9 @@ public class AppointmentService {
             activityLogService.add("APPOINTMENT", "Benh nhan " + patient.getFullName() + " da huy lich hen " + id + reasonSuffix);
         }
 
-        return ApiResponse.ok("DELETE SUCCESSFULLY", null);
+        activityLogService.addAdminIfCurrentUser("ADMIN DELETE APPOINTMENT: #" + id + reasonSuffix);
+
+        return ApiResponse.ok("CANCEL SUCCESSFULLY", null);
     }
 
     public ApiResponse<Object> updateStatusDone(Long id) {
@@ -345,6 +360,8 @@ public class AppointmentService {
             activityLogService.addNotification("APPOINTMENT_NOTICE", null, doctor.getId(), id, messageToDoctor);
         }
 
+        activityLogService.addAdminIfCurrentUser("ADMIN UPDATE APPOINTMENT STATUS: #" + id + " -> " + nextStatus.name());
+
         return ApiResponse.ok("UPDATE APPOINTMENT STATUS SUCCESSFULLY", null);
     }
 
@@ -382,7 +399,9 @@ public class AppointmentService {
         validateScheduleConflicts(id, appointment);
 
         try {
-            return appointmentRepository.saveAndFlush(appointment);
+            Appointment saved = appointmentRepository.saveAndFlush(appointment);
+            activityLogService.addAdminIfCurrentUser("ADMIN UPDATE APPOINTMENT: #" + saved.getId());
+            return saved;
         } catch (DataIntegrityViolationException ex) {
             throw new ConflictException("Khung gio vua duoc dat boi nguoi khac, vui long chon khung gio khac");
         }
@@ -484,10 +503,28 @@ public class AppointmentService {
             return List.of();
         }
 
+        if (Boolean.TRUE.equals(profile.getOnLeave())) {
+            return List.of();
+        }
+
+        LocalTime shiftStart = profile.getShiftStart() == null ? BUSINESS_START : profile.getShiftStart();
+        LocalTime shiftEnd = profile.getShiftEnd() == null ? BUSINESS_END : profile.getShiftEnd();
+
+        LocalTime effectiveStart = maxTime(shiftStart, BUSINESS_START);
+        LocalTime effectiveEnd = minTime(shiftEnd, BUSINESS_END);
+
+        if (!effectiveEnd.isAfter(effectiveStart)) {
+            return List.of();
+        }
+
         List<AppointmentAvailabilityOption> options = new ArrayList<>();
-        LocalTime cursor = BUSINESS_START;
-        LocalTime lastStart = BUSINESS_END.minusMinutes(durationMinutes);
+        LocalTime cursor = ceilToHalfHour(effectiveStart);
+        LocalTime lastStart = floorToHalfHour(effectiveEnd.minusMinutes(durationMinutes));
         LocalDateTime now = LocalDateTime.now();
+
+        if (cursor.isAfter(lastStart)) {
+            return List.of();
+        }
 
         while (!cursor.isAfter(lastStart)) {
             LocalDateTime start = date.atTime(cursor);
@@ -505,6 +542,40 @@ public class AppointmentService {
         }
 
         return options;
+    }
+
+    private LocalTime maxTime(LocalTime first, LocalTime second) {
+        return first.isAfter(second) ? first : second;
+    }
+
+    private LocalTime minTime(LocalTime first, LocalTime second) {
+        return first.isBefore(second) ? first : second;
+    }
+
+    private LocalTime ceilToHalfHour(LocalTime value) {
+        LocalTime normalized = value.withSecond(0).withNano(0);
+        int minute = normalized.getMinute();
+
+        if (minute == 0 || minute == 30) {
+            return normalized;
+        }
+
+        if (minute < 30) {
+            return normalized.withMinute(30);
+        }
+
+        return normalized.plusHours(1).withMinute(0);
+    }
+
+    private LocalTime floorToHalfHour(LocalTime value) {
+        LocalTime normalized = value.withSecond(0).withNano(0);
+        int minute = normalized.getMinute();
+
+        if (minute < 30) {
+            return normalized.withMinute(0);
+        }
+
+        return normalized.withMinute(30);
     }
 
     public List<AppointmentAvailabilityOption> getAvailability(Long serviceId, LocalDate date) {

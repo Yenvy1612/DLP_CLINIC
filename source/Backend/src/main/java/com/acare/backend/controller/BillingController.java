@@ -13,9 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.acare.backend.entity.Invoice;
-import com.acare.backend.entity.InvoiceItem;
-import com.acare.backend.entity.PaymentTransaction;
+import com.acare.backend.dto.billing.InvoiceItemRequest;
+import com.acare.backend.dto.billing.InvoiceItemResponse;
+import com.acare.backend.dto.billing.InvoiceRequest;
+import com.acare.backend.dto.billing.InvoiceResponse;
+import com.acare.backend.dto.billing.PaymentTransactionRequest;
+import com.acare.backend.dto.billing.PaymentTransactionResponse;
 import com.acare.backend.service.BillingService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,62 +32,62 @@ public class BillingController {
 
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     @PostMapping("/invoices")
-    public ResponseEntity<Invoice> createInvoice(@RequestBody Invoice request) {
-        return ResponseEntity.ok(billingService.createInvoice(request));
+    public ResponseEntity<InvoiceResponse> createInvoice(@RequestBody InvoiceRequest request) {
+        return ResponseEntity.ok(InvoiceResponse.from(billingService.createInvoice(request.toEntity())));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     @PostMapping("/invoices/{invoiceId}/items")
-    public ResponseEntity<InvoiceItem> addInvoiceItem(
+    public ResponseEntity<InvoiceItemResponse> addInvoiceItem(
             @PathVariable Long invoiceId,
-            @RequestBody InvoiceItem item) {
-        return ResponseEntity.ok(billingService.addInvoiceItem(invoiceId, item));
+            @RequestBody InvoiceItemRequest request) {
+        return ResponseEntity.ok(InvoiceItemResponse.from(billingService.addInvoiceItem(invoiceId, request.toEntity())));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     @PatchMapping("/invoices/{invoiceId}/issue")
-    public ResponseEntity<Invoice> issueInvoice(@PathVariable Long invoiceId) {
-        return ResponseEntity.ok(billingService.issueInvoice(invoiceId));
+    public ResponseEntity<InvoiceResponse> issueInvoice(@PathVariable Long invoiceId) {
+        return ResponseEntity.ok(InvoiceResponse.from(billingService.issueInvoice(invoiceId)));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     @PostMapping("/invoices/{invoiceId}/payments")
-    public ResponseEntity<PaymentTransaction> recordPayment(
+    public ResponseEntity<PaymentTransactionResponse> recordPayment(
             @PathVariable Long invoiceId,
-            @RequestBody PaymentTransaction payment) {
-        return ResponseEntity.ok(billingService.recordPayment(invoiceId, payment));
+            @RequestBody PaymentTransactionRequest request) {
+        return ResponseEntity.ok(PaymentTransactionResponse.from(billingService.recordPayment(invoiceId, request.toEntity())));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
     @GetMapping("/invoices/{invoiceId}")
-    public ResponseEntity<Invoice> getInvoiceById(@PathVariable Long invoiceId) {
-        return ResponseEntity.ok(billingService.getInvoiceById(invoiceId));
+    public ResponseEntity<InvoiceResponse> getInvoiceById(@PathVariable Long invoiceId) {
+        return ResponseEntity.ok(InvoiceResponse.from(billingService.getInvoiceById(invoiceId)));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
     @GetMapping("/invoices")
-    public ResponseEntity<List<Invoice>> getInvoices(@RequestParam(required = false) Long patientId) {
+    public ResponseEntity<List<InvoiceResponse>> getInvoices(@RequestParam(required = false) Long patientId) {
         if (patientId != null) {
-            return ResponseEntity.ok(billingService.getInvoicesByPatientId(patientId));
+            return ResponseEntity.ok(billingService.getInvoicesByPatientId(patientId).stream().map(InvoiceResponse::from).toList());
         }
         return ResponseEntity.ok(List.of());
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
     @GetMapping("/invoices/patient/{patientId}")
-    public ResponseEntity<List<Invoice>> getInvoicesByPatientId(@PathVariable Long patientId) {
+    public ResponseEntity<List<InvoiceResponse>> getInvoicesByPatientId(@PathVariable Long patientId) {
         return getInvoices(patientId);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
     @GetMapping("/invoices/{invoiceId}/items")
-    public ResponseEntity<List<InvoiceItem>> getInvoiceItems(@PathVariable Long invoiceId) {
-        return ResponseEntity.ok(billingService.getInvoiceItems(invoiceId));
+    public ResponseEntity<List<InvoiceItemResponse>> getInvoiceItems(@PathVariable Long invoiceId) {
+        return ResponseEntity.ok(billingService.getInvoiceItems(invoiceId).stream().map(InvoiceItemResponse::from).toList());
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
     @GetMapping("/invoices/{invoiceId}/payments")
-    public ResponseEntity<List<PaymentTransaction>> getPayments(@PathVariable Long invoiceId) {
-        return ResponseEntity.ok(billingService.getPaymentsByInvoiceId(invoiceId));
+    public ResponseEntity<List<PaymentTransactionResponse>> getPayments(@PathVariable Long invoiceId) {
+        return ResponseEntity.ok(billingService.getPaymentsByInvoiceId(invoiceId).stream().map(PaymentTransactionResponse::from).toList());
     }
 }

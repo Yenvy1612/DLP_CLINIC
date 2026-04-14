@@ -16,6 +16,14 @@ export const httpGet = async (url) => {
     return data;
 };
 
+export const httpGetPublic = async (url) => {
+    const { data } = await apiClient.get(url, {
+        headers: { "X-Skip-Auth": "true" },
+        withCredentials: false,
+    });
+    return data;
+};
+
 export const httpPost = async (url, payload) => {
     const { data } = await apiClient.post(url, payload);
     return data;

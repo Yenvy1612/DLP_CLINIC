@@ -55,6 +55,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/error", "/actuator/health", "/api/auth/login", "/api/auth/register", "/api/auth/refresh", "/api/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/services/**", "/api/activities/recent", "/api/specialties/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users/doctor").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/activities/recent/user/**").hasAnyRole("ADMIN", "DOCTOR", "PATIENT")
                         .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole("ADMIN", "DOCTOR", "PATIENT")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
@@ -89,7 +90,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.stream(props.getCors().getAllowedOrigins().split(","))
+        config.setAllowedOriginPatterns(Arrays.stream(props.getCors().getAllowedOrigins().split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .toList());

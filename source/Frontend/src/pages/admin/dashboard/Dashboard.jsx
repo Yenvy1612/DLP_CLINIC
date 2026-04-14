@@ -1,211 +1,133 @@
 import { useEffect, useState } from "react";
-import DashboardReportTable from "./DashboardReportTable";
-import { motion } from "framer-motion";
 import { NavLink } from "react-router-dom";
-import { FiUsers, FiActivity, FiCalendar, FiBarChart2 } from "react-icons/fi";
-import { activityService, appointmentService, serviceService, userService } from "../../../api";
+import { FiUsers, FiActivity, FiCalendar, FiBarChart2, FiArrowUpRight } from "react-icons/fi";
+import { adminDashboardService } from "../../../api";
+
+const EMPTY_LABEL = "Chưa có dữ liệu";
 
 function Dashboard() {
 
-    const [users, setUsers] = useState([]);
-    const [aptToday, setAptToday] = useState([]);
-    const [upcommingApt, setUpcommingApt] = useState([]);
-    const [monthRevenue, setMonthRevenue] = useState(0);
-    const [logs, setLogs] = useState([]);
-    const [month, setMonth] = useState("--");
-    const [year, setYear] = useState("--");
-
-    const convertTimeFormat = (a) => {
-        var res = "";
-        var x;
-        for (x in a) {
-            if (a[x] != "T") res += a[x];
-            else res += " ";
-        }
-        const part = res.split(" ");
-        const dmy = part[0];
-        const time = part[1];
-        const partDmy = dmy.split("-");
-        return time + " " + partDmy[2] + "/" + partDmy[1] + "/" + partDmy[0];
-    }
+    const [summary, setSummary] = useState({
+        userCount: 0,
+        topDoctorName: EMPTY_LABEL,
+        topDoctorDoneCount: 0,
+        topServiceName: EMPTY_LABEL,
+        topServiceDoneCount: 0,
+        monthRevenue: 0,
+        month: "--",
+        year: "--",
+    });
 
     useEffect(() => {
-        const now = new Date();
-        const month = now.getMonth() + 1;
-        const year = now.getFullYear();
-        setMonth(month);
-        setYear(year);
-        /* Lấy người dùng */
-        const getUserData = async () => {
+        const getDashboardSummary = async () => {
             try {
-                const data = await userService.getAll();
-                setUsers(data);
+                const data = await adminDashboardService.getSummary();
+                setSummary({
+                    userCount: Number(data?.userCount) || 0,
+                    topDoctorName: data?.topDoctorName || EMPTY_LABEL,
+                    topDoctorDoneCount: Number(data?.topDoctorDoneCount) || 0,
+                    topServiceName: data?.topServiceName || EMPTY_LABEL,
+                    topServiceDoneCount: Number(data?.topServiceDoneCount) || 0,
+                    monthRevenue: Number(data?.monthRevenue) || 0,
+                    month: data?.month || "--",
+                    year: data?.year || "--",
+                });
             }
             catch (error) {
                 console.log(error.message);
             }
         }
-        getUserData();
 
-        /* lấy cuộc hẹn hôm nay */
-        const getAptToday = async () => {
-            try {
-                const data = await appointmentService.getToday();
-                setAptToday(data);
-            }
-            catch (error) {
-                console.log(error.message);
-            }
-        }
-        getAptToday();
-
-        /* lấy cuộc hẹn sắp tới: status = "PENDING" */
-        const getUpcommingAppointment = async () => {
-            try {
-                const data = await appointmentService.pendingToday();
-                setUpcommingApt(data);
-            }
-            catch (error) {
-                console.log(error.message);
-            }
-        }
-        getUpcommingAppointment();
-
-        /* lấy doanh thu tháng này: từ mùng 1 tới hiện tại */
-        const getMonthRevenue = async () => {
-            try {
-                const data = await appointmentService.doneThisMonth();
-                var sum = 0;
-                for (const a of data) {
-                    const rawServiceId = a.serviceId ?? a.note;
-                    const serviceId = Number.parseInt(rawServiceId, 10);
-                    if (Number.isNaN(serviceId)) {
-                        continue;
-                    }
-                    const service = await serviceService.getById(serviceId);
-                    sum += service.price;
-                }
-                setMonthRevenue(sum);
-            }
-            catch (error) {
-                console.log(error.message);
-            }
-        }
-        getMonthRevenue();
-
-        /* lấy hoạt động gần dây */
-        const getLogs = async () => {
-            try {
-                const data = await activityService.getRecent();
-                setLogs(data);
-            }
-            catch (error) {
-                console.log(error.message);
-            }
-        }
-        getLogs();
+        getDashboardSummary();
     }, []);
+
     const stats = [
-        { id: 1, icon: <FiUsers />, label: "Người dùng", value: users.length, to: "/admin/users" },
-        { id: 2, icon: <FiActivity />, label: "Cuộc hẹn hôm nay", value: aptToday.length },
-        { id: 3, icon: <FiCalendar />, label: "Lịch sắp tới trong ngày", value: upcommingApt.length },
-        { id: 4, icon: <FiBarChart2 />, label: `Doanh thu tháng ${month}/${year}`, value: monthRevenue.toLocaleString("vi-VN") + " ₫" },
+        { id: 1, icon: <FiUsers />, label: "Người dùng", value: summary.userCount, to: "/admin/users" },
+        {
+            id: 2,
+            icon: <FiActivity />,
+            label: `Bác sĩ được yêu thích nhất tháng ${summary.month}/${summary.year}`,
+            value: summary.topDoctorName,
+            meta: summary.topDoctorDoneCount > 0 ? `${summary.topDoctorDoneCount} lịch đã khám` : "",
+            to: "/admin/users",
+            valueClassName: "text-xl md:text-2xl",
+        },
+        {
+            id: 3,
+            icon: <FiCalendar />,
+            label: `Dịch vụ dùng nhiều nhất tháng ${summary.month}/${summary.year}`,
+            value: summary.topServiceName,
+            meta: summary.topServiceDoneCount > 0 ? `${summary.topServiceDoneCount} lượt sử dụng` : "",
+            to: "/admin/services",
+            valueClassName: "text-xl md:text-2xl",
+        },
+        {
+            id: 4,
+            icon: <FiBarChart2 />,
+            label: `Doanh thu tháng ${summary.month}/${summary.year}`,
+            value: summary.monthRevenue.toLocaleString("vi-VN") + " ₫",
+            to: "/admin/statistics"
+        },
     ];
 
     return (
-        <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="min-h-screen bg-[var(--surface)] text-slate-800"
-        >
+        <div className="min-h-screen bg-[var(--surface)] text-slate-800">
             {/* HEADER */}
-            <motion.div 
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-                className="max-w-7xl mx-auto flex items-center justify-between p-6"
-            >
-                <h1 className="text-3xl font-bold p-2 rounded-xl shadow-xl text-[#00278D] bg-white">
+            <div className="max-w-7xl mx-auto px-6 pt-8">
+                <h1 className="inline-flex items-center rounded-2xl border border-slate-200 bg-white px-5 py-3 text-3xl font-bold text-[#00278D] shadow-[0_10px_26px_rgba(15,23,42,0.08)]">
                     Xin chào! Quản trị viên A<sup className="text-yellow-500">*</sup><span className="text-sky-500">Care</span>
                 </h1>
-            </motion.div>
+            </div>
 
             {/* MAIN */}
-            <main className="max-w-7xl mx-auto px-6 py-10 space-y-12">
+            <main className="max-w-7xl mx-auto px-6 py-8 space-y-8">
                 {/* STATS */}
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-                >
-                    {stats.map((s, i) => (
-                        <NavLink key={s.id} to={s.to}>
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.2 }}
-                                className="cursor-pointer hover:bg-sky-200 group relative overflow-hidden rounded-3xl p-6 bg-white/70 backdrop-blur-md shadow-slate-300 shadow-2xl hover:shadow-xl transition-all duration-300"
-                            >
-                                <div className="absolute inset-0"></div>
-                                <div className="relative z-10">
-                                    <div className="rounded-xl w-12 h-12 flex items-center justify-center bg-[var(--brand-600)] text-white rounded-2xl shadow-md text-xl">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    {stats.map((s) => (
+                        <NavLink key={s.id} to={s.to} className="block h-full">
+                            <div className="h-full min-h-[220px] cursor-pointer rounded-3xl border border-slate-200/90 bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.08)] transition-shadow duration-200 hover:shadow-[0_20px_38px_rgba(15,23,42,0.14)]">
+                                <div className="flex h-full flex-col">
+                                    <div className="h-12 w-12 flex items-center justify-center rounded-2xl bg-[var(--brand-600)] text-xl text-white shadow-md">
                                         {s.icon}
                                     </div>
-                                    <div className="mt-5">
-                                        <h3 className="text-sm font-medium text-slate-500">
+                                    <div className="mt-5 flex-1">
+                                        <h3 className="min-h-[42px] text-sm font-semibold leading-5 text-slate-500">
                                             {s.label}
                                         </h3>
-                                        <p className="text-3xl font-extrabold text-[#00278D] mt-1 tracking-tight">
+                                        <p className={`${s.valueClassName || "text-3xl"} mt-2 break-words font-extrabold leading-tight tracking-tight text-[#00278D]`}>
                                             {s.value}
                                         </p>
+                                        {s.meta ? (
+                                            <p className="mt-2 text-xs text-slate-500">{s.meta}</p>
+                                        ) : null}
                                     </div>
                                 </div>
-                            </motion.div>
+                            </div>
                         </NavLink>
                     ))}
-                </motion.div>
+                </div>
 
                 {/* CONTENT */}
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.8 }}
-                    className="grid grid-cols-1 lg:grid-cols-3 gap-8"
-                >
-                    {/* BIỂU ĐỒ */}
-                    <motion.div 
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: 1 }}
-                        className="lg:col-span-2 bg-white/70 backdrop-blur-md rounded-3xl shadow-2xl shadow-slate-300 hover:shadow-xl transition-all duration-300 p-8"
-                    >
-                        <DashboardReportTable />
-                    </motion.div>
-
-                    {/* HOẠT ĐỘNG GẦN ĐÂY */}
-                    <motion.div 
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: 1 }}
-                        className="bg-white/70 backdrop-blur-md rounded-3xl shadow-2xl hover:shadow-xl transition-all duration-300 p-8"
-                    >
-                        <h2 className="text-xl font-semibold text-[#00278D] mb-5">
-                            Hoạt động gần đây
-                        </h2>
-                        <ul className="space-y-5">
-                            {logs.map((l) => (
-                                <li key={l.id} className="flex items-start gap-3 text-slate-600 text-sm">
-                                    <div className="w-2 h-2 rounded-full bg-sky-500 mt-1"></div>
-                                    <p><span className="font-bold">{l.type + ": "}</span>{l.message + " lúc " + convertTimeFormat(l.time)}</p>
-                                </li>
-                            ))}
-                        </ul>
-                    </motion.div>
-                </motion.div>
+                <section className="rounded-3xl border border-slate-200/80 bg-white/95 p-8 shadow-[0_14px_34px_rgba(15,23,42,0.10)]">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                        <div>
+                            <h2 className="text-2xl font-bold text-[#00278D]">Trang tổng quan đã được tối giản</h2>
+                            <p className="text-slate-600 mt-2 max-w-2xl">
+                                Biểu đồ và log đã được tách khỏi dashboard để giảm nhiễu khi theo dõi nhanh.
+                                Bạn có thể xem thống kê chi tiết theo tháng, theo quý, theo dịch vụ và theo bác sĩ ở trang thống kê admin.
+                            </p>
+                        </div>
+                        <NavLink
+                            to="/admin/statistics"
+                            className="inline-flex w-fit items-center gap-2 rounded-xl border border-[#00278D]/20 bg-[var(--brand-600)] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[#00278D]/25 transition-colors duration-200 hover:bg-[var(--brand-700)]"
+                        >
+                            Mở trang thống kê admin
+                            <FiArrowUpRight className="text-base" />
+                        </NavLink>
+                    </div>
+                </section>
             </main>
-        </motion.div>
+        </div>
     );
 }
 

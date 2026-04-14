@@ -1,5 +1,18 @@
 import { httpDelete, httpGet, httpPatch, httpPost, httpPut, toQueryString } from "./http";
 
+export const APPOINTMENT_CHANGED_EVENT = "appointment-changed";
+
+const emitAppointmentChanged = (detail = {}) => {
+    if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent(APPOINTMENT_CHANGED_EVENT, {
+            detail: {
+                at: Date.now(),
+                ...detail,
+            },
+        }));
+    }
+};
+
 export const appointmentService = {
     async getAll() {
         return httpGet("/appointments");
@@ -26,22 +39,34 @@ export const appointmentService = {
         return httpGet(`/appointments/doctors-by-service${toQueryString({ serviceId })}`);
     },
     async create(appointment) {
-        return httpPost("/appointments", appointment);
+        const response = await httpPost("/appointments", appointment);
+        emitAppointmentChanged({ action: "create" });
+        return response;
     },
     async bookForPatient(appointment) {
-        return httpPost("/appointments", appointment);
+        const response = await httpPost("/appointments", appointment);
+        emitAppointmentChanged({ action: "book" });
+        return response;
     },
     async update(id, updated) {
-        return httpPut(`/appointments/${id}`, updated);
+        const response = await httpPut(`/appointments/${id}`, updated);
+        emitAppointmentChanged({ action: "update", appointmentId: id });
+        return response;
     },
     async remove(id, cancelledBy = "PATIENT", cancelReason = "") {
-        return httpDelete(`/appointments/${id}${toQueryString({ cancelledBy, cancelReason })}`);
+        const response = await httpDelete(`/appointments/${id}${toQueryString({ cancelledBy, cancelReason })}`);
+        emitAppointmentChanged({ action: "remove", appointmentId: id, cancelledBy });
+        return response;
     },
     async markDone(id) {
-        return httpPatch(`/appointments/${id}/status${toQueryString({ status: "DONE" })}`);
+        const response = await httpPatch(`/appointments/${id}/status${toQueryString({ status: "DONE" })}`);
+        emitAppointmentChanged({ action: "done", appointmentId: id });
+        return response;
     },
     async markCancelled(id) {
-        return httpPatch(`/appointments/${id}/status${toQueryString({ status: "CANCELLED" })}`);
+        const response = await httpPatch(`/appointments/${id}/status${toQueryString({ status: "CANCELLED" })}`);
+        emitAppointmentChanged({ action: "cancel", appointmentId: id });
+        return response;
     },
     async pendingToday() {
         return httpGet(`/appointments${toQueryString({ today: true, pending: true })}`);
@@ -60,5 +85,11 @@ export const appointmentService = {
     },
     async notPendingByPatientId(id) {
         return httpGet(`/appointments${toQueryString({ patientId: id, pending: false })}`);
+    },
+    async getDoctorDashboard(filters = {}) {
+        return httpGet(`/doctor/statistics/dashboard${toQueryString(filters)}`);
+    },
+    async getDoctorPatientAppointments(patientId, filters = {}) {
+        return httpGet(`/doctor/statistics/patients/${patientId}/appointments${toQueryString(filters)}`);
     },
 };

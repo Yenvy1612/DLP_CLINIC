@@ -20,6 +20,7 @@ public class ServiceService {
 
     private final ServiceRepository serviceRepository;
     private final SpecialtyService specialtyService;
+    private final ActivityLogService activityLogService;
 
     public List<com.acare.backend.entity.Service> getAllServices() {
         List<com.acare.backend.entity.Service> services = serviceRepository.findAll();
@@ -57,6 +58,7 @@ public class ServiceService {
         }
 
         com.acare.backend.entity.Service created = serviceRepository.save(normalized);
+        activityLogService.addAdminIfCurrentUser("ADMIN CREATE SERVICE: " + created.getName());
         return ApiResponse.created("ADD SERVICE SUCCESSFULLY", created);
     }
 
@@ -73,12 +75,14 @@ public class ServiceService {
             .department(normalizeDepartment(specialty.getCode()))
                 .build();
         com.acare.backend.entity.Service updated = serviceRepository.save(service);
+        activityLogService.addAdminIfCurrentUser("ADMIN UPDATE SERVICE: " + updated.getName());
         return ApiResponse.ok("UPDATE SERVICE SUCCESSFULLY", updated);
     }
 
     public ApiResponse<com.acare.backend.entity.Service> deleteService(Long id) {
         com.acare.backend.entity.Service service = getById(id);
         serviceRepository.deleteById(id);
+        activityLogService.addAdminIfCurrentUser("ADMIN DELETE SERVICE: " + service.getName());
         return ApiResponse.ok("DELETE SERVICE SUCCESSFULLY", service);
     }
 

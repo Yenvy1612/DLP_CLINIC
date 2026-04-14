@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUserId } from "../../utils/authUtils";
 import { activityService, appointmentService, serviceService, userService } from "../../api";
+import { APPOINTMENT_CHANGED_EVENT } from "../../api/services/appointmentService";
 
 const formatDateTime = (value) => {
     if (!value) return "--/--/---- --:--";
@@ -34,6 +35,7 @@ function Cart() {
     const navigate = useNavigate();
     const id = getUserId();
     const [loading, setLoading] = useState(true);
+    const [refreshKey, setRefreshKey] = useState(0);
     const [appointments, setAppointments] = useState([]);
     const [patientInfo, setPatientInfo] = useState(null);
     const [doctorMap, setDoctorMap] = useState({});
@@ -45,6 +47,15 @@ function Cart() {
     const [selectedCancelReason, setSelectedCancelReason] = useState(cancelReasonOptions[0]);
     const [customCancelReason, setCustomCancelReason] = useState("");
     const [cancelFormError, setCancelFormError] = useState("");
+
+    useEffect(() => {
+        const handleAppointmentChanged = () => {
+            setRefreshKey((prev) => prev + 1);
+        };
+
+        window.addEventListener(APPOINTMENT_CHANGED_EVENT, handleAppointmentChanged);
+        return () => window.removeEventListener(APPOINTMENT_CHANGED_EVENT, handleAppointmentChanged);
+    }, []);
 
     useEffect(() => {
         if (!id) {
@@ -110,7 +121,7 @@ function Cart() {
         };
         loadAppointments();
 
-    }, [id]);
+    }, [id, refreshKey]);
 
     if (loading) return <p className="text-center text-gray-500 py-10">Đang tải...</p>;
 
@@ -336,7 +347,6 @@ function Cart() {
                                     setCancelingId(target.id);
                                     try {
                                         await appointmentService.remove(target.id, "PATIENT", reason);
-                                        window.location.reload();
                                     } catch {
                                         // Close modal to avoid stuck UI; user can retry from the list.
                                     } finally {

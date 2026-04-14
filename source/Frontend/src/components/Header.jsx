@@ -4,6 +4,7 @@ import { RiMenuFill } from "react-icons/ri";
 import { TbPhone } from "react-icons/tb";
 import { NavLink, useNavigate } from "react-router-dom";
 import { activityService, appointmentService, authService } from "../api";
+import { APPOINTMENT_CHANGED_EVENT } from "../api/services/appointmentService";
 import logo from "../assets/images/logo/logo_png.png";
 import { useSidebarContext } from "../contexts/SideBarContext";
 import { headerListByRole } from "../data/headerList";
@@ -24,14 +25,19 @@ function Header() {
     const [isBellOpen, setIsBellOpen] = useState(false);
     const [selectedNotification, setSelectedNotification] = useState(null);
     const [deletingNotificationId, setDeletingNotificationId] = useState(null);
+    const [refreshKey, setRefreshKey] = useState(0);
     const containerRef = useRef(null);
     const logoRef = useRef(null);
     const navRef = useRef(null);
     const rightRef = useRef(null);
     const bellPanelRef = useRef(null);
 
-    const isNotificationEnabledRole = isLoggedIn && (role === "DOCTOR" || role === "PATIENT") && !!userId;
-    const notificationTitle = role === "DOCTOR" ? "Thông báo bác sĩ" : "Thông báo bệnh nhân";
+    const isNotificationEnabledRole = isLoggedIn && (role === "DOCTOR" || role === "PATIENT" || role === "ADMIN") && !!userId;
+    const notificationTitle = role === "DOCTOR"
+        ? "Thông báo bác sĩ"
+        : role === "ADMIN"
+            ? "Nhật ký hệ thống"
+            : "Thông báo bệnh nhân";
 
     const normalizeNoticeMessage = (raw) => String(raw || "").replace(/^\[USER:\d+\]\s*/, "");
 
@@ -46,6 +52,15 @@ function Header() {
         const min = String(value.getMinutes()).padStart(2, "0");
         return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
     };
+
+    useEffect(() => {
+        const handleAppointmentChanged = () => {
+            setRefreshKey((prev) => prev + 1);
+        };
+
+        window.addEventListener(APPOINTMENT_CHANGED_EVENT, handleAppointmentChanged);
+        return () => window.removeEventListener(APPOINTMENT_CHANGED_EVENT, handleAppointmentChanged);
+    }, []);
 
     useEffect(() => {
         if (role !== "PATIENT" || !userId) {
@@ -63,7 +78,7 @@ function Header() {
             }
         }
         getPendingAppointments();
-    }, [role, userId]);
+    }, [role, userId, refreshKey]);
 
     useEffect(() => {
         const updateLayout = () => {
@@ -107,6 +122,26 @@ function Header() {
 
         const loadNotifications = async () => {
             try {
+                if (role === "ADMIN") {
+                    const list = await activityService.getRecentAdmin();
+                    if (!isMounted) return;
+
+                    const normalizedList = Array.isArray(list) ? list : [];
+                    setNotifications(normalizedList);
+                    setNotificationCount(normalizedList.length);
+
+                    if (normalizedList.length === 0) {
+                        setSelectedNotification(null);
+                        return;
+                    }
+
+                    setSelectedNotification((prev) => {
+                        if (!prev) return normalizedList[0];
+                        return normalizedList.find((item) => item.id === prev.id) || normalizedList[0];
+                    });
+                    return;
+                }
+
                 const [list, count] = await Promise.all([
                     activityService.getRecentByUser(userId),
                     activityService.getCountByUser(userId),
@@ -140,7 +175,7 @@ function Header() {
             isMounted = false;
             clearInterval(timer);
         };
-    }, [isNotificationEnabledRole, userId]);
+    }, [isNotificationEnabledRole, userId, role, refreshKey]);
 
     useEffect(() => {
         if (!isBellOpen) return undefined;
@@ -170,7 +205,7 @@ function Header() {
 
 
     return (
-        <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
+        <header className="sticky top-0 z-1000 border-b border-slate-200 bg-white/95 backdrop-blur">
             <div ref={containerRef} className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 md:px-8">
             <img ref={logoRef} src={logo} alt="logo" className="logo h-28 w-44 bg-cover cursor-pointer object-contain" onClick={() => navigate("/")} />
             <div ref={navRef} className={`header-menu ${showHamburger ? 'hidden' : 'hidden md:flex'} flex-wrap gap-x-8 text-[var(--brand-navy)]`}>
@@ -226,15 +261,6 @@ function Header() {
                 ))}
             </div>
             <div ref={rightRef} className="other-header-items flex items-center gap-x-4 text-[var(--brand-600)]">
-                <div className="phone gap-x-2 hidden md:flex">
-                    <div className="text-xl w-11 h-11 flex justify-center items-center rounded-full p-3 border border-slate-200 bg-slate-100 text-[var(--brand-600)]">
-                        <TbPhone />
-                    </div>
-                    <div className="flex flex-col pr-2">
-                        <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Emergency Line</p>
-                        <a href="tel:0379330721" className="text-lg font-bold text-[var(--brand-navy)] cursor-pointer">+84-379-330-721</a>
-                    </div>
-                </div>
                 <div className="hidden items-center gap-2 md:flex">
                     {isLoggedIn ? (
                         <>
@@ -307,15 +333,28 @@ function Header() {
                                                                 disabled={!selectedNotification || deletingNotificationId === selectedNotification?.id}
                                                                 onClick={async () => {
                                                                     if (!selectedNotification) return;
-                                                                    setDeletingNotificationId(selectedNotification.id);
+
+                                                                    const deletingItem = selectedNotification;
+                                                                    const previousList = notifications;
+                                                                    const previousCount = notificationCount;
+
+                                                                    const nextList = previousList.filter((item) => item.id !== deletingItem.id);
+                                                                    setNotifications(nextList);
+                                                                    setSelectedNotification(nextList[0] || null);
+                                                                    setNotificationCount(Math.max(0, Number(previousCount || 0) - 1));
+
+                                                                    setDeletingNotificationId(deletingItem.id);
                                                                     try {
-                                                                        await activityService.deleteByUser(userId, selectedNotification.id);
-                                                                        setNotifications((prev) => {
-                                                                            const next = prev.filter((item) => item.id !== selectedNotification.id);
-                                                                            setSelectedNotification(next[0] || null);
-                                                                            return next;
-                                                                        });
-                                                                        setNotificationCount((prev) => Math.max(0, Number(prev || 0) - 1));
+                                                                        if (role === "ADMIN") {
+                                                                            await activityService.deleteAdmin(deletingItem.id);
+                                                                        } else {
+                                                                            await activityService.deleteByUser(userId, deletingItem.id);
+                                                                        }
+                                                                        setRefreshKey((prev) => prev + 1);
+                                                                    } catch {
+                                                                        setNotifications(previousList);
+                                                                        setSelectedNotification(deletingItem);
+                                                                        setNotificationCount(previousCount);
                                                                     } finally {
                                                                         setDeletingNotificationId(null);
                                                                     }

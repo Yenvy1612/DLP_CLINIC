@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { FiEye, FiEdit2, FiTrash2 } from "react-icons/fi";
+import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { FiSearch } from "react-icons/fi";
 import { serviceService } from "../../../api";
@@ -34,21 +34,21 @@ function AdminServiceManagement() {
         };
     }, []);
 
-    // Lấy danh sách user
+    // Lấy danh sách dịch vụ
     useEffect(() => {
-        const fetchUsers = async () => {
+        const fetchServices = async () => {
             try {
                 const response = await serviceService.getAll();
                 setServices(response);
             }
             catch (err) {
-                console.error("Error fetching users:", err);
+                console.error("Error fetching services:", err);
             }
             finally {
                 setLoading(false);
             }
         };
-        fetchUsers();
+        fetchServices();
     }, []);
 
     // Xử lý thay đổi search input
@@ -103,7 +103,13 @@ function AdminServiceManagement() {
         setDeleting(true);
         try {
             await serviceService.remove(deleteTargetId);
-            window.location.reload();
+            setServices((prev) => prev.filter((item) => item.id !== deleteTargetId));
+            setNoticeModal({
+                isOpen: true,
+                title: "Xóa thành công",
+                message: "Dịch vụ đã được xóa khỏi hệ thống.",
+                tone: "success",
+            });
         }
         catch (error) {
             setNoticeModal({
@@ -125,13 +131,25 @@ function AdminServiceManagement() {
             className="min-h-screen bg-[var(--surface)] px-6 py-8"
         >
             <div className="max-w-6xl mx-auto">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-3xl font-bold text-[#00278D] mb-6 p-2 bg-white rounded-xl shadow-xl">Danh sách dịch vụ</h1>
-                    <button onClick={() => navigate("/admin/add-service")} className="flex items-center text-sm mb-6 bg-sky-500 text-white p-2 rounded-xl hover:shadow-xl hover:bg-sky-700 transition duration-300 cursor-pointer"> + Thêm dịch vụ</button>
+                <div className="mb-6 rounded-3xl border border-slate-200/80 bg-white/90 px-6 py-5 shadow-[0_14px_34px_rgba(15,23,42,0.10)]">
+                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h1 className="text-3xl font-bold text-[#00278D]">Quản lý dịch vụ</h1>
+                            <p className="mt-2 text-sm text-slate-600">
+                                Theo dõi danh sách dịch vụ, tìm kiếm nhanh và cập nhật thông tin dịch vụ trong hệ thống.
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => navigate("/admin/add-service")}
+                            className="inline-flex w-fit items-center gap-2 rounded-xl bg-[var(--brand-600)] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#00278D]/20 transition hover:bg-[var(--brand-700)] hover:shadow-xl"
+                        >
+                            + Thêm dịch vụ
+                        </button>
+                    </div>
                 </div>
 
                 {/* Thanh tìm kiếm */}
-                <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
+                <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_12px_30px_rgba(15,23,42,0.08)] p-6 mb-6">
                     <div className="flex items-center gap-2 mb-4">
                         <FiSearch className="text-[#00278D]" size={20} />
                         <h2 className="text-lg font-semibold text-[#00278D]">Tìm kiếm dịch vụ</h2>
@@ -149,7 +167,7 @@ function AdminServiceManagement() {
                                 value={searchParams.name}
                                 onChange={handleSearchChange}
                                 placeholder="Nhập tên dịch vụ..."
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                                className="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-slate-800 focus:ring-2 focus:ring-[#00278D]/20 focus:border-[#00278D]/40"
                             />
                         </div>
 
@@ -165,7 +183,7 @@ function AdminServiceManagement() {
                                 onChange={handleSearchChange}
                                 placeholder="0"
                                 min="0"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                                className="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-slate-800 focus:ring-2 focus:ring-[#00278D]/20 focus:border-[#00278D]/40"
                             />
                         </div>
 
@@ -181,7 +199,7 @@ function AdminServiceManagement() {
                                 onChange={handleSearchChange}
                                 placeholder="Không giới hạn"
                                 min="0"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                                className="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-slate-800 focus:ring-2 focus:ring-[#00278D]/20 focus:border-[#00278D]/40"
                             />
                         </div>
                     </div>
@@ -190,21 +208,21 @@ function AdminServiceManagement() {
                     <div className="flex gap-3">
                         <button
                             onClick={handleSearch}
-                            className="bg-[#00278D] text-white px-6 py-2 rounded-lg hover:bg-sky-700 transition-colors font-medium flex items-center gap-2"
+                            className="bg-[#00278D] text-white px-6 py-2.5 rounded-xl hover:bg-[var(--brand-700)] transition-colors font-medium flex items-center gap-2"
                         >
                             <FiSearch size={16} />
                             Tìm kiếm
                         </button>
                         <button
                             onClick={handleReset}
-                            className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors font-medium"
+                            className="bg-slate-600 text-white px-6 py-2.5 rounded-xl hover:bg-slate-700 transition-colors font-medium"
                         >
                             Đặt lại
                         </button>
                     </div>
                 </div>
 
-                <div className="bg-white border border-slate-200 rounded-3xl shadow-xl overflow-hidden">
+                <div className="bg-white border border-slate-200/80 rounded-3xl shadow-[0_14px_34px_rgba(15,23,42,0.10)] overflow-hidden">
                     <table className="min-w-full text-sm">
                         <thead className="bg-sky-50 text-[#00278D]">
                             <tr>
@@ -232,7 +250,7 @@ function AdminServiceManagement() {
                                 services.map((s, idx) => (
                                     <tr
                                         key={s.id}
-                                        className={`hover:bg-sky-50 transition ${idx % 2 === 0 ? "bg-white" : "bg-slate-50/60"
+                                        className={`transition hover:bg-slate-50 ${idx % 2 === 0 ? "bg-white" : "bg-slate-50/60"
                                             }`}
                                     >
                                         <td className="px-6 py-3 text-slate-800">{idx + 1}</td>
@@ -240,20 +258,14 @@ function AdminServiceManagement() {
                                         <td className="px-6 py-3 text-left text-slate-700">{s.price.toLocaleString("vi-VN") + " ₫"}</td>
                                         <td className="px-6 py-3 text-left flex justify-center gap-2">
                                             <button
-                                                onClick={() => navigate(`/show-service/${s.id}`)}
-                                                className="px-3 py-1.5 rounded-xl border border-sky-300 border-2 cursor-pointer text-[#00278D] hover:bg-sky-50 flex items-center gap-1 text-xs transition"
-                                            >
-                                                <FiEye size={14} /> Xem
-                                            </button>
-                                            <button
                                                 onClick={() => navigate(`/admin/edit-service/${s.id}`)}
-                                                className="px-3 py-1.5 rounded-xl border border-emerald-300 border-2 cursor-pointer text-emerald-600 hover:bg-emerald-50 flex items-center gap-1 text-xs transition"
+                                                className="px-3 py-1.5 rounded-xl border-2 border-slate-400 cursor-pointer text-slate-700 hover:bg-slate-100 flex items-center gap-1 text-xs transition"
                                             >
-                                                <FiEdit2 size={14} /> Sửa
+                                                <FiEdit2 size={14} /> Chi tiết/Sửa
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(s.id)}
-                                                className="px-3 py-1.5 rounded-xl border border-red-300 border-2 cursor-pointer text-red-500 hover:bg-red-50 flex items-center gap-1 text-xs transition"
+                                                className="px-3 py-1.5 rounded-xl border border-rose-300 cursor-pointer text-rose-600 hover:bg-rose-50 flex items-center gap-1 text-xs transition"
                                             >
                                                 <FiTrash2 size={14} /> Xóa
                                             </button>

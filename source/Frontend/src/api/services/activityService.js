@@ -5,6 +5,18 @@ export const activityService = {
         return httpGet("/activities/recent");
     },
 
+    async getRecentAdmin() {
+        return httpGet("/activities/recent/admin");
+    },
+
+    async deleteRecent(notificationId) {
+        return httpDelete(`/activities/recent/admin/${notificationId}`);
+    },
+
+    async deleteAdmin(notificationId) {
+        return httpDelete(`/activities/recent/admin/${notificationId}`);
+    },
+
     async getRecentByUser(userId) {
         return httpGet(`/activities/recent/user/${userId}`);
     },

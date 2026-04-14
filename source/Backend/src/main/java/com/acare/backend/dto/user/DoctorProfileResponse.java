@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class DoctorProfileResponse {
     private Long specialtyId;
     private String specialty;
+    private Integer yearsExperience;
     private String clinicLocation;
     private String workingDays;
     private LocalTime shiftStart;
@@ -29,10 +30,11 @@ public class DoctorProfileResponse {
         return DoctorProfileResponse.builder()
             .specialtyId(profile.getSpecialtyId())
             .specialty(profile.getSpecialty())
-                .clinicLocation(profile.getClinicLocation())
-                .workingDays(profile.getWorkingDays())
-                .shiftStart(profile.getShiftStart())
-                .shiftEnd(profile.getShiftEnd())
-                .build();
+            .yearsExperience(profile.getYearsExperience())
+            .clinicLocation(profile.getClinicLocation())
+            .workingDays(profile.getWorkingDays())
+            .shiftStart(profile.getShiftStart())
+            .shiftEnd(profile.getShiftEnd())
+            .build();
     }
 }
