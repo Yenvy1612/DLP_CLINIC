@@ -89,7 +89,28 @@ function Cart() {
                 const serviceIds = [...new Set(merged.map((item) => Number(item.serviceId ?? item.note)).filter((value) => !Number.isNaN(value)))];
 
                 const [doctorResponses, serviceResponses] = await Promise.all([
-                    Promise.all(doctorIds.map((doctorId) => userService.getById(doctorId))),
+                    Promise.all(
+                        doctorIds.map(async (doctorId) => {
+                            const [doctorResult, profileResult] = await Promise.allSettled([
+                                userService.getById(doctorId),
+                                userService.getDoctorProfile(doctorId),
+                            ]);
+
+                            const doctor = doctorResult.status === "fulfilled" ? doctorResult.value : null;
+                            const profile = profileResult.status === "fulfilled" ? profileResult.value : null;
+
+                            if (!doctor?.id) {
+                                return null;
+                            }
+
+                            return {
+                                ...doctor,
+                                clinicLocation: profile?.clinicLocation || doctor?.clinicLocation || "",
+                                workingDays: profile?.workingDays || doctor?.workingDays || "",
+                                specialty: profile?.specialty || doctor?.specialty || "",
+                            };
+                        })
+                    ),
                     Promise.all(serviceIds.map((serviceId) => serviceService.getById(serviceId))),
                 ]);
 
@@ -217,7 +238,7 @@ function Cart() {
             </div>
 
             {detailTarget ? (
-                <div className="fixed inset-0 z-[130] bg-black/40 p-4 flex items-center justify-center" onClick={() => setDetailTarget(null)}>
+                <div className="fixed inset-0 z-[1000] bg-black/40 p-4 flex items-center justify-center" onClick={() => setDetailTarget(null)}>
                     <div className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl p-6" onClick={(event) => event.stopPropagation()}>
                         <h3 className="text-2xl font-bold text-[#00278D]">Hóa đơn lịch hẹn</h3>
                         <p className="text-sm text-slate-500 mt-1">Mã lịch hẹn: #{detailTarget.appointment.id}</p>
