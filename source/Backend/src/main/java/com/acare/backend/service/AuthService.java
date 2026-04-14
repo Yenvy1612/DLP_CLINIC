@@ -259,11 +259,21 @@ public class AuthService {
             cookiePath = "/";
         }
 
+        String sameSite = securityProperties.getCookie().getSameSite();
+        if (sameSite == null || sameSite.isBlank()) {
+            sameSite = "Lax";
+        }
+
+        boolean secure = securityProperties.getCookie().isSecure();
+        if ("none".equalsIgnoreCase(sameSite.trim())) {
+            secure = true;
+        }
+
         ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from(name, value)
                 .httpOnly(true)
-                .secure(securityProperties.getCookie().isSecure())
+                .secure(secure)
                 .path(cookiePath)
-                .sameSite(securityProperties.getCookie().getSameSite())
+                .sameSite(sameSite)
                 .maxAge(maxAgeSeconds);
 
         String domain = securityProperties.getCookie().getDomain();
