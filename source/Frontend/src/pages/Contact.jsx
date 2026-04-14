@@ -28,10 +28,9 @@ function Contact() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // Thay thế 3 giá trị này sau khi đăng ký EmailJS
-    const EMAILJS_SERVICE_ID = "service_esk90tg"; 
-    const EMAILJS_TEMPLATE_ID = "template_3ko6f39";
-    const EMAILJS_PUBLIC_KEY = "ruM4IPsGPOVwT1-dx";
+    const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+    const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
     const contactInfo = [
         {
@@ -69,6 +68,12 @@ function Contact() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
+            setError("Thiếu cấu hình EmailJS. Vui lòng thêm VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, VITE_EMAILJS_PUBLIC_KEY.");
+            return;
+        }
+
         setIsLoading(true);
         setError(null);
         
