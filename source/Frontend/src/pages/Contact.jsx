@@ -28,9 +28,31 @@ function Contact() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-    const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-    const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+    const resolveEnv = (...keys) => {
+        for (const key of keys) {
+            const raw = import.meta.env[key];
+            if (typeof raw === "string" && raw.trim()) {
+                return raw.trim();
+            }
+        }
+        return "";
+    };
+
+    const EMAILJS_SERVICE_ID = resolveEnv(
+        "VITE_EMAILJS_SERVICE_ID",
+        "NEXT_PUBLIC_EMAILJS_SERVICE_ID",
+        "EMAILJS_SERVICE_ID",
+    );
+    const EMAILJS_TEMPLATE_ID = resolveEnv(
+        "VITE_EMAILJS_TEMPLATE_ID",
+        "NEXT_PUBLIC_EMAILJS_TEMPLATE_ID",
+        "EMAILJS_TEMPLATE_ID",
+    );
+    const EMAILJS_PUBLIC_KEY = resolveEnv(
+        "VITE_EMAILJS_PUBLIC_KEY",
+        "NEXT_PUBLIC_EMAILJS_PUBLIC_KEY",
+        "EMAILJS_PUBLIC_KEY",
+    );
 
     const contactInfo = [
         {
@@ -70,7 +92,7 @@ function Contact() {
         e.preventDefault();
 
         if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
-            setError("Thiếu cấu hình EmailJS. Vui lòng thêm VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, VITE_EMAILJS_PUBLIC_KEY.");
+            setError("Thiếu cấu hình EmailJS. Vui lòng cấu hình SERVICE_ID, TEMPLATE_ID, PUBLIC_KEY trên Vercel (prefix VITE_ hoặc NEXT_PUBLIC_ hoặc EMAILJS_) và redeploy.");
             return;
         }
 
