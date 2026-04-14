@@ -356,10 +356,10 @@ export default function Booking() {
 
                                 return (
                                     <div key={doc.id} className={`bg-white rounded-xl shadow-md border-2 transition-all overflow-hidden ${isSelectedDoctor && selectedTime ? 'border-[#001f5f] ring-2 ring-[#001f5f]/20' : 'border-slate-200'}`}>
-                                        <div className="flex flex-col md:flex-row">
+                                        <div className="flex flex-col lg:flex-row">
                                             
                                             {/* LEFT: Doctor Info */}
-                                            <div className="md:w-5/12 p-6 border-b md:border-b-0 md:border-r border-slate-200 flex sm:flex-row flex-col gap-4 items-center sm:items-start text-center sm:text-left bg-slate-50">
+                                            <div className="lg:w-5/12 p-6 border-b lg:border-b-0 lg:border-r border-slate-200 flex sm:flex-row flex-col gap-4 items-center sm:items-start text-center sm:text-left bg-slate-50">
                                                 <div className="w-24 h-24 flex-shrink-0 bg-white text-[#00278D] rounded-full shadow-inner flex items-center justify-center border-2 border-slate-200">
                                                     <FiUser className="h-12 w-12" />
                                                 </div>
@@ -380,10 +380,10 @@ export default function Booking() {
                                             </div>
 
                                             {/* RIGHT: Booking Flow (Date -> Slots) */}
-                                            <div className="md:w-7/12 p-6">
+                                            <div className="lg:w-7/12 p-6">
                                                 
                                                 {/* Date Selector */}
-                                                <div className="mb-4 w-56">
+                                                <div className="mb-4 w-full sm:w-56">
                                                     <CustomDropdown
                                                         value={currentDoctorDate}
                                                         onValueChange={(value) => handleDateChange(doc.id, value)}

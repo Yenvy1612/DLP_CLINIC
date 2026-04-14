@@ -98,7 +98,7 @@ function Chatbot() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.8 }}
                         transition={{ duration: 0.3 }}
-                        className="fixed bottom-40 right-6 z-40"
+                        className="fixed bottom-32 right-3 z-40 sm:bottom-40 sm:right-6"
                     >
                         <div className="bg-[#00278D] rounded-2xl shadow-2xl p-4 max-w-xs flex items-start gap-3 relative mb-3">
                             <div className="flex-1">
@@ -122,7 +122,7 @@ function Chatbot() {
             {/* Chatbot Button - Above the scroll-to-top button */}
             <motion.button
                 onClick={() => setIsOpen(!isOpen)}
-                className="fixed bottom-24 right-6 z-50 h-14 w-14 rounded-full bg-[#00278D] hover:from-[#003bb5] hover:to-sky-400 text-white shadow-xl shadow-blue-900/30 flex items-center justify-center transition-all duration-300 p-2"
+                className="fixed bottom-20 right-3 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#00278D] p-2 text-white shadow-xl shadow-blue-900/30 transition-all duration-300 hover:from-[#003bb5] hover:to-sky-400 sm:bottom-24 sm:right-6"
                 whileHover={isAdmin ? undefined : { scale: 1.06 }}
                 whileTap={isAdmin ? undefined : { scale: 0.94 }}
                 aria-label="Open chatbot"
@@ -142,7 +142,7 @@ function Chatbot() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="fixed bottom-40 right-6 z-40 w-96 h-[500px] bg-white rounded-4xl shadow-2xl flex flex-col overflow-hidden"
+                        className="fixed bottom-28 right-3 z-40 flex h-[72vh] w-[calc(100vw-1.5rem)] max-w-[380px] flex-col overflow-hidden rounded-3xl bg-white shadow-2xl sm:bottom-40 sm:right-6 sm:h-[500px] sm:w-96 sm:rounded-4xl"
                     >
                         {/* Header */}
                         <div className="bg-[#00278D] text-white p-4 flex items-center gap-3">

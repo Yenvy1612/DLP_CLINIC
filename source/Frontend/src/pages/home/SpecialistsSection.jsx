@@ -54,7 +54,7 @@ export default function SpecialistsSection() {
                     </button>
                 </div>
 
-                <div className="flex gap-6 overflow-x-auto pb-6 md:grid md:grid-cols-2 md:overflow-visible lg:grid-cols-5">
+                <div className="flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory md:grid md:grid-cols-2 md:overflow-visible lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
                     {doctors.map((doctor, idx) => (
                         <motion.div
                             key={doctor.id}
@@ -62,7 +62,7 @@ export default function SpecialistsSection() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: idx * 0.1, duration: 0.5 }}
-                            className="min-w-[220px]"
+                            className="min-w-[260px] snap-start md:min-w-0"
                         >
                             <DoctorCard doctor={doctor} />
                         </motion.div>

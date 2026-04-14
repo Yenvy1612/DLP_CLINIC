@@ -128,19 +128,19 @@ function AdminUserManagement() {
     return (
         <div
             ref={pageRef}
-            className="min-h-screen bg-[var(--surface)] px-6 py-8"
+            className="min-h-screen bg-[var(--surface)] px-4 py-6 sm:px-6 sm:py-8"
         >
             <div className="max-w-6xl mx-auto">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-3xl font-bold text-[#00278D] mb-6 p-2 bg-white rounded-xl shadow-xl">Danh sách người dùng</h1>
-                    <button onClick={() => navigate("/admin/add-user")} className="flex items-center gap-2 text-sm mb-6 bg-[#00278D] text-white p-2 rounded-xl hover:shadow-xl hover:bg-[#001f5f] transition duration-300 cursor-pointer">
+                <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <h1 className="w-fit rounded-xl bg-white p-2 text-2xl font-bold text-[#00278D] shadow-xl sm:text-3xl">Danh sách người dùng</h1>
+                    <button onClick={() => navigate("/admin/add-user")} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#00278D] p-2 text-sm text-white transition duration-300 hover:bg-[#001f5f] hover:shadow-xl sm:mb-0 sm:w-auto">
                         <FiUserPlus />
                         Thêm người dùng
                     </button>
                 </div>
 
                 {/* Thanh tìm kiếm */}
-                <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
+                <div className="mb-6 rounded-2xl bg-white p-4 shadow-xl sm:p-6">
                     <div className="flex items-center gap-2 mb-4">
                         <FiSearch className="text-[#00278D]" size={20} />
                         <h2 className="text-lg font-semibold text-[#00278D]">Tìm kiếm người dùng</h2>
@@ -197,25 +197,25 @@ function AdminUserManagement() {
                     </div>
 
                     {/* Buttons */}
-                    <div className="flex gap-3 mt-4">
+                    <div className="mt-4 flex flex-wrap gap-3">
                         <button
                             onClick={handleSearch}
-                            className="bg-[#00278D] text-white px-6 py-2 rounded-lg hover:bg-[#001f5f] transition-colors font-medium flex items-center gap-2"
+                            className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#00278D] px-6 py-2 font-medium text-white transition-colors hover:bg-[#001f5f] sm:w-auto"
                         >
                             <FiSearch size={16} />
                             Tìm kiếm
                         </button>
                         <button
                             onClick={handleReset}
-                            className="bg-slate-700 text-white px-6 py-2 rounded-lg hover:bg-slate-800 transition-colors font-medium"
+                            className="w-full rounded-lg bg-slate-700 px-6 py-2 font-medium text-white transition-colors hover:bg-slate-800 sm:w-auto"
                         >
                             Đặt lại
                         </button>
                     </div>
                 </div>
 
-                <div className="bg-white border border-slate-200 rounded-3xl shadow-xl overflow-hidden">
-                    <table className="min-w-full text-sm">
+                <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-xl">
+                    <table className="min-w-[980px] w-full text-sm">
                         <thead className="bg-slate-100 text-[#00278D]">
                             <tr>
                                 <th className="px-6 py-3 text-left font-semibold">STT</th>
@@ -264,13 +264,13 @@ function AdminUserManagement() {
                                         <td className="px-6 py-3 text-right flex justify-end gap-2">
                                             <button
                                                 onClick={() => navigate(`/admin/edit-user/${u.id}`)}
-                                                className="px-3 py-1.5 rounded-xl border border-slate-400 border-2 cursor-pointer text-slate-700 hover:bg-slate-100 flex items-center gap-1 text-xs transition"
+                                                className="px-3 py-1.5 rounded-xl border-2 border-slate-400 cursor-pointer text-slate-700 hover:bg-slate-100 flex items-center gap-1 text-xs transition"
                                             >
                                                 <FiEdit2 size={14} /> Chi tiết/Sửa
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(u.id)}
-                                                className="px-3 py-1.5 rounded-xl border border-slate-500 border-2 cursor-pointer text-slate-800 hover:bg-slate-200 flex items-center gap-1 text-xs transition"
+                                                className="px-3 py-1.5 rounded-xl border-2 border-slate-500 cursor-pointer text-slate-800 hover:bg-slate-200 flex items-center gap-1 text-xs transition"
                                             >
                                                 <FiTrash2 size={14} /> Xóa
                                             </button>

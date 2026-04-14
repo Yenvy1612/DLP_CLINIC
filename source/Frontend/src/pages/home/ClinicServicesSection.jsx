@@ -71,8 +71,8 @@ function ClinicServicesSection() {
     };
 
     return (
-        <section className="w-full bg-white py-20">
-            <div className="mx-auto flex max-w-7xl flex-col items-stretch gap-10 px-6 xl:flex-row xl:gap-14">
+        <section className="w-full bg-white py-12 sm:py-20">
+            <div className="mx-auto flex max-w-7xl flex-col items-stretch gap-10 px-4 sm:px-6 xl:flex-row xl:gap-14">
                 <motion.div 
                     className="flex-1"
                     initial="hidden"
@@ -87,7 +87,7 @@ function ClinicServicesSection() {
                         our featured treatments
                     </motion.p>
                     <motion.h2 
-                        className="mb-4 text-4xl font-bold leading-tight text-[var(--brand-navy)] xl:text-5xl"
+                        className="mb-4 text-3xl font-bold leading-tight text-[var(--brand-navy)] sm:text-4xl xl:text-5xl"
                         variants={itemVariants}
                     >
                         Dịch vụ nổi bật
@@ -125,7 +125,7 @@ function ClinicServicesSection() {
 
                         <motion.button 
                             onClick={() => navigate("/services")} 
-                            className="cursor-pointer hidden sm:inline-flex items-center gap-2 px-6 py-3 rounded-full bg-sky-500 text-white text-sm font-semibold shadow-md hover:bg-sky-600 transition"
+                            className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-sky-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-sky-600 sm:w-auto"
                         >
                             Xem tất cả dịch vụ
                             <FiArrowRight className="w-4 h-4" />
@@ -157,7 +157,7 @@ function ClinicServicesSection() {
                     </motion.div>
 
                     <motion.div 
-                        className="mt-8 select-none text-[40px] font-extrabold tracking-[0.15em] text-cyan-100 md:text-[52px]"
+                        className="mt-8 select-none text-[30px] font-extrabold tracking-[0.12em] text-cyan-100 sm:text-[40px] md:text-[52px]"
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}

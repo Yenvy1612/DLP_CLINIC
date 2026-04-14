@@ -89,15 +89,15 @@ function AdminAppointmentManagement() {
     return (
         <div
             ref={pageRef}
-            className="min-h-screen bg-[var(--surface)] px-6 py-8"
+            className="min-h-screen bg-[var(--surface)] px-4 py-6 sm:px-6 sm:py-8"
         >
-            <div className="max-w-9xl mx-auto">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-3xl font-bold text-[#00278D] mb-6 p-2 bg-white rounded-xl shadow-xl">Danh sách lịch hẹn</h1>
+            <div className="mx-auto max-w-7xl">
+                <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <h1 className="w-fit rounded-xl bg-white p-2 text-2xl font-bold text-[#00278D] shadow-xl sm:text-3xl">Danh sách lịch hẹn</h1>
                 </div>
 
                 {/* Thanh tìm kiếm / Filter */}
-                <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
+                <div className="mb-6 rounded-2xl bg-white p-4 shadow-xl sm:p-6">
                     <h2 className="text-lg font-semibold text-[#00278D] mb-4">Tìm kiếm lịch hẹn</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {/* Tên bác sĩ */}
@@ -164,16 +164,16 @@ function AdminAppointmentManagement() {
                         </div>
 
                         {/* Buttons */}
-                        <div className="flex items-end gap-2">
+                        <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-end">
                             <button
                                 onClick={handleSearch}
-                                className="flex-1 bg-[#00278D] text-white px-6 py-2 rounded-lg hover:bg-[#001f5f] transition-colors font-medium"
+                                className="w-full rounded-lg bg-[#00278D] px-6 py-2 text-white transition-colors hover:bg-[#001f5f] sm:flex-1"
                             >
                                 Tìm kiếm
                             </button>
                             <button
                                 onClick={handleReset}
-                                className="flex-1 bg-slate-700 text-white px-6 py-2 rounded-lg hover:bg-slate-800 transition-colors font-medium"
+                                className="w-full rounded-lg bg-slate-700 px-6 py-2 text-white transition-colors hover:bg-slate-800 sm:flex-1"
                             >
                                 Đặt lại
                             </button>
@@ -181,8 +181,8 @@ function AdminAppointmentManagement() {
                     </div>
                 </div>
 
-                <div className="bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden">
-                    <table className="min-w-full text-sm">
+                <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-xl">
+                    <table className="min-w-[900px] w-full text-sm">
                         <thead className="bg-slate-100 text-[#00278D]">
                             <tr>
                                 <th className="px-6 py-3 text-left font-semibold">STT</th>

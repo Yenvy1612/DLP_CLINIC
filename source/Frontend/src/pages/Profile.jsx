@@ -56,16 +56,16 @@ function Profile() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="h-[100vh] bg-[url(../../assets/images/profile/profile-bg.jpg)] bg-cover"
+            className="min-h-[100svh] bg-[url(../../assets/images/profile/profile-bg.jpg)] bg-cover bg-center"
         >
             <motion.div
                 variants={container}
                 initial="hidden"
                 animate="show"
-                className="max-w-6xl p-6"
+                className="mx-auto max-w-6xl px-4 py-6 sm:px-6"
             >
                 <motion.div variants={item} className="rounded-3xl bg-white border border-gray-100 shadow-xl">
-                    <div className="p-8 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-8">
+                    <div className="grid grid-cols-1 gap-6 p-4 sm:p-6 md:grid-cols-[220px_1fr] md:gap-8 lg:p-8">
                         {/* Ảnh */}
                         <motion.div variants={item} className="flex md:block justify-center">
                             <div className="relative">
@@ -95,43 +95,43 @@ function Profile() {
                                 <span className="text-[#00278D]">{profile.fullName}</span>
                             </motion.h1>
 
-                            <motion.div variants={item} className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-3 text-[15px] text-slate-800">
-                                <motion.div variants={item} className="flex gap-3">
-                                    <div className="w-32 shrink-0 text-slate-500">Email</div>
+                            <motion.div variants={item} className="grid grid-cols-1 gap-x-12 gap-y-3 text-[15px] text-slate-800 sm:grid-cols-2">
+                                <motion.div variants={item} className="flex flex-col gap-1 sm:flex-row sm:gap-3">
+                                    <div className="shrink-0 text-slate-500 sm:w-32">Email</div>
                                     <div className="font-medium">{profile.email}</div>
                                 </motion.div>
 
-                                <motion.div variants={item} className="flex gap-3">
-                                    <div className="w-32 shrink-0 text-slate-500">Số điện thoại</div>
+                                <motion.div variants={item} className="flex flex-col gap-1 sm:flex-row sm:gap-3">
+                                    <div className="shrink-0 text-slate-500 sm:w-32">Số điện thoại</div>
                                     <div className="font-medium">{profile.phone}</div>
                                 </motion.div>
 
-                                <motion.div variants={item} className="flex gap-3">
-                                    <div className="w-32 shrink-0 text-slate-500">Số CCCD</div>
+                                <motion.div variants={item} className="flex flex-col gap-1 sm:flex-row sm:gap-3">
+                                    <div className="shrink-0 text-slate-500 sm:w-32">Số CCCD</div>
                                     <div className="font-medium">{profile.idNumber}</div>
                                 </motion.div>
 
-                                <motion.div variants={item} className="flex gap-3">
-                                    <div className="w-32 shrink-0 text-slate-500">Vai trò</div>
+                                <motion.div variants={item} className="flex flex-col gap-1 sm:flex-row sm:gap-3">
+                                    <div className="shrink-0 text-slate-500 sm:w-32">Vai trò</div>
                                     <div className="font-medium">
                                         {roleTag}
                                     </div>
                                 </motion.div>
 
-                                <motion.div variants={item} className="flex gap-3">
-                                    <div className="w-32 shrink-0 text-slate-500">Giới tính</div>
+                                <motion.div variants={item} className="flex flex-col gap-1 sm:flex-row sm:gap-3">
+                                    <div className="shrink-0 text-slate-500 sm:w-32">Giới tính</div>
                                     <div className="font-medium">
                                         {profile.gender === "MALE" ? "Nam" : profile.gender === "FEMALE" ? "Nữ" : "Khác"}
                                     </div>
                                 </motion.div>
 
-                                <motion.div variants={item} className="flex gap-3">
-                                    <div className="w-32 shrink-0 text-slate-500">Ngày sinh</div>
+                                <motion.div variants={item} className="flex flex-col gap-1 sm:flex-row sm:gap-3">
+                                    <div className="shrink-0 text-slate-500 sm:w-32">Ngày sinh</div>
                                     <div className="font-medium">{profile.birthDate}</div>
                                 </motion.div>
 
-                                <motion.div variants={item} className="flex gap-3">
-                                    <div className="w-32 shrink-0 text-slate-500">Địa chỉ</div>
+                                <motion.div variants={item} className="flex flex-col gap-1 sm:flex-row sm:gap-3">
+                                    <div className="shrink-0 text-slate-500 sm:w-32">Địa chỉ</div>
                                     <div className="font-medium">{profile.address}</div>
                                 </motion.div>
                             </motion.div>
@@ -146,7 +146,7 @@ function Profile() {
                                     whileHover={{ y: -3, boxShadow: "0px 6px 12px rgba(0,0,0,0.15)" }}
                                     whileTap={{ scale: 0.97 }}
                                     transition={{ type: "spring", stiffness: 180, damping: 20 }}
-                                    className="flex justify-between items-center px-5 py-2.5 rounded-xl bg-[#00278D] text-white font-medium hover:bg-sky-500 transition-colors"
+                                    className="flex w-full items-center justify-between rounded-xl bg-[#00278D] px-5 py-2.5 font-medium text-white transition-colors hover:bg-sky-500 sm:w-auto"
                                 >
                                     <p className="mr-3">Chỉnh sửa hồ sơ</p> <FaEdit />
                                 </motion.button>

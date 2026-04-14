@@ -128,7 +128,7 @@ function AdminServiceManagement() {
     return (
         <div
             ref={pageRef}
-            className="min-h-screen bg-[var(--surface)] px-6 py-8"
+            className="min-h-screen bg-[var(--surface)] px-4 py-6 sm:px-6 sm:py-8"
         >
             <div className="max-w-6xl mx-auto">
                 <div className="mb-6 rounded-3xl border border-slate-200/80 bg-white/90 px-6 py-5 shadow-[0_14px_34px_rgba(15,23,42,0.10)]">
@@ -149,7 +149,7 @@ function AdminServiceManagement() {
                 </div>
 
                 {/* Thanh tìm kiếm */}
-                <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_12px_30px_rgba(15,23,42,0.08)] p-6 mb-6">
+                <div className="mb-6 rounded-3xl border border-slate-200/80 bg-white p-4 shadow-[0_12px_30px_rgba(15,23,42,0.08)] sm:p-6">
                     <div className="flex items-center gap-2 mb-4">
                         <FiSearch className="text-[#00278D]" size={20} />
                         <h2 className="text-lg font-semibold text-[#00278D]">Tìm kiếm dịch vụ</h2>
@@ -205,25 +205,25 @@ function AdminServiceManagement() {
                     </div>
 
                     {/* Buttons */}
-                    <div className="flex gap-3">
+                    <div className="flex flex-wrap gap-3">
                         <button
                             onClick={handleSearch}
-                            className="bg-[#00278D] text-white px-6 py-2.5 rounded-xl hover:bg-[var(--brand-700)] transition-colors font-medium flex items-center gap-2"
+                            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#00278D] px-6 py-2.5 font-medium text-white transition-colors hover:bg-[var(--brand-700)] sm:w-auto"
                         >
                             <FiSearch size={16} />
                             Tìm kiếm
                         </button>
                         <button
                             onClick={handleReset}
-                            className="bg-slate-600 text-white px-6 py-2.5 rounded-xl hover:bg-slate-700 transition-colors font-medium"
+                            className="w-full rounded-xl bg-slate-600 px-6 py-2.5 font-medium text-white transition-colors hover:bg-slate-700 sm:w-auto"
                         >
                             Đặt lại
                         </button>
                     </div>
                 </div>
 
-                <div className="bg-white border border-slate-200/80 rounded-3xl shadow-[0_14px_34px_rgba(15,23,42,0.10)] overflow-hidden">
-                    <table className="min-w-full text-sm">
+                <div className="overflow-x-auto rounded-3xl border border-slate-200/80 bg-white shadow-[0_14px_34px_rgba(15,23,42,0.10)]">
+                    <table className="min-w-[860px] w-full text-sm">
                         <thead className="bg-sky-50 text-[#00278D]">
                             <tr>
                                 <th className="px-6 py-3 text-left font-semibold">STT</th>

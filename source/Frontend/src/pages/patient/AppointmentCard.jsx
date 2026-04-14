@@ -135,12 +135,12 @@ function AppointmentCard({ appointment }) {
 
     return (
         <>
-            <div className="bg-white h-[40vh] rounded-xl p-5 shadow-xl hover:shadow-md transition duration-200 flex flex-col justify-between">
+            <div className="flex min-h-[340px] flex-col justify-between rounded-xl bg-white p-5 shadow-xl transition duration-200 hover:shadow-md sm:min-h-[360px]">
                 <h3 className="text-lg font-semibold text-[#00278D] mb-3">
                     Cuộc hẹn #{id}
                 </h3>
 
-                <div className="grid grid-cols-3 gap-x-4 gap-y-2 text-gray-700 flex-grow">
+                <div className="grid flex-grow grid-cols-1 gap-x-4 gap-y-2 text-gray-700 sm:grid-cols-2 lg:grid-cols-3">
                     <div>
                         <p className="font-medium text-gray-500">{role === "DOCTOR" ? "Bệnh nhân:" : "Bác sĩ:"}</p>{" "}
                         <p className="font-semibold">{role === "DOCTOR" ? patientInfo.fullName : doctorInfo.fullName} </p>
@@ -151,23 +151,24 @@ function AppointmentCard({ appointment }) {
                     </div>
                     <div>
                         <p className="font-medium text-gray-500">Thời gian:</p>{" "}
-                        <p className="font-semibold">{displayStartTime}</p>
+                        <p className="whitespace-pre-line font-semibold">{displayStartTime}</p>
                     </div>
                     {role === "PATIENT" ?
                         (<>
-                            <div className="col-span-2">
+                            <div className="sm:col-span-2">
                                 <p className="font-medium text-gray-500">Ghi chú: {serviceInfo.name + "\n"}</p>
                                 <p className="font-medium text-gray-500">Đơn giá: {serviceInfo.price + " vnđ"}</p>
                             </div>
                             <div className="text-sm text-gray-400">
-                                <p className="font-medium text-gray-400">Tạo lúc:</p> {displayCreatedAt}
+                                <p className="font-medium text-gray-400">Tạo lúc:</p>
+                                <p className="whitespace-pre-line">{displayCreatedAt}</p>
                             </div>
                         </>) : ""}
                 </div>
 
-                <div className="mt-4 flex justify-between">
+                <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <span
-                        className={`px-3 py-2 rounded-md text-sm font-medium border ${resolvedStatusColor} w-2/3 text-center`}
+                        className={`w-full rounded-md border px-3 py-2 text-center text-sm font-medium sm:w-2/3 ${resolvedStatusColor}`}
                     >
                         {statusLabel}
                     </span>
@@ -176,7 +177,7 @@ function AppointmentCard({ appointment }) {
                         <button
                             onClick={() => appointment && navigate(`/patient/edit-appointment/${appointment.id}`)}
                             disabled={currentStatus === "DONE"}
-                            className="cursor-pointer bg-sky-500 hover:bg-sky-600 text-white w-[120px] rounded text-sm disabled:opacity-60"
+                            className="w-full cursor-pointer rounded bg-sky-500 py-2 text-sm text-white hover:bg-sky-600 disabled:opacity-60 sm:w-[120px]"
                         >
                             Sửa lịch
                         </button>
@@ -185,7 +186,7 @@ function AppointmentCard({ appointment }) {
                     {role === "DOCTOR" && currentStatus === "PENDING" ? (
                         <button
                             onClick={requestMarkCancelled}
-                            className="cursor-pointer hover:bg-red-800 delete-appointment bg-red-700 text-white w-[100px] rounded text-sm"
+                            className="delete-appointment w-full cursor-pointer rounded bg-red-700 py-2 text-sm text-white hover:bg-red-800 sm:w-[100px]"
                         >
                             Hủy
                         </button>

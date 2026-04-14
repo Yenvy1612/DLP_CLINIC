@@ -169,14 +169,14 @@ function Services() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="min-h-[40vh] bg-[var(--surface)] px-6 py-10"
+            className="min-h-[40vh] bg-[var(--surface)] px-4 py-8 sm:px-6 sm:py-10"
         >
             {/* Header */}
             <motion.h1 
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="mx-auto mb-8 max-w-6xl rounded-[28px] bg-[var(--brand-navy)] p-8 text-center text-4xl font-semibold text-white shadow-2xl"
+                className="mx-auto mb-8 max-w-6xl rounded-[24px] bg-[var(--brand-navy)] p-5 text-center text-3xl font-semibold text-white shadow-2xl sm:rounded-[28px] sm:p-8 sm:text-4xl"
             >
                 Danh mục dịch vụ
             </motion.h1>
@@ -186,7 +186,7 @@ function Services() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
-                className="mx-auto mb-8 max-w-6xl rounded-2xl border border-cyan-100 bg-white p-6 shadow-xl"
+                className="mx-auto mb-8 max-w-6xl rounded-2xl border border-cyan-100 bg-white p-4 shadow-xl sm:p-6"
             >
                 <div className="flex items-center gap-2 mb-4">
                     <FiSearch className="text-[#00278D]" size={20} />
@@ -243,17 +243,17 @@ function Services() {
                 </div>
 
                 {/* Buttons */}
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                     <button
                         onClick={handleSearch}
-                        className="flex items-center gap-2 rounded-lg bg-[var(--brand-navy)] px-6 py-2 font-medium text-white transition-colors hover:bg-sky-700"
+                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--brand-navy)] px-6 py-2 font-medium text-white transition-colors hover:bg-sky-700 sm:w-auto"
                     >
                         <FiSearch size={16} />
                         Tìm kiếm
                     </button>
                     <button
                         onClick={handleReset}
-                        className="rounded-lg bg-slate-500 px-6 py-2 font-medium text-white transition-colors hover:bg-slate-600"
+                        className="w-full rounded-lg bg-slate-500 px-6 py-2 font-medium text-white transition-colors hover:bg-slate-600 sm:w-auto"
                     >
                         Đặt lại
                     </button>
@@ -272,7 +272,7 @@ function Services() {
                         <motion.div
                             key={s.id}
                             variants={item}
-                            className="group flex flex-col justify-between rounded-2xl border border-cyan-100 bg-white p-8 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+                            className="group flex flex-col justify-between rounded-2xl border border-cyan-100 bg-white p-6 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl sm:p-8"
                         >
                             <h2 className="text-2xl font-semibold leading-snug text-[#00278D] mb-4">
                                 {s.name}

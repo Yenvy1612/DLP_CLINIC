@@ -116,18 +116,18 @@ function Contact() {
 
     return (
         <div className="min-h-screen bg-[var(--surface)]">
-            <div className="max-w-7xl mx-auto px-6 py-16">
+            <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16">
                 {/* Header */}
                 <motion.div
                     initial="hidden"
                     animate="show"
                     variants={fadeUp}
-                    className="mb-14 rounded-[28px] bg-[var(--brand-navy)] p-10 text-center text-white shadow-2xl"
+                    className="mb-10 rounded-[24px] bg-[var(--brand-navy)] p-6 text-center text-white shadow-2xl sm:mb-14 sm:rounded-[28px] sm:p-10"
                 >
                     <span className="font-bold text-sm uppercase tracking-[0.18em] text-cyan-200">
                         GET IN TOUCH
                     </span>
-                    <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">
+                    <h1 className="mt-4 mb-6 text-3xl font-bold sm:text-4xl md:text-5xl">
                         Liên hệ với chúng tôi
                     </h1>
                     <p className="mx-auto max-w-2xl text-lg text-cyan-50/90">
@@ -147,7 +147,7 @@ function Contact() {
                         <motion.div
                             key={idx}
                             variants={fadeUp}
-                            className="rounded-2xl border border-cyan-100 bg-white p-6 text-center shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
+                            className="rounded-2xl border border-cyan-100 bg-white p-5 text-center shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl sm:p-6"
                         >
                             <div className={`w-16 h-16 rounded-full ${item.color} flex items-center justify-center text-white mx-auto mb-4 shadow-lg`}>
                                 {item.icon}
@@ -170,7 +170,7 @@ function Contact() {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6 }}
-                        className="rounded-2xl border border-cyan-100 bg-white p-8 shadow-lg"
+                        className="rounded-2xl border border-cyan-100 bg-white p-5 shadow-lg sm:p-8"
                     >
                         <h2 className="text-2xl font-bold text-[#00278D] mb-6">
                             Gửi tin nhắn cho chúng tôi
@@ -306,7 +306,7 @@ function Contact() {
                         className="space-y-6"
                     >
                         {/* Map */}
-                        <div className="h-[400px] overflow-hidden rounded-2xl border border-cyan-100 bg-white shadow-lg">
+                        <div className="h-[280px] overflow-hidden rounded-2xl border border-cyan-100 bg-white shadow-lg sm:h-[360px] lg:h-[400px]">
                             <iframe
                                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3725.292401303918!2d105.78484157503009!3d20.980912980656463!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135accdd0921797%3A0xe2ed991c5990d2b1!2zOTZBIMSQLiBUcuG6p24gUGjDuiwgUC4gTeG7mSBMYW8sIEjDoCDEkMO0bmcsIEjDoCBO4buZaSwgVmnhu4d0IE5hbQ!5e0!3m2!1svi!2sus!4v1763947011415!5m2!1svi!2sus"
                                 width="100%"
@@ -319,7 +319,7 @@ function Contact() {
                         </div>
 
                         {/* Why Contact Us */}
-                        <div className="rounded-2xl border border-cyan-100 bg-white p-8 shadow-lg">
+                        <div className="rounded-2xl border border-cyan-100 bg-white p-5 shadow-lg sm:p-8">
                             <h3 className="text-xl font-bold text-[#00278D] mb-4">
                                 Tại sao nên liên hệ với chúng tôi?
                             </h3>
