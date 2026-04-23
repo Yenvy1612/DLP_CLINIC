@@ -63,10 +63,6 @@ export const faqs = [
                     q: "Có nhận bảo hiểm y tế không?",
                     a: "Vui lòng liên hệ trực tiếp qua email hung.clinic@ptit.edu.vn hoặc trang 'LIÊN HỆ' để biết chính sách bảo hiểm y tế hiện tại và các loại bảo hiểm được chấp nhận."
                 },
-                {
-                    q: "Làm sao để xem chi tiết dịch vụ?",
-                    a: "Vào trang 'DỊCH VỤ' → Duyệt danh sách hoặc tìm kiếm theo tên → Nhấn vào dịch vụ cần xem → Hệ thống hiển thị mô tả chi tiết, giá cả và thông tin liên quan."
-                }
             ]
         },
         {
