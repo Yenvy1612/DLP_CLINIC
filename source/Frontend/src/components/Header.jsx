@@ -172,6 +172,16 @@ function Header() {
 
     const roleProfilePath = getRoleProfilePath(role);
 
+    const renderAssistantBadge = (item) => {
+        if (!item.badge) return null;
+
+        return (
+            <span className="ml-2 inline-flex items-center rounded-full border border-fuchsia-300 bg-gradient-to-r from-fuchsia-500 to-rose-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-white shadow-sm shadow-fuchsia-200/70">
+                {item.badge}
+            </span>
+        );
+    };
+
     // Render một nav item (desktop)
     const renderDesktopNavItem = (item) => {
         // Item external (Trợ lý A*Care)
@@ -184,7 +194,8 @@ function Header() {
                         rel="noopener noreferrer"
                         className="font-semibold flex items-center gap-1 text-[var(--brand-navy)] hover:text-[var(--brand-600)] transition-colors"
                     >
-                        {item.name}
+                        <span>{item.name}</span>
+                        {renderAssistantBadge(item)}
                     </a>
                 </div>
             );
@@ -442,7 +453,8 @@ function Header() {
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
                                     <span className="w-1.5 h-1.5 rounded-full bg-[var(--brand-600)] flex-shrink-0" />
-                                    {item.name}
+                                    <span>{item.name}</span>
+                                    {renderAssistantBadge(item)}
                                 </a>
                             );
                         }
