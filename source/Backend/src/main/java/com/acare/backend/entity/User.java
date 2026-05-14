@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -55,6 +56,7 @@ public class User {
     private LocalDate birthDate;
     private String address;
     @Column(unique = true, length = 30)
+    @Convert(converter = com.acare.backend.utils.AttributeEncryptor.class) // DLP: Mã hóa CCCD trước khi lưu DB
     private String idNumber;
     @Column(nullable = false)
     @Builder.Default

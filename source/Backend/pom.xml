@@ -84,6 +84,20 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- ==================== DLP Module Dependencies ==================== -->
+
+		<!-- Redis: dùng cho rate limiting / đếm request trong RuleEngineService -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+
+		<!-- AOP: dùng cho BehaviorAspect (tự động kiểm tra rule trước khi gọi Controller) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

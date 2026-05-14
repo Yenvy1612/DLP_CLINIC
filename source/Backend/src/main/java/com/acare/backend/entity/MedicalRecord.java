@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -65,12 +66,15 @@ public class MedicalRecord {
     private String chiefComplaint;
 
     @Column(columnDefinition = "TEXT")
+    @Convert(converter = com.acare.backend.utils.AttributeEncryptor.class) // DLP: Mã hóa chẩn đoán
     private String diagnosis;
 
     @Column(name = "treatment_plan", columnDefinition = "TEXT")
+    @Convert(converter = com.acare.backend.utils.AttributeEncryptor.class) // DLP: Mã hóa phác đồ điều trị
     private String treatmentPlan;
 
     @Column(name = "clinical_notes", columnDefinition = "TEXT")
+    @Convert(converter = com.acare.backend.utils.AttributeEncryptor.class) // DLP: Mã hóa ghi chú lâm sàng
     private String clinicalNotes;
 
     @Column(name = "follow_up_date")
