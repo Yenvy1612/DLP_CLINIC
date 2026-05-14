@@ -1,0 +1,146 @@
+[
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\layout_fragment_appointment.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\fragment_appointment.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\layout_dialog_change_password.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\dialog_change_password.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\drawable_ic_calendar_add.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\drawable\\ic_calendar_add.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\drawable_ic_arrow_back.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\drawable\\ic_arrow_back.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\menu_bottom_nav_menu.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\menu\\bottom_nav_menu.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\drawable_ic_home.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\drawable\\ic_home.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\layout_item_medical_record.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\item_medical_record.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\layout_item_appointment_card.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\item_appointment_card.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\layout_activity_register.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\activity_register.xml"
+    },
+    {
+        "merged": "com.acare.clinic.app-merged_res-4:/layout_activity_main.xml.flat",
+        "source": "com.acare.clinic.app-main-6:/layout/activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\drawable_ic_person.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\drawable\\ic_person.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\layout_fragment_home.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\fragment_home.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\drawable_ic_calendar.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\drawable\\ic_calendar.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\drawable_bg_login_header.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\drawable\\bg_login_header.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\mipmap-anydpi-v26\\ic_launcher.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\drawable_bg_splash.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\drawable\\bg_splash.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\layout_activity_main.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\color_bottom_nav_selector.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\color\\bottom_nav_selector.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\mipmap-anydpi-v26\\ic_launcher_round.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\layout_fragment_medical_record.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\fragment_medical_record.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\drawable_ic_medical_cross.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\drawable\\ic_medical_cross.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\drawable_bg_avatar_circle.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\drawable\\bg_avatar_circle.xml"
+    },
+    {
+        "merged": "com.acare.clinic.app-merged_res-4:/layout_activity_splash.xml.flat",
+        "source": "com.acare.clinic.app-main-6:/layout/activity_splash.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\layout_activity_splash.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\activity_splash.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\drawable_bg_action_primary.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\drawable\\bg_action_primary.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\drawable_ic_calendar_empty.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\drawable\\ic_calendar_empty.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\drawable_ic_doctor.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\drawable\\ic_doctor.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\layout_activity_login.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\activity_login.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\drawable_ic_lock.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\drawable\\ic_lock.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\drawable_ic_medical_record.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\drawable\\ic_medical_record.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\drawable_ic_email.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\drawable\\ic_email.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\drawable_bg_action_green.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\drawable\\bg_action_green.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\drawable_bg_action_orange.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\drawable\\bg_action_orange.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\drawable_bg_home_header.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\drawable\\bg_home_header.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\layout_fragment_profile.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\fragment_profile.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-merged_res-4:\\navigation_nav_graph.xml.flat",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\navigation\\nav_graph.xml"
+    }
+]

@@ -55,17 +55,27 @@ public class AuthService {
     private final JwtService jwtService;
     private final AppSecurityProperties securityProperties;
     private final UserService userService;
+    private final AnomalyDetectionService anomalyDetectionService;
 
     @Transactional
     public AuthResponse login(LoginRequest request, HttpServletResponse response) {
         User user = userRepository.findByEmailIgnoreCase(request.getUsername())
-                .orElseThrow(() -> new BadRequestException("Sai tai khoan hoac mat khau"));
+                .orElseThrow(() -> {
+                    // Ghi nhận login thất bại khi không tìm thấy tài khoản
+                    anomalyDetectionService.recordLoginFailure("unknown", request.getUsername());
+                    return new BadRequestException("Sai tai khoan hoac mat khau");
+                });
 
         validateUserEnabled(user);
 
         if (!matchesPassword(request.getPassword(), user.getPasswordHash())) {
+            // Ghi nhận login thất bại khi sai mật khẩu
+            anomalyDetectionService.recordLoginFailure("unknown", request.getUsername());
             throw new BadRequestException("Sai tai khoan hoac mat khau");
         }
+
+        // Ghi nhận nếu đăng nhập thành công sau nhiều lần thất bại (suspicious)
+        anomalyDetectionService.recordSuspiciousLoginSuccess(user.getId(), "unknown");
 
         issueAuthCookies(user, response);
         return buildAuthResponse(user);

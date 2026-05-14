@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand colors -->
+    <color name="primary">#2563EB</color>
+    <color name="primary_dark">#1D4ED8</color>
+    <color name="primary_light">#DBEAFE</color>
+    <color name="secondary">#7C3AED</color>
+
+    <!-- Semantic colors -->
+    <color name="success">#16A34A</color>
+    <color name="success_light">#DCFCE7</color>
+    <color name="warning">#D97706</color>
+    <color name="warning_light">#FEF3C7</color>
+    <color name="error">#DC2626</color>
+    <color name="error_light">#FEE2E2</color>
+
+    <!-- Neutrals -->
+    <color name="white">#FFFFFF</color>
+    <color name="background">#F8FAFC</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="divider">#E2E8F0</color>
+
+    <!-- Status colors (appointment status) -->
+    <color name="status_pending">#D97706</color>
+    <color name="status_done">#16A34A</color>
+    <color name="status_cancelled">#DC2626</color>
+    <color name="status_no_show">#6B7280</color>
+
+    <!-- Bottom nav -->
+    <color name="nav_selected">#2563EB</color>
+    <color name="nav_unselected">#94A3B8</color>
+</resources>
