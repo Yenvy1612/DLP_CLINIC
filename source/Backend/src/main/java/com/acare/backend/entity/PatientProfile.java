@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -43,12 +44,15 @@ public class PatientProfile {
     private String bloodType;
 
     @Column(name = "insurance_number", length = 50, unique = true)
+    @Convert(converter = com.acare.backend.utils.AttributeEncryptor.class) // DLP: Mã hóa số BHYT
     private String insuranceNumber;
 
     @Column(columnDefinition = "TEXT")
+    @Convert(converter = com.acare.backend.utils.AttributeEncryptor.class) // DLP: Mã hóa tiền sử dị ứng
     private String allergies;
 
     @Column(name = "chronic_conditions", columnDefinition = "TEXT")
+    @Convert(converter = com.acare.backend.utils.AttributeEncryptor.class) // DLP: Mã hóa bệnh mãn tính
     private String chronicConditions;
 
     @Column(name = "emergency_contact_name", length = 120)

@@ -183,6 +183,23 @@ public class UserService {
         return users;
     }
 
+    /**
+     * Khóa hoặc mở khóa tài khoản user.
+     * Được gọi từ DlpController khi admin muốn block/unblock user vi phạm DLP.
+     *
+     * @param userId  ID user cần thay đổi trạng thái
+     * @param enabled true = mở khóa, false = khóa
+     */
+    public void toggleUserEnabled(Long userId, boolean enabled) {
+        User user = getUserById(userId);
+        user.setEnabled(enabled);
+        userRepository.save(user);
+
+        String action = enabled ? "UNBLOCK" : "BLOCK";
+        activityLogService.addAdminIfCurrentUser(
+                "DLP " + action + " USER: " + user.getFullName() + " (ID: " + userId + ")");
+    }
+
     public DoctorProfileResponse getDoctorProfileByUserId(Long userId) {
         User user = getUserById(userId);
         if (user.getRole() != UserRole.DOCTOR) {
