@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background">#F8FAFC</color>
+    <color name="divider">#E2E8F0</color>
+    <color name="error">#DC2626</color>
+    <color name="error_light">#FEE2E2</color>
+    <color name="nav_selected">#2563EB</color>
+    <color name="nav_unselected">#94A3B8</color>
+    <color name="primary">#2563EB</color>
+    <color name="primary_dark">#1D4ED8</color>
+    <color name="primary_light">#DBEAFE</color>
+    <color name="secondary">#7C3AED</color>
+    <color name="status_cancelled">#DC2626</color>
+    <color name="status_done">#16A34A</color>
+    <color name="status_no_show">#6B7280</color>
+    <color name="status_pending">#D97706</color>
+    <color name="success">#16A34A</color>
+    <color name="success_light">#DCFCE7</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="warning">#D97706</color>
+    <color name="warning_light">#FEF3C7</color>
+    <color name="white">#FFFFFF</color>
+    <string name="app_name">ACare Clinic</string>
+    <string name="appointments">Lịch hẹn</string>
+    <string name="book_appointment">Đặt lịch khám</string>
+    <string name="cancel_appointment">Hủy lịch hẹn</string>
+    <string name="confirm_cancel">Bạn có chắc muốn hủy lịch hẹn này?</string>
+    <string name="error_network">Lỗi kết nối. Vui lòng thử lại.</string>
+    <string name="home">Trang chủ</string>
+    <string name="loading">Đang tải...</string>
+    <string name="login">Đăng nhập</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="medical_records">Hồ sơ bệnh án</string>
+    <string name="no">Không</string>
+    <string name="no_appointments">Chưa có lịch hẹn nào</string>
+    <string name="profile">Hồ sơ</string>
+    <string name="register">Đăng ký</string>
+    <string name="upcoming_appointments">Lịch hẹn sắp tới</string>
+    <string name="yes">Có</string>
+    <style name="Theme.ACareClinic" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="android:colorBackground">@color/background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+    <style name="Theme.ACareClinic.Splash" parent="Theme.ACareClinic">
+        <item name="android:statusBarColor">@color/primary</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+    <style name="Widget.ACare.Card" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">2dp</item>
+        <item name="cardBackgroundColor">@color/white</item>
+    </style>
+    <style name="Widget.ACare.Chip.Status" parent="Widget.Material3.Chip.Assist">
+        <item name="android:textSize">11sp</item>
+    </style>
+</resources>

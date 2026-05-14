@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ACare Clinic</string>
+    <string name="login">Đăng nhập</string>
+    <string name="register">Đăng ký</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="home">Trang chủ</string>
+    <string name="appointments">Lịch hẹn</string>
+    <string name="medical_records">Hồ sơ bệnh án</string>
+    <string name="profile">Hồ sơ</string>
+    <string name="book_appointment">Đặt lịch khám</string>
+    <string name="upcoming_appointments">Lịch hẹn sắp tới</string>
+    <string name="no_appointments">Chưa có lịch hẹn nào</string>
+    <string name="loading">Đang tải...</string>
+    <string name="error_network">Lỗi kết nối. Vui lòng thử lại.</string>
+    <string name="cancel_appointment">Hủy lịch hẹn</string>
+    <string name="confirm_cancel">Bạn có chắc muốn hủy lịch hẹn này?</string>
+    <string name="yes">Có</string>
+    <string name="no">Không</string>
+</resources>
