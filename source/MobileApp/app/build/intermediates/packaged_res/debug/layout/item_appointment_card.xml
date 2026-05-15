@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
     app:cardCornerRadius="16dp"
-    app:cardElevation="3dp"
+    app:cardElevation="2dp"
     app:cardBackgroundColor="@color/white">
 
     <LinearLayout
@@ -14,89 +15,129 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Top row: code + status chip -->
+        <!-- Header row: code + status chip -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/tvCode"
+            <!-- Left accent bar (giống web FE card left border) -->
+            <View
+                android:id="@+id/statusBar"
+                android:layout_width="4dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_status_bar"
+                android:layout_marginEnd="12dp" />
+
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="#APT001"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
+                android:orientation="vertical">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipStatus"
+                <TextView
+                    android:id="@+id/tvCode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="#APT-001"
+                    android:textColor="@color/text_hint"
+                    android:textSize="11sp"
+                    android:letterSpacing="0.05" />
+
+                <TextView
+                    android:id="@+id/tvDoctorName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="BS. Nguyễn Văn A"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Status chip (giống web FE statusColors) -->
+            <TextView
+                android:id="@+id/tvStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Chờ khám"
-                android:textSize="11sp"
-                android:textColor="@color/white"
-                app:chipMinHeight="24dp"
-                style="@style/Widget.Material3.Chip.Assist" />
+                android:background="@drawable/bg_chip_status"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:text="Đang chờ"
+                android:textSize="12sp"
+                android:textStyle="bold" />
         </LinearLayout>
-
-        <!-- Doctor name -->
-        <TextView
-            android:id="@+id/tvDoctorName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="BS. Nguyễn Văn A"
-            android:textColor="@color/text_primary"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <!-- Service name -->
-        <TextView
-            android:id="@+id/tvServiceName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="Khám tổng quát"
-            android:textColor="@color/text_secondary"
-            android:textSize="13sp" />
 
         <!-- Divider -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
+            android:layout_marginVertical="12dp"
             android:background="@color/divider" />
 
-        <!-- Bottom row: time + cancel button -->
+        <!-- Info rows -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_services"
+                android:contentDescription="Dịch vụ"
+                app:tint="@color/text_secondary" />
+
             <TextView
-                android:id="@+id/tvDateTime"
+                android:id="@+id/tvService"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="09:00  •  14/05/2026"
-                android:textColor="@color/primary"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCancel"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="Hủy"
-                android:textSize="12sp"
-                app:strokeColor="@color/error"
-                android:textColor="@color/error" />
+                android:layout_marginStart="6dp"
+                android:text="Nha khoa tổng quát"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="6dp">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_calendar"
+                android:contentDescription="Thời gian"
+                app:tint="@color/text_secondary" />
+
+            <TextView
+                android:id="@+id/tvTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:text="Thứ 2, 09:00"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!-- Cancel button (only for PENDING) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancel"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="14dp"
+            android:text="Hủy lịch hẹn"
+            android:textColor="@color/error"
+            android:textSize="13sp"
+            app:strokeColor="@color/error"
+            app:cornerRadius="10dp"
+            android:visibility="gone" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

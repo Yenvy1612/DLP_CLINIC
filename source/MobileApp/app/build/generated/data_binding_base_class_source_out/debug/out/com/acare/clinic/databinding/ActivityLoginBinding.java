@@ -4,23 +4,26 @@ package com.acare.clinic.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.cardview.widget.CardView;
+import androidx.core.widget.NestedScrollView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.acare.clinic.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
 
 public final class ActivityLoginBinding implements ViewBinding {
   @NonNull
-  private final CoordinatorLayout rootView;
+  private final NestedScrollView rootView;
 
   @NonNull
   public final MaterialButton btnLogin;
@@ -32,26 +35,47 @@ public final class ActivityLoginBinding implements ViewBinding {
   public final TextInputEditText etPassword;
 
   @NonNull
+  public final CardView formCard;
+
+  @NonNull
+  public final View heroBackground;
+
+  @NonNull
+  public final LinearLayout heroBrand;
+
+  @NonNull
   public final ProgressBar progressBar;
+
+  @NonNull
+  public final TextInputLayout tilEmail;
+
+  @NonNull
+  public final TextInputLayout tilPassword;
 
   @NonNull
   public final TextView tvRegister;
 
-  private ActivityLoginBinding(@NonNull CoordinatorLayout rootView,
-      @NonNull MaterialButton btnLogin, @NonNull TextInputEditText etEmail,
-      @NonNull TextInputEditText etPassword, @NonNull ProgressBar progressBar,
-      @NonNull TextView tvRegister) {
+  private ActivityLoginBinding(@NonNull NestedScrollView rootView, @NonNull MaterialButton btnLogin,
+      @NonNull TextInputEditText etEmail, @NonNull TextInputEditText etPassword,
+      @NonNull CardView formCard, @NonNull View heroBackground, @NonNull LinearLayout heroBrand,
+      @NonNull ProgressBar progressBar, @NonNull TextInputLayout tilEmail,
+      @NonNull TextInputLayout tilPassword, @NonNull TextView tvRegister) {
     this.rootView = rootView;
     this.btnLogin = btnLogin;
     this.etEmail = etEmail;
     this.etPassword = etPassword;
+    this.formCard = formCard;
+    this.heroBackground = heroBackground;
+    this.heroBrand = heroBrand;
     this.progressBar = progressBar;
+    this.tilEmail = tilEmail;
+    this.tilPassword = tilPassword;
     this.tvRegister = tvRegister;
   }
 
   @Override
   @NonNull
-  public CoordinatorLayout getRoot() {
+  public NestedScrollView getRoot() {
     return rootView;
   }
 
@@ -94,9 +118,39 @@ public final class ActivityLoginBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.formCard;
+      CardView formCard = ViewBindings.findChildViewById(rootView, id);
+      if (formCard == null) {
+        break missingId;
+      }
+
+      id = R.id.heroBackground;
+      View heroBackground = ViewBindings.findChildViewById(rootView, id);
+      if (heroBackground == null) {
+        break missingId;
+      }
+
+      id = R.id.heroBrand;
+      LinearLayout heroBrand = ViewBindings.findChildViewById(rootView, id);
+      if (heroBrand == null) {
+        break missingId;
+      }
+
       id = R.id.progressBar;
       ProgressBar progressBar = ViewBindings.findChildViewById(rootView, id);
       if (progressBar == null) {
+        break missingId;
+      }
+
+      id = R.id.tilEmail;
+      TextInputLayout tilEmail = ViewBindings.findChildViewById(rootView, id);
+      if (tilEmail == null) {
+        break missingId;
+      }
+
+      id = R.id.tilPassword;
+      TextInputLayout tilPassword = ViewBindings.findChildViewById(rootView, id);
+      if (tilPassword == null) {
         break missingId;
       }
 
@@ -106,8 +160,8 @@ public final class ActivityLoginBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivityLoginBinding((CoordinatorLayout) rootView, btnLogin, etEmail, etPassword,
-          progressBar, tvRegister);
+      return new ActivityLoginBinding((NestedScrollView) rootView, btnLogin, etEmail, etPassword,
+          formCard, heroBackground, heroBrand, progressBar, tilEmail, tilPassword, tvRegister);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

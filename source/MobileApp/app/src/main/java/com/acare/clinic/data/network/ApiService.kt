@@ -32,43 +32,87 @@ interface ApiService {
     // ── Specialties ───────────────────────────────────────────────────────────
 
     @GET("api/specialties")
-    suspend fun getSpecialties(): Response<ApiResponse<List<Specialty>>>
+    suspend fun getSpecialties(): Response<List<Specialty>>
 
-    // ── Services ──────────────────────────────────────────────────────────────
+    // ── Services (web FE: serviceService.getAll() → GET /services) ────────────
 
     @GET("api/services")
-    suspend fun getServices(): Response<ApiResponse<List<ClinicService>>>
+    suspend fun getServices(): Response<List<ClinicService>>
+
+    @GET("api/services/{id}")
+    suspend fun getServiceById(@Path("id") id: Long): Response<ClinicService>
 
     @GET("api/services/search")
-    suspend fun searchServices(@Query("keyword") keyword: String): Response<ApiResponse<List<ClinicService>>>
+    suspend fun searchServices(@Query("keyword") keyword: String): Response<List<ClinicService>>
 
-    // ── Doctors ───────────────────────────────────────────────────────────────
+    // ── Doctors (web FE: userService.getDoctors()) ────────────────────────────
 
     @GET("api/users/doctor")
-    suspend fun getDoctors(): Response<ApiResponse<List<DoctorUser>>>
+    suspend fun getDoctors(): Response<List<DoctorUser>>
 
+    @GET("api/users/{id}")
+    suspend fun getUserById(@Path("id") id: Long): Response<DoctorUser>
+
+    // ── Appointments (match web FE appointmentService exactly) ────────────────
+
+    /**
+     * Web FE: appointmentService.getDoctorsByService(serviceId)
+     * → GET /appointments/doctors-by-service?serviceId=
+     */
     @GET("api/appointments/doctors-by-service")
-    suspend fun getDoctorsByService(@Query("serviceId") serviceId: Long): Response<ApiResponse<List<DoctorUser>>>
+    suspend fun getDoctorsByService(@Query("serviceId") serviceId: Long): Response<List<DoctorUser>>
 
-    // ── Appointments ──────────────────────────────────────────────────────────
-
-    @POST("api/appointments/book")
-    suspend fun bookAppointment(@Body request: BookAppointmentRequest): Response<ApiResponse<Appointment>>
-
-    @GET("api/appointments/pending/patient/{patientId}")
-    suspend fun getPendingAppointments(@Path("patientId") patientId: Long): Response<List<Appointment>>
-
-    @GET("api/appointments/not-pending/patient/{patientId}")
-    suspend fun getCompletedAppointments(@Path("patientId") patientId: Long): Response<List<Appointment>>
-
-    @PATCH("api/appointments/cancel/{id}")
-    suspend fun cancelAppointment(@Path("id") id: Long): Response<Void>
-
-    @GET("api/appointments/availability")
-    suspend fun checkAvailability(
+    /**
+     * Web FE: appointmentService.getDoctorAvailability(doctorId, serviceId, date)
+     * → GET /appointments/doctor-availability?doctorId=&serviceId=&date=
+     */
+    @GET("api/appointments/doctor-availability")
+    suspend fun getDoctorAvailability(
         @Query("doctorId") doctorId: Long,
-        @Query("date") date: String
-    ): Response<ApiResponse<List<String>>>
+        @Query("serviceId") serviceId: Long,
+        @Query("date") date: String,
+        @Query("appointmentId") appointmentId: Long? = null
+    ): Response<List<TimeSlot>>
+
+    /**
+     * Web FE: appointmentService.bookForPatient(appointment)
+     * → POST /appointments (KHÔNG phải /appointments/book)
+     */
+    @POST("api/appointments")
+    suspend fun bookAppointment(@Body request: BookAppointmentRequest): Response<Appointment>
+
+    /**
+     * Web FE: appointmentService.pendingByPatientId(id)
+     * → GET /appointments?patientId=&pending=true
+     */
+    @GET("api/appointments")
+    suspend fun getPendingAppointments(
+        @Query("patientId") patientId: Long,
+        @Query("pending") pending: Boolean = true
+    ): Response<List<Appointment>>
+
+    /**
+     * Web FE: appointmentService.historyByPatientId(id, {page, size, sort})
+     * → GET /appointments/history/patient/{id}?page=&size=&sort=
+     */
+    @GET("api/appointments/history/patient/{id}")
+    suspend fun getAppointmentHistory(
+        @Path("id") patientId: Long,
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 10,
+        @Query("sort") sort: String = "startTime,desc"
+    ): Response<PageResponse<Appointment>>
+
+    /**
+     * Web FE: appointmentService.remove(id, cancelledBy, cancelReason)
+     * → DELETE /appointments/{id}?cancelledBy=&cancelReason=
+     */
+    @DELETE("api/appointments/{id}")
+    suspend fun cancelAppointment(
+        @Path("id") id: Long,
+        @Query("cancelledBy") cancelledBy: String = "PATIENT",
+        @Query("cancelReason") cancelReason: String = ""
+    ): Response<Void>
 
     // ── Medical Records ───────────────────────────────────────────────────────
 

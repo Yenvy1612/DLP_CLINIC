@@ -1,0 +1,161 @@
+@import "tailwindcss";
+@font-face {
+    font-family: 'Outfit';
+    src: url('../fonts/Outfit-Medium.ttf');
+}
+@font-face {
+    font-family: 'Manrope';
+    src: url('../fonts/Manrope-Light.ttf');
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('../fonts/Inter_18pt-Regular.ttf');
+}
+
+:root {
+    --main-font: 'Montserrat', 'Segoe UI', sans-serif;
+    --display-font: 'Montserrat', 'Segoe UI', sans-serif;
+    --brand-navy: #00278D;
+    --brand-900: #0d2746;
+    --brand-800: #1e293b;
+    --brand-700: #1b4a7d;
+    --brand-600: #245f9e;
+    --brand-500: #3274b5;
+    --brand-200: #d7e6f7;
+    --surface: #f5f8fc;
+    --surface-strong: #ffffff;
+    --line: #dbe3ef;
+}
+
+body {
+    font-family: var(--main-font);
+    background-color: var(--surface);
+    color: var(--brand-800);
+    min-height: 100vh;
+}
+
+html,
+body,
+#root {
+    min-height: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--display-font);
+    color: var(--brand-navy);
+}
+
+.slogan-h-1 {
+    color: white;
+}
+
+
+
+a,
+button {
+    transition: all 0.2s ease;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--brand-500);
+    outline-offset: 1px;
+}
+
+.page-wrap {
+    background: var(--surface);
+    min-height: calc(100vh - 8rem);
+    padding: 1.5rem;
+}
+
+.page-shell {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.page-title-chip {
+    display: inline-block;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface-strong);
+    padding: 0.75rem 1rem;
+    box-shadow: 0 6px 20px rgba(15, 45, 82, 0.08);
+}
+
+.panel {
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--surface-strong);
+    box-shadow: 0 8px 28px rgba(15, 45, 82, 0.08);
+}
+
+/* Global responsive safeguards for tighter mobile layouts */
+@media (max-width: 640px) {
+    .page-wrap {
+        padding: 1rem;
+        min-height: calc(100svh - 7rem);
+    }
+
+    .page-title-chip {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+    }
+
+    .panel {
+        border-radius: 14px;
+    }
+
+    .text-5xl {
+        font-size: 2rem !important;
+        line-height: 1.1 !important;
+    }
+
+    .text-4xl {
+        font-size: 1.75rem !important;
+        line-height: 1.15 !important;
+    }
+
+    .text-3xl {
+        font-size: 1.5rem !important;
+        line-height: 1.2 !important;
+    }
+
+    .text-2xl {
+        font-size: 1.25rem !important;
+        line-height: 1.3 !important;
+    }
+
+    .p-10 {
+        padding: 1.25rem !important;
+    }
+
+    .p-8 {
+        padding: 1rem !important;
+    }
+
+    .px-10,
+    .px-8 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    .grid-cols-4,
+    .grid-cols-5 {
+        grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    .grid-cols-4,
+    .grid-cols-5 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}

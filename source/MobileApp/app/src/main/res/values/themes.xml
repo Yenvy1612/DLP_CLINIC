@@ -6,24 +6,39 @@
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorSurface">@color/surface</item>
         <item name="android:colorBackground">@color/background</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">true</item>
-    </style>
-
-    <style name="Theme.ACareClinic.Splash" parent="Theme.ACareClinic">
-        <item name="android:statusBarColor">@color/primary</item>
+        <item name="android:statusBarColor">@color/brand_navy</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>
 
-    <!-- Card style -->
-    <style name="Widget.ACare.Card" parent="Widget.MaterialComponents.CardView">
-        <item name="cardCornerRadius">16dp</item>
-        <item name="cardElevation">2dp</item>
-        <item name="cardBackgroundColor">@color/white</item>
+    <style name="Theme.ACareClinic.Splash" parent="Theme.ACareClinic">
+        <item name="android:windowBackground">@drawable/bg_splash</item>
+        <item name="android:statusBarColor">@color/brand_navy</item>
     </style>
 
-    <!-- Appointment chip style -->
+    <!-- Card style dùng trong toàn app -->
+    <style name="Widget.ACare.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">2dp</item>
+        <item name="cardBackgroundColor">@color/card_bg</item>
+    </style>
+
+    <!-- Chip trạng thái -->
     <style name="Widget.ACare.Chip.Status" parent="Widget.Material3.Chip.Assist">
-        <item name="android:textSize">11sp</item>
+        <item name="chipStrokeWidth">0dp</item>
+        <item name="chipMinHeight">28dp</item>
+    </style>
+
+    <!-- Button primary -->
+    <style name="Widget.ACare.Button.Primary" parent="Widget.Material3.Button">
+        <item name="android:backgroundTint">@color/primary</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- Button outline -->
+    <style name="Widget.ACare.Button.Outline" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="strokeColor">@color/primary</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:textColor">@color/primary</item>
     </style>
 </resources>

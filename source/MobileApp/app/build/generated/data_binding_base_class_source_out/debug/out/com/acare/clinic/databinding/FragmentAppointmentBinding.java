@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.acare.clinic.R;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -20,6 +21,9 @@ import java.lang.String;
 public final class FragmentAppointmentBinding implements ViewBinding {
   @NonNull
   private final LinearLayout rootView;
+
+  @NonNull
+  public final MaterialButton btnBookAppointment;
 
   @NonNull
   public final LinearLayout emptyState;
@@ -34,9 +38,11 @@ public final class FragmentAppointmentBinding implements ViewBinding {
   public final TabLayout tabLayout;
 
   private FragmentAppointmentBinding(@NonNull LinearLayout rootView,
-      @NonNull LinearLayout emptyState, @NonNull ProgressBar progressBar,
-      @NonNull RecyclerView rvAppointments, @NonNull TabLayout tabLayout) {
+      @NonNull MaterialButton btnBookAppointment, @NonNull LinearLayout emptyState,
+      @NonNull ProgressBar progressBar, @NonNull RecyclerView rvAppointments,
+      @NonNull TabLayout tabLayout) {
     this.rootView = rootView;
+    this.btnBookAppointment = btnBookAppointment;
     this.emptyState = emptyState;
     this.progressBar = progressBar;
     this.rvAppointments = rvAppointments;
@@ -70,6 +76,12 @@ public final class FragmentAppointmentBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.btnBookAppointment;
+      MaterialButton btnBookAppointment = ViewBindings.findChildViewById(rootView, id);
+      if (btnBookAppointment == null) {
+        break missingId;
+      }
+
       id = R.id.emptyState;
       LinearLayout emptyState = ViewBindings.findChildViewById(rootView, id);
       if (emptyState == null) {
@@ -94,8 +106,8 @@ public final class FragmentAppointmentBinding implements ViewBinding {
         break missingId;
       }
 
-      return new FragmentAppointmentBinding((LinearLayout) rootView, emptyState, progressBar,
-          rvAppointments, tabLayout);
+      return new FragmentAppointmentBinding((LinearLayout) rootView, btnBookAppointment, emptyState,
+          progressBar, rvAppointments, tabLayout);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

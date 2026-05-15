@@ -45,7 +45,9 @@ data class UserProfile(
     val role: String,
     val gender: String?,
     val birthDate: String?,
-    val address: String?
+    val address: String?,
+    val idNumber: String?,
+    val enabled: Boolean = true
 )
 
 data class UpdateProfileRequest(
@@ -76,7 +78,8 @@ data class ClinicService(
     val name: String,
     val price: Double,
     val description: String?,
-    val department: String,
+    val department: String?,
+    val active: Boolean = true,
     @SerializedName("specialtyId") val specialtyId: Long?
 )
 
@@ -86,33 +89,57 @@ data class DoctorUser(
     val id: Long,
     val fullName: String,
     val email: String,
+    val phone: String?,
     val specialty: String?,
     val department: String?,
+    val biography: String?,
+    val clinicLocation: String?,
+    val workingDays: String?,
     @SerializedName("yearsExperience") val yearsExperience: Int?
+)
+
+// ── Appointment slot ──────────────────────────────────────────────────────────
+
+data class TimeSlot(
+    val time: String,
+    val available: Boolean
 )
 
 // ── Appointment ───────────────────────────────────────────────────────────────
 
 data class Appointment(
     val id: Long,
-    @SerializedName("appointmentCode") val code: String,
+    @SerializedName("appointmentCode") val code: String?,
     @SerializedName("patientId") val patientId: Long,
     @SerializedName("doctorId") val doctorId: Long,
+    @SerializedName("serviceId") val serviceId: Long?,
     @SerializedName("doctorName") val doctorName: String?,
     @SerializedName("serviceName") val serviceName: String?,
     @SerializedName("startTime") val startTime: String,
-    @SerializedName("endTime") val endTime: String,
+    @SerializedName("endTime") val endTime: String?,
     val status: String,
     val reason: String?,
-    val note: String?
+    val note: String?,
+    val paymentMethod: String?
 )
 
+/** Dùng để đặt lịch - POST /api/appointments (giống web FE) */
 data class BookAppointmentRequest(
     @SerializedName("patientId") val patientId: Long,
     @SerializedName("doctorId") val doctorId: Long,
     @SerializedName("serviceId") val serviceId: Long,
     @SerializedName("startTime") val startTime: String,
-    val reason: String?
+    val reason: String?,
+    val paymentMethod: String = "COUNTER"
+)
+
+/** Paginated response (giống web FE historyByPatientId) */
+data class PageResponse<T>(
+    val content: List<T>,
+    val totalPages: Int,
+    val totalElements: Long,
+    val number: Int,  // current page
+    val size: Int
 )
 
 // ── Medical Record ────────────────────────────────────────────────────────────
