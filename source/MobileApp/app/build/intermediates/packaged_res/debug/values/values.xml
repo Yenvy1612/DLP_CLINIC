@@ -1,25 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="background">#F8FAFC</color>
+    <color name="brand_navy">#0F172A</color>
+    <color name="brand_navy_light">#1E293B</color>
+    <color name="brand_navy_medium">#334155</color>
+    <color name="card_bg">#FFFFFF</color>
     <color name="divider">#E2E8F0</color>
-    <color name="error">#DC2626</color>
+    <color name="error">#EF4444</color>
     <color name="error_light">#FEE2E2</color>
-    <color name="nav_selected">#2563EB</color>
+    <color name="nav_selected">#0EA5E9</color>
     <color name="nav_unselected">#94A3B8</color>
-    <color name="primary">#2563EB</color>
-    <color name="primary_dark">#1D4ED8</color>
-    <color name="primary_light">#DBEAFE</color>
-    <color name="secondary">#7C3AED</color>
-    <color name="status_cancelled">#DC2626</color>
-    <color name="status_done">#16A34A</color>
-    <color name="status_no_show">#6B7280</color>
-    <color name="status_pending">#D97706</color>
-    <color name="success">#16A34A</color>
-    <color name="success_light">#DCFCE7</color>
+    <color name="primary">#0EA5E9</color>
+    <color name="primary_dark">#0284C7</color>
+    <color name="primary_light">#E0F2FE</color>
+    <color name="primary_surface">#F0F9FF</color>
+    <color name="status_cancelled">#FECACA</color>
+    <color name="status_cancelled_text">#B91C1C</color>
+    <color name="status_done">#BBF7D0</color>
+    <color name="status_done_text">#15803D</color>
+    <color name="status_pending">#BAE6FD</color>
+    <color name="status_pending_text">#0369A1</color>
+    <color name="success">#10B981</color>
+    <color name="success_light">#D1FAE5</color>
     <color name="surface">#FFFFFF</color>
+    <color name="text_hint">#94A3B8</color>
+    <color name="text_on_navy">#FFFFFF</color>
     <color name="text_primary">#0F172A</color>
     <color name="text_secondary">#64748B</color>
-    <color name="warning">#D97706</color>
+    <color name="text_sky">#0EA5E9</color>
+    <color name="warning">#F59E0B</color>
     <color name="warning_light">#FEF3C7</color>
     <color name="white">#FFFFFF</color>
     <string name="app_name">ACare Clinic</string>
@@ -45,19 +54,30 @@
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorSurface">@color/surface</item>
         <item name="android:colorBackground">@color/background</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">true</item>
-    </style>
-    <style name="Theme.ACareClinic.Splash" parent="Theme.ACareClinic">
-        <item name="android:statusBarColor">@color/primary</item>
+        <item name="android:statusBarColor">@color/brand_navy</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>
-    <style name="Widget.ACare.Card" parent="Widget.MaterialComponents.CardView">
+    <style name="Theme.ACareClinic.Splash" parent="Theme.ACareClinic">
+        <item name="android:windowBackground">@drawable/bg_splash</item>
+        <item name="android:statusBarColor">@color/brand_navy</item>
+    </style>
+    <style name="Widget.ACare.Button.Outline" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="strokeColor">@color/primary</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:textColor">@color/primary</item>
+    </style>
+    <style name="Widget.ACare.Button.Primary" parent="Widget.Material3.Button">
+        <item name="android:backgroundTint">@color/primary</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+    <style name="Widget.ACare.Card" parent="Widget.Material3.CardView.Elevated">
         <item name="cardCornerRadius">16dp</item>
         <item name="cardElevation">2dp</item>
-        <item name="cardBackgroundColor">@color/white</item>
+        <item name="cardBackgroundColor">@color/card_bg</item>
     </style>
     <style name="Widget.ACare.Chip.Status" parent="Widget.Material3.Chip.Assist">
-        <item name="android:textSize">11sp</item>
+        <item name="chipStrokeWidth">0dp</item>
+        <item name="chipMinHeight">28dp</item>
     </style>
 </resources>

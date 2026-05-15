@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.acare.clinic.R;
+import com.google.android.material.button.MaterialButton;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
@@ -31,33 +32,47 @@ public final class FragmentHomeBinding implements ViewBinding {
   public final LinearLayout actionRecords;
 
   @NonNull
+  public final LinearLayout actionServices;
+
+  @NonNull
+  public final MaterialButton btnBookNow;
+
+  @NonNull
   public final LinearLayout emptyState;
 
   @NonNull
   public final RecyclerView rvUpcomingAppointments;
 
   @NonNull
-  public final TextView tvGreeting;
+  public final TextView tvAvatarInitial;
 
   @NonNull
-  public final TextView tvSubtitle;
+  public final TextView tvGreeting;
 
   @NonNull
   public final TextView tvUserName;
 
+  @NonNull
+  public final TextView tvViewAll;
+
   private FragmentHomeBinding(@NonNull NestedScrollView rootView, @NonNull LinearLayout actionBook,
       @NonNull LinearLayout actionDoctors, @NonNull LinearLayout actionRecords,
+      @NonNull LinearLayout actionServices, @NonNull MaterialButton btnBookNow,
       @NonNull LinearLayout emptyState, @NonNull RecyclerView rvUpcomingAppointments,
-      @NonNull TextView tvGreeting, @NonNull TextView tvSubtitle, @NonNull TextView tvUserName) {
+      @NonNull TextView tvAvatarInitial, @NonNull TextView tvGreeting, @NonNull TextView tvUserName,
+      @NonNull TextView tvViewAll) {
     this.rootView = rootView;
     this.actionBook = actionBook;
     this.actionDoctors = actionDoctors;
     this.actionRecords = actionRecords;
+    this.actionServices = actionServices;
+    this.btnBookNow = btnBookNow;
     this.emptyState = emptyState;
     this.rvUpcomingAppointments = rvUpcomingAppointments;
+    this.tvAvatarInitial = tvAvatarInitial;
     this.tvGreeting = tvGreeting;
-    this.tvSubtitle = tvSubtitle;
     this.tvUserName = tvUserName;
+    this.tvViewAll = tvViewAll;
   }
 
   @Override
@@ -105,6 +120,18 @@ public final class FragmentHomeBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.actionServices;
+      LinearLayout actionServices = ViewBindings.findChildViewById(rootView, id);
+      if (actionServices == null) {
+        break missingId;
+      }
+
+      id = R.id.btnBookNow;
+      MaterialButton btnBookNow = ViewBindings.findChildViewById(rootView, id);
+      if (btnBookNow == null) {
+        break missingId;
+      }
+
       id = R.id.emptyState;
       LinearLayout emptyState = ViewBindings.findChildViewById(rootView, id);
       if (emptyState == null) {
@@ -117,15 +144,15 @@ public final class FragmentHomeBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.tvGreeting;
-      TextView tvGreeting = ViewBindings.findChildViewById(rootView, id);
-      if (tvGreeting == null) {
+      id = R.id.tvAvatarInitial;
+      TextView tvAvatarInitial = ViewBindings.findChildViewById(rootView, id);
+      if (tvAvatarInitial == null) {
         break missingId;
       }
 
-      id = R.id.tvSubtitle;
-      TextView tvSubtitle = ViewBindings.findChildViewById(rootView, id);
-      if (tvSubtitle == null) {
+      id = R.id.tvGreeting;
+      TextView tvGreeting = ViewBindings.findChildViewById(rootView, id);
+      if (tvGreeting == null) {
         break missingId;
       }
 
@@ -135,8 +162,15 @@ public final class FragmentHomeBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.tvViewAll;
+      TextView tvViewAll = ViewBindings.findChildViewById(rootView, id);
+      if (tvViewAll == null) {
+        break missingId;
+      }
+
       return new FragmentHomeBinding((NestedScrollView) rootView, actionBook, actionDoctors,
-          actionRecords, emptyState, rvUpcomingAppointments, tvGreeting, tvSubtitle, tvUserName);
+          actionRecords, actionServices, btnBookNow, emptyState, rvUpcomingAppointments,
+          tvAvatarInitial, tvGreeting, tvUserName, tvViewAll);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

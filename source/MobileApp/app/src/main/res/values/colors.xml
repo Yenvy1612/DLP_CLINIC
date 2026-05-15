@@ -1,34 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand colors -->
-    <color name="primary">#2563EB</color>
-    <color name="primary_dark">#1D4ED8</color>
-    <color name="primary_light">#DBEAFE</color>
-    <color name="secondary">#7C3AED</color>
+    <!-- Brand Navy (chủ đạo từ web FE) -->
+    <color name="brand_navy">#0F172A</color>
+    <color name="brand_navy_light">#1E293B</color>
+    <color name="brand_navy_medium">#334155</color>
 
-    <!-- Semantic colors -->
-    <color name="success">#16A34A</color>
-    <color name="success_light">#DCFCE7</color>
-    <color name="warning">#D97706</color>
+    <!-- Sky / Primary accent (từ web FE sky-500) -->
+    <color name="primary">#0EA5E9</color>
+    <color name="primary_dark">#0284C7</color>
+    <color name="primary_light">#E0F2FE</color>
+    <color name="primary_surface">#F0F9FF</color>
+
+    <!-- Semantic -->
+    <color name="success">#10B981</color>
+    <color name="success_light">#D1FAE5</color>
+    <color name="warning">#F59E0B</color>
     <color name="warning_light">#FEF3C7</color>
-    <color name="error">#DC2626</color>
+    <color name="error">#EF4444</color>
     <color name="error_light">#FEE2E2</color>
 
-    <!-- Neutrals -->
+    <!-- Neutral (slate scale từ web FE) -->
     <color name="white">#FFFFFF</color>
     <color name="background">#F8FAFC</color>
     <color name="surface">#FFFFFF</color>
-    <color name="text_primary">#0F172A</color>
-    <color name="text_secondary">#64748B</color>
+    <color name="card_bg">#FFFFFF</color>
     <color name="divider">#E2E8F0</color>
 
-    <!-- Status colors (appointment status) -->
-    <color name="status_pending">#D97706</color>
-    <color name="status_done">#16A34A</color>
-    <color name="status_cancelled">#DC2626</color>
-    <color name="status_no_show">#6B7280</color>
+    <!-- Text (từ web FE tailwind slate) -->
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="text_hint">#94A3B8</color>
+    <color name="text_on_navy">#FFFFFF</color>
+    <color name="text_sky">#0EA5E9</color>
 
     <!-- Bottom nav -->
-    <color name="nav_selected">#2563EB</color>
+    <color name="nav_selected">#0EA5E9</color>
     <color name="nav_unselected">#94A3B8</color>
+
+    <!-- Status chips (giống web FE) -->
+    <color name="status_pending">#BAE6FD</color>
+    <color name="status_pending_text">#0369A1</color>
+    <color name="status_done">#BBF7D0</color>
+    <color name="status_done_text">#15803D</color>
+    <color name="status_cancelled">#FECACA</color>
+    <color name="status_cancelled_text">#B91C1C</color>
 </resources>
