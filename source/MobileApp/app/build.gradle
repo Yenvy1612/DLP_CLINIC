@@ -18,7 +18,7 @@ android {
         // [1] Emulator Android (AVD) — trỏ về localhost của máy host
         // buildConfigField "String", "BASE_URL", '"http://10.0.2.2:8080/"'
         // [2] Điện thoại thật cùng WiFi/LAN ← ĐANG DÙNG
-        buildConfigField "String", "BASE_URL", '"http://192.168.33.216:8080/"'
+        buildConfigField "String", "BASE_URL", '"http://[IP_ADDRESS]/"'
         // [3] Điện thoại qua Radmin VPN
         // buildConfigField "String", "BASE_URL", '"http://26.50.63.117:8080/"'
     }
@@ -83,6 +83,9 @@ dependencies {
 
     // Shimmer loading effect
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
+
+    // FlexboxLayout (time slot grid)
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
 
     // ===================================================
     // PLACEHOLDER: Agent SDK sẽ được thêm tại đây
