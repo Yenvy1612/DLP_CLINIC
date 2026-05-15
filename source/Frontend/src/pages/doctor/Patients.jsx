@@ -1,0 +1,209 @@
+import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { getUserId } from "../../utils/authUtils";
+import { appointmentService, userService } from "../../api";
+import CustomDropdown from "../../components/CustomDropdown";
+
+const container = {
+    hidden: { opacity: 0, y: 16 },
+    show: {
+        opacity: 1, y: 0,
+        transition: {
+            when: "beforeChildren", staggerChildren: 0.06, duration: 0.3, ease: "easeOut"
+        }
+    }
+};
+const item = {
+    hidden: { opacity: 0, y: 10 },
+    show: {
+        opacity: 1, y: 0, transition: {
+            duration: 0.3, ease: "easeOut"
+        }
+    }
+};
+
+function PatientCard({ p }) {
+    return (
+        <motion.div
+            variants={item}
+            whileHover={{ y: 0 }}
+            transition={{ type: "spring", damping: 24 }}
+            className="bg-white rounded-2xl border border-slate-100 shadow-md hover:shadow-lg transition duration-200 p-5"
+        >
+            <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full bg-slate-200 text-[#00278D] flex items-center justify-center font-bold">
+                    {p.fullName?.charAt(0) ?? "?"}
+                </div>
+                <h3 className="text-lg font-semibold text-[#00278D]">{p.fullName || "—"}</h3>
+            </div>
+
+            <ul className="text-slate-700 text-sm space-y-2">
+                <li className="flex flex-col sm:flex-row">
+                    <span className="text-slate-500 sm:w-28">CCCD/CMND</span>
+                    <span className="font-medium break-all">{p.idNumber || "—"}</span>
+                </li>
+                <li className="flex flex-col sm:flex-row">
+                    <span className="text-slate-500 sm:w-28">Ngày sinh</span>
+                    <span className="font-medium">{p.birthDate || "—"}</span>
+                </li>
+                <li className="flex flex-col sm:flex-row">
+                    <span className="text-slate-500 sm:w-28">Điện thoại</span>
+                    <span className="font-medium">{p.phone || "—"}</span>
+                </li>
+                <li className="flex flex-col sm:flex-row">
+                    <span className="text-slate-500 sm:w-28">Địa chỉ</span>
+                    <span className="font-medium line-clamp-2">{p.address || "—"}</span>
+                </li>
+            </ul>
+        </motion.div>
+    );
+}
+
+function SkeletonCard() {
+    return (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-md p-5 animate-pulse">
+            <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full bg-slate-200" />
+                <div className="h-5 w-40 bg-slate-200 rounded" />
+            </div>
+            <div className="space-y-2">
+                <div className="h-4 w-full bg-slate-200 rounded" />
+                <div className="h-4 w-3/4 bg-slate-200 rounded" />
+                <div className="h-4 w-2/3 bg-slate-200 rounded" />
+                <div className="h-4 w-4/5 bg-slate-200 rounded" />
+            </div>
+        </div>
+    );
+}
+
+function Patients() {
+    const [patients, setPatients] = useState([]);
+    const [q, setQ] = useState("");
+    const [sortBy, setSortBy] = useState("name"); // name | dob | id
+    const [loading, setLoading] = useState(true);
+    const [err, setErr] = useState("");
+    const doctorId = getUserId();
+
+    useEffect(() => {
+        if (!doctorId) {
+            setLoading(false);
+            return;
+        }
+
+        const getPatients = async () => {
+            try {
+                const appoinments = await appointmentService.getByDoctorId(doctorId);
+                const patientSet = new Set(appoinments.map(a => a.patientId));
+                const list = await Promise.all(
+                    Array.from(patientSet).map(async (patientId) => {
+                        const response = await userService.getById(patientId);
+                        return {
+                            id: patientId,
+                            fullName: response?.fullName || "",
+                            idNumber: response?.idNumber || "",
+                            birthDate: response?.birthDate || "",
+                            phone: response?.phone || "",
+                            address: response?.address || "",
+                        };
+                    })
+                );
+                setPatients(list);
+
+            }
+            catch (error) {
+                setErr(error.message);
+            }
+            finally {
+                setLoading(false);
+            }
+        }
+        getPatients();
+    }, [doctorId]);
+
+    const filtered = useMemo(() => {
+        const text = q.trim().toLowerCase();
+
+        const sorted = [...patients]
+            .filter(p =>
+                !text ||
+                [p.fullName, p.idNumber, p.phone]
+                    .some(field => field?.toLowerCase().includes(text))
+            )
+            .sort((a, b) => {
+                const key =
+                    sortBy === "dob" ? "birthDate" :
+                        sortBy === "id" ? "idNumber" :
+                            "fullName";
+                return (a[key] || "").localeCompare(b[key] || "");
+            });
+        return sorted;
+    }, [patients, q, sortBy]);
+
+    return (
+        <div className="min-h-screen bg-[var(--surface)] px-4 py-6 sm:px-6 md:p-10">
+            <div className="max-w-7xl mx-auto">
+                <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ type: "spring", stiffness: 180, damping: 22 }}
+                    className="mb-6 w-fit rounded-2xl bg-white px-4 py-3 shadow-xl"
+                >
+                    <h1 className="text-2xl md:text-3xl font-bold text-[#00278D]">Danh sách bệnh nhân</h1>
+                </motion.div>
+            </div>
+
+            {/* Toolbar */}
+            <motion.div
+                variants={container}
+                initial="hidden"
+                animate="show"
+                className="mx-auto mb-6 flex max-w-7xl flex-col gap-3 rounded-2xl bg-white p-4 shadow md:flex-row md:items-center md:justify-between"
+            >
+                <motion.div variants={item} className="flex-1">
+                    <input
+                        value={q}
+                        onChange={(e) => setQ(e.target.value)}
+                        placeholder="Tìm theo tên / CCCD / SĐT…"
+                        className="w-full border border-slate-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00278D]"
+                    />
+                </motion.div>
+                <motion.div variants={item} className="flex items-center gap-2">
+                    <span className="text-slate-600 text-sm">Sắp xếp:</span>
+                    <CustomDropdown
+                        value={sortBy}
+                        onValueChange={setSortBy}
+                        options={[
+                            { value: "name", label: "Theo tên" },
+                            { value: "dob", label: "Theo ngày sinh" },
+                            { value: "id", label: "Theo CCCD" },
+                        ]}
+                        className="w-full sm:min-w-48"
+                    />
+                </motion.div>
+            </motion.div>
+
+            {/* Grid */}
+            {loading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+                    {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
+                </div>
+            ) : err ? (
+                <div className="text-slate-700">{err}</div>
+            ) : filtered.length ? (
+                <motion.div
+                    variants={container}
+                    initial="hidden"
+                    animate="show"
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto"
+                >
+                    {filtered.map((p) => (
+                        <PatientCard key={p.id} p={p} />
+                    ))}
+                </motion.div>
+            ) : (
+                <div className="text-[#00278D] text-lg max-w-7xl mx-auto">Không tìm thấy bệnh nhân nào.</div>
+            )}
+        </div>
+    );
+}
+export default Patients;

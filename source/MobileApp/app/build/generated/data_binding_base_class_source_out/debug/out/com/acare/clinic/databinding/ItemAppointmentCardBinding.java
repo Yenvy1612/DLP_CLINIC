@@ -12,7 +12,6 @@ import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.acare.clinic.R;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.chip.Chip;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
@@ -25,30 +24,34 @@ public final class ItemAppointmentCardBinding implements ViewBinding {
   public final MaterialButton btnCancel;
 
   @NonNull
-  public final Chip chipStatus;
+  public final View statusBar;
 
   @NonNull
   public final TextView tvCode;
 
   @NonNull
-  public final TextView tvDateTime;
-
-  @NonNull
   public final TextView tvDoctorName;
 
   @NonNull
-  public final TextView tvServiceName;
+  public final TextView tvService;
+
+  @NonNull
+  public final TextView tvStatus;
+
+  @NonNull
+  public final TextView tvTime;
 
   private ItemAppointmentCardBinding(@NonNull CardView rootView, @NonNull MaterialButton btnCancel,
-      @NonNull Chip chipStatus, @NonNull TextView tvCode, @NonNull TextView tvDateTime,
-      @NonNull TextView tvDoctorName, @NonNull TextView tvServiceName) {
+      @NonNull View statusBar, @NonNull TextView tvCode, @NonNull TextView tvDoctorName,
+      @NonNull TextView tvService, @NonNull TextView tvStatus, @NonNull TextView tvTime) {
     this.rootView = rootView;
     this.btnCancel = btnCancel;
-    this.chipStatus = chipStatus;
+    this.statusBar = statusBar;
     this.tvCode = tvCode;
-    this.tvDateTime = tvDateTime;
     this.tvDoctorName = tvDoctorName;
-    this.tvServiceName = tvServiceName;
+    this.tvService = tvService;
+    this.tvStatus = tvStatus;
+    this.tvTime = tvTime;
   }
 
   @Override
@@ -84,9 +87,9 @@ public final class ItemAppointmentCardBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.chipStatus;
-      Chip chipStatus = ViewBindings.findChildViewById(rootView, id);
-      if (chipStatus == null) {
+      id = R.id.statusBar;
+      View statusBar = ViewBindings.findChildViewById(rootView, id);
+      if (statusBar == null) {
         break missingId;
       }
 
@@ -96,26 +99,32 @@ public final class ItemAppointmentCardBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.tvDateTime;
-      TextView tvDateTime = ViewBindings.findChildViewById(rootView, id);
-      if (tvDateTime == null) {
-        break missingId;
-      }
-
       id = R.id.tvDoctorName;
       TextView tvDoctorName = ViewBindings.findChildViewById(rootView, id);
       if (tvDoctorName == null) {
         break missingId;
       }
 
-      id = R.id.tvServiceName;
-      TextView tvServiceName = ViewBindings.findChildViewById(rootView, id);
-      if (tvServiceName == null) {
+      id = R.id.tvService;
+      TextView tvService = ViewBindings.findChildViewById(rootView, id);
+      if (tvService == null) {
         break missingId;
       }
 
-      return new ItemAppointmentCardBinding((CardView) rootView, btnCancel, chipStatus, tvCode,
-          tvDateTime, tvDoctorName, tvServiceName);
+      id = R.id.tvStatus;
+      TextView tvStatus = ViewBindings.findChildViewById(rootView, id);
+      if (tvStatus == null) {
+        break missingId;
+      }
+
+      id = R.id.tvTime;
+      TextView tvTime = ViewBindings.findChildViewById(rootView, id);
+      if (tvTime == null) {
+        break missingId;
+      }
+
+      return new ItemAppointmentCardBinding((CardView) rootView, btnCancel, statusBar, tvCode,
+          tvDoctorName, tvService, tvStatus, tvTime);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

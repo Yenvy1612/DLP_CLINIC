@@ -1,6 +1,8 @@
 package com.acare.clinic.ui.home
 
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -23,36 +25,38 @@ class AppointmentCardAdapter(
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val apt = items[position]
+        val ctx = holder.itemView.context
+
         with(holder.binding) {
-            tvDoctorName.text = apt.doctorName ?: "Bác sĩ chưa xác định"
-            tvServiceName.text = apt.serviceName ?: "Dịch vụ chưa xác định"
-            tvDateTime.text = formatDateTime(apt.startTime)
             tvCode.text = "#${apt.code}"
+            tvDoctorName.text = apt.doctorName ?: "Bác sĩ chưa xác định"
+            tvService.text = apt.serviceName ?: "Dịch vụ chưa xác định"
+            tvTime.text = formatDateTime(apt.startTime)
 
-            // Status chip
-            val (label, colorRes, textColorRes) = when (apt.status) {
-                "PENDING" -> Triple("Chờ khám", R.color.warning_light, R.color.warning)
-                "DONE" -> Triple("Hoàn thành", R.color.success_light, R.color.success)
-                "CANCELLED" -> Triple("Đã hủy", R.color.error_light, R.color.error)
-                "NO_SHOW" -> Triple("Không đến", R.color.divider, R.color.text_secondary)
-                else -> Triple(apt.status, R.color.divider, R.color.text_secondary)
+            // Status: label + colors (giống web FE statusColors)
+            val (label, bgColorRes, textColorRes, barColorRes) = when (apt.status) {
+                "PENDING"   -> listOf("Đang chờ",  R.color.status_pending,   R.color.status_pending_text,   R.color.primary)
+                "DONE"      -> listOf("Hoàn thành",R.color.status_done,      R.color.status_done_text,      R.color.success)
+                "CANCELLED" -> listOf("Đã hủy",    R.color.status_cancelled, R.color.status_cancelled_text, R.color.error)
+                "NO_SHOW"   -> listOf("Không đến", R.color.divider,          R.color.text_secondary,        R.color.text_hint)
+                else        -> listOf(apt.status,  R.color.divider,          R.color.text_secondary,        R.color.text_hint)
             }
-            chipStatus.text = label
-            chipStatus.chipBackgroundColor = android.content.res.ColorStateList.valueOf(
-                ContextCompat.getColor(holder.itemView.context, colorRes)
-            )
-            chipStatus.setTextColor(ContextCompat.getColor(holder.itemView.context, textColorRes))
 
-            // Nút hủy chỉ hiển thị khi PENDING
-            btnCancel.visibility = if (apt.status == "PENDING" && onCancel != null)
-                android.view.View.VISIBLE else android.view.View.GONE
+            tvStatus.text = label as String
+            tvStatus.setTextColor(ContextCompat.getColor(ctx, textColorRes as Int))
+            (tvStatus.background as? GradientDrawable)?.setColor(ContextCompat.getColor(ctx, bgColorRes as Int))
+
+            // Left accent bar color
+            statusBar.setBackgroundColor(ContextCompat.getColor(ctx, barColorRes as Int))
+
+            // Cancel button
+            btnCancel.visibility = if (apt.status == "PENDING" && onCancel != null) View.VISIBLE else View.GONE
             btnCancel.setOnClickListener { onCancel?.invoke(apt) }
         }
     }
 
     private fun formatDateTime(raw: String): String {
         return try {
-            // "2026-05-14T09:00:00" → "09:00 - 14/05/2026"
             val parts = raw.split("T")
             val date = parts[0].split("-")
             val time = parts.getOrElse(1) { "" }.take(5)

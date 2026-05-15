@@ -38,6 +38,13 @@ class HomeFragment : Fragment() {
         setupHeader()
         setupQuickActions()
         loadUpcomingAppointments()
+
+        binding.tvViewAll.setOnClickListener {
+            findNavController().navigate(R.id.appointmentFragment)
+        }
+        binding.btnBookNow.setOnClickListener {
+            findNavController().navigate(R.id.appointmentFragment)
+        }
     }
 
     private fun setupHeader() {
@@ -48,7 +55,9 @@ class HomeFragment : Fragment() {
             else -> "Chào buổi tối 🌙"
         }
         binding.tvGreeting.text = greeting
-        binding.tvUserName.text = SessionManager.getUserName()
+        val name = SessionManager.getUserName()
+        binding.tvUserName.text = name
+        binding.tvAvatarInitial.text = name.firstOrNull()?.uppercaseChar()?.toString() ?: "A"
     }
 
     private fun setupQuickActions() {
@@ -59,7 +68,10 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.recordFragment)
         }
         binding.actionDoctors.setOnClickListener {
-            // Navigate to doctors list — có thể mở bottom sheet
+            // TODO: navigate to doctors list
+        }
+        binding.actionServices.setOnClickListener {
+            // TODO: navigate to services list
         }
     }
 
