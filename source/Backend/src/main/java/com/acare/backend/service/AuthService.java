@@ -55,6 +55,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AppSecurityProperties securityProperties;
     private final UserService userService;
+    private final AgentService agentService;
 
     @Transactional
     public AuthResponse login(LoginRequest request, HttpServletResponse response) {
@@ -68,6 +69,14 @@ public class AuthService {
         }
 
         issueAuthCookies(user, response);
+        if (request.getDeviceId() == null || request.getDeviceId().isBlank()) {
+            throw new BadRequestException("Missing deviceId");
+        }
+
+        if (!agentService.isTrusted(request.getDeviceId())) {
+            throw new BadRequestException("Device is not trusted");
+        }
+
         return buildAuthResponse(user);
     }
 

@@ -1,6 +1,7 @@
 package com.acare.backend.controller;
 
 import com.acare.backend.dto.ApiResponse;
+import com.acare.backend.dto.agent.AgentHeartbeatRequest;
 import com.acare.backend.dto.agent.AgentRegisterRequest;
 import com.acare.backend.dto.agent.AgentStatusResponse;
 import com.acare.backend.entity.Agent;
@@ -8,6 +9,8 @@ import com.acare.backend.service.AgentService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/agents")
@@ -31,14 +34,19 @@ public class AgentController {
                         .installed(true)
                         .trusted(Boolean.TRUE.equals(agent.getTrusted()))
                         .deviceId(agent.getDeviceId())
+                        .platform(agent.getPlatform())
+                        .status(agent.getStatus())
                         .message("Agent registered successfully")
                         .build())
                 .build();
     }
 
     @PostMapping("/{deviceId}/heartbeat")
-    public ApiResponse<String> heartbeat(@PathVariable String deviceId) {
-        agentService.heartbeat(deviceId);
+    public ApiResponse<String> heartbeat(
+            @PathVariable String deviceId,
+            @RequestBody(required = false) AgentHeartbeatRequest request
+    ) {
+        agentService.heartbeat(deviceId, request);
 
         return ApiResponse.<String>builder()
                 .data("Heartbeat received")
@@ -47,15 +55,15 @@ public class AgentController {
 
     @GetMapping("/{deviceId}/status")
     public ApiResponse<AgentStatusResponse> status(@PathVariable String deviceId) {
-        boolean trusted = agentService.isTrusted(deviceId);
-
         return ApiResponse.<AgentStatusResponse>builder()
-                .data(AgentStatusResponse.builder()
-                        .installed(trusted)
-                        .trusted(trusted)
-                        .deviceId(deviceId)
-                        .message(trusted ? "Trusted device" : "Device not trusted")
-                        .build())
+                .data(agentService.getStatus(deviceId))
+                .build();
+    }
+
+    @GetMapping("/list")
+    public ApiResponse<List<AgentStatusResponse>> listAgent() {
+        return ApiResponse.<List<AgentStatusResponse>>builder()
+                .data(agentService.getAllAgents())
                 .build();
     }
 }

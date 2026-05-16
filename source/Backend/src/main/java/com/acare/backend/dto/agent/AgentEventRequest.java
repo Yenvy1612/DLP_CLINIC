@@ -1,31 +1,25 @@
-package com.acare.backend.entity;
+package com.acare.backend.dto.agent;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
-@Entity
 @Getter
 @Setter
-@Table(name="dlp_logs")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DlpLog {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String deviceId;
-    // WEB / ANDROID_AGENT / WINDOWS_AGENT
-    private String sourceType;
+public class AgentEventRequest {
 
-    // ANDROID / WINDOWS / WEB
+    private String deviceId;
+
     private String platform;
+
+    private Long userId;
+
+    // ANDROID_AGENT
+    private String sourceType;
 
     // FORM_DLP_MATCHED, COPY_PATIENT_DATA, EXPORT_BLOCKED...
     private String eventType;
@@ -35,11 +29,13 @@ public class DlpLog {
 
     // CCCD, PHONE, EMAIL, KEYWORD:HIV...
     private String violationType;
+
+    // LOW, MEDIUM, HIGH, CRITICAL
     private String severity;
 
-    private String details;
-    private Long userId;
     private String contentSnippet;
+
+    private Map<String, Object> details;
 
     private LocalDateTime timestamp;
 }
