@@ -8,17 +8,18 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AgentStatusResponse {
-
-    private boolean installed;
-
-    private boolean trusted;
+public class AgentHeartbeatRequest {
 
     private String deviceId;
 
     private String platform;
 
+    // ONLINE / OFFLINE
     private AgentStatus status;
 
-    private String message;
+    private Integer batteryLevel;
+
+    private String networkType;
+
+    private String appVersion;
 }
