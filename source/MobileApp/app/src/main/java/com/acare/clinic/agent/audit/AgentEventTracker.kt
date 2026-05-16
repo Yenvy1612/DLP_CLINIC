@@ -1,5 +1,9 @@
 package com.acare.clinic.agent.audit
 import java.time.Instant
+import com.acare.clinic.agent.device.DeviceIdProvider
+import com.acare.clinic.agent.dlp.DlpScanner
+import com.acare.clinic.agent.dlp.MaskingUtil
+import com.acare.clinic.agent.queue.EventQueueRepository
 
 class AgentEventTracker(
     private val deviceIdProvider: DeviceIdProvider,

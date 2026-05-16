@@ -1,4 +1,6 @@
 package com.acare.clinic.agent.policy
+import com.acare.clinic.agent.network.AgentApiService
+import com.acare.clinic.agent.storage.AgentPreferences
 
 class PolicyManager(
     private val api: AgentApiService,

@@ -3,8 +3,8 @@ package com.acare.clinic.agent.queue
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.asquad.mobile.agent.core.AgentInitializer
-
+import androidx.work.ListenableWorker.Result
+import com.acare.clinic.agent.core.AgentInitializer
 class EventSyncWorker(
     context: Context,
     params: WorkerParameters

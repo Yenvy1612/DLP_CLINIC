@@ -4,7 +4,11 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
-
+import com.acare.clinic.agent.device.AgentRegisterRequest
+import com.acare.clinic.agent.device.AgentStatusResponse
+import com.acare.clinic.agent.heartbeat.HeartbeatRequest
+import com.acare.clinic.agent.policy.AgentPolicyResponse
+import com.acare.clinic.agent.audit.AgentEventRequest
 interface AgentApiService {
 
     @POST("api/agents/register")

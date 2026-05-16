@@ -75,8 +75,8 @@ class AppointmentFragment : Fragment() {
         setLoading(true)
         lifecycleScope.launch {
             try {
-                val res = api.getCompletedAppointments(userId)
-                val list = res.body() ?: emptyList()
+                val res = api.getAppointmentHistory(userId)
+                val list = res.body()?.content ?: emptyList()
                 if (list.isEmpty()) showEmpty() else {
                     binding.emptyState.visibility = View.GONE
                     binding.rvAppointments.visibility = View.VISIBLE

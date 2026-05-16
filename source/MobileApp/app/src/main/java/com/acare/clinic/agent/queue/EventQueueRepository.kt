@@ -1,6 +1,9 @@
 package com.acare.clinic.agent.queue
 
 import com.google.gson.Gson
+import com.acare.clinic.agent.audit.AgentEventRequest
+import com.acare.clinic.agent.storage.AgentEventEntity
+import com.acare.clinic.agent.storage.AgentEventDao
 
 class EventQueueRepository(
     private val dao: AgentEventDao

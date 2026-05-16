@@ -1,4 +1,5 @@
 package com.acare.clinic.agent.dlp
+import com.acare.clinic.agent.policy.PolicyManager
 
 class DlpScanner(
     private val policyManager: PolicyManager

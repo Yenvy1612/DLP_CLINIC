@@ -1,6 +1,18 @@
 package com.acare.clinic.agent.core
 
 import android.content.Context
+import com.acare.clinic.agent.audit.AgentEventTracker
+import com.acare.clinic.agent.auth.TokenProvider
+import com.acare.clinic.agent.device.DeviceIdProvider
+import com.acare.clinic.agent.device.DeviceInfoCollector
+import com.acare.clinic.agent.dlp.DlpScanner
+import com.acare.clinic.agent.heartbeat.HeartbeatScheduler
+import com.acare.clinic.agent.network.RetrofitClient
+import com.acare.clinic.agent.policy.PolicyManager
+import com.acare.clinic.agent.queue.EventQueueRepository
+import com.acare.clinic.agent.queue.EventSyncScheduler
+import com.acare.clinic.agent.storage.AgentDatabase
+import com.acare.clinic.agent.storage.AgentPreferences
 
 object AgentInitializer {
 

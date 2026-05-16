@@ -3,8 +3,8 @@ package com.acare.clinic.agent.heartbeat
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.asquad.mobile.agent.core.AgentInitializer
-
+import androidx.work.ListenableWorker.Result
+import com.acare.clinic.agent.core.AgentInitializer
 class HeartbeatWorker(
     context: Context,
     params: WorkerParameters

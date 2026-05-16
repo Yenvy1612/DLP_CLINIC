@@ -1,4 +1,12 @@
 package com.acare.clinic.agent.core
+import com.acare.clinic.agent.device.AgentRegisterRequest
+import com.acare.clinic.agent.device.DeviceIdProvider
+import com.acare.clinic.agent.device.DeviceInfoCollector
+import com.acare.clinic.agent.heartbeat.HeartbeatRequest
+import com.acare.clinic.agent.network.AgentApiService
+import com.acare.clinic.agent.policy.PolicyManager
+import com.acare.clinic.agent.queue.EventQueueRepository
+import com.acare.clinic.agent.storage.AgentEventDao
 
 class AgentManager(
     private val config: AgentConfig,
