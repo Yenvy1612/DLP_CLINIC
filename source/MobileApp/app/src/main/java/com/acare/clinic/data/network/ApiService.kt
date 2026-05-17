@@ -225,6 +225,18 @@ interface ApiService {
     @GET("api/medical-records/patient/{patientId}")
     suspend fun getMedicalRecords(@Path("patientId") patientId: Long): Response<List<MedicalRecord>>
 
+    @GET("api/medical-records/appointment/{appointmentId}")
+    suspend fun getMedicalRecordByAppointmentId(@Path("appointmentId") appointmentId: Long): Response<MedicalRecord>
+
+    @POST("api/medical-records")
+    suspend fun createMedicalRecord(@Body request: CreateMedicalRecordRequest): Response<MedicalRecord>
+
+    @PUT("api/medical-records/{id}")
+    suspend fun updateMedicalRecord(@Path("id") id: Long, @Body request: CreateMedicalRecordRequest): Response<MedicalRecord>
+
+    @GET("api/medical-records/doctor/{doctorId}")
+    suspend fun getMedicalRecordsByDoctor(@Path("doctorId") doctorId: Long): Response<List<MedicalRecord>>
+
     // ── Security & DLP (Admin) ────────────────────────────────────────────────
 
     @GET("api/security/events")

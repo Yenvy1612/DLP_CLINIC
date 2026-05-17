@@ -98,7 +98,7 @@ class AdminSecurityFragment : Fragment() {
         val topTypes = d.topEventTypes
         if (!topTypes.isNullOrEmpty()) {
             val topTypesText = topTypes.entries.joinToString("\n") { (type, count) ->
-                "• $type: $count"
+                "Ã¢â‚¬Â¢ $type: $count"
             }
             binding.tvTopEventTypes.text = topTypesText
             binding.tvTopEventTypes.visibility = View.VISIBLE
@@ -125,7 +125,7 @@ class AdminSecurityFragment : Fragment() {
                 }
             } catch (e: Exception) {
                 if (_binding != null) {
-                    Snackbar.make(binding.root, "Không thể tải nhật ký bảo mật", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(binding.root, "KhÃƒÂ´ng thÃ¡Â»Æ’ tÃ¡ÂºÂ£i nhÃ¡ÂºÂ­t kÃƒÂ½ bÃ¡ÂºÂ£o mÃ¡ÂºÂ­t", Snackbar.LENGTH_SHORT).show()
                 }
             } finally {
                 if (_binding != null) {
@@ -152,7 +152,7 @@ class AdminSecurityFragment : Fragment() {
                 }
             } catch (e: Exception) {
                 if (_binding != null) {
-                    Snackbar.make(binding.root, "Không thể tải nhật ký DLP", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(binding.root, "KhÃƒÂ´ng thÃ¡Â»Æ’ tÃ¡ÂºÂ£i nhÃ¡ÂºÂ­t kÃƒÂ½ DLP", Snackbar.LENGTH_SHORT).show()
                 }
             } finally {
                 if (_binding != null) {
@@ -212,8 +212,8 @@ class SecurityEventAdapter(private val items: List<SecurityEventResponse>) : Rec
         )
         holder.tvIpAddress.text = "IP: ${item.ipAddress ?: "N/A"}"
         holder.tvUri.text = "${item.httpMethod ?: "N/A"} ${item.requestUri ?: "N/A"}"
-        holder.tvDescription.text = item.description ?: "Không có chi tiết"
-        holder.tvAction.text = "Hành động: ${item.actionTaken ?: "N/A"}"
+        holder.tvDescription.text = item.description ?: "KhÃƒÂ´ng cÃƒÂ³ chi tiÃ¡ÂºÂ¿t"
+        holder.tvAction.text = "HÃƒÂ nh Ã„â€˜Ã¡Â»â„¢ng: ${item.actionTaken ?: "N/A"}"
         holder.tvTime.text = item.occurredAt
     }
 }
@@ -237,7 +237,7 @@ class DlpLogAdapter(private val items: List<DlpLog>) : RecyclerView.Adapter<DlpL
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val item = items[position]
-        holder.tvActionType.text = item.eventType ?: "N/A"
+        holder.tvActionType.text = friendlyEvent(item.eventType, item.action)
         holder.chipSeverity.text = item.severity ?: "INFO"
         holder.chipSeverity.setChipBackgroundColorResource(
             when (item.severity?.uppercase()) {
@@ -247,10 +247,88 @@ class DlpLogAdapter(private val items: List<DlpLog>) : RecyclerView.Adapter<DlpL
                 else -> R.color.success
             }
         )
-        holder.tvMachine.text = "Device: ${item.deviceId ?: "N/A"} | Platform: ${item.platform ?: "N/A"}"
-        holder.tvFile.text = "Vi phạm: ${item.violationType ?: "N/A"} | Hành động: ${item.action ?: "N/A"}"
-        holder.tvDetails.text = item.contentSnippet ?: item.details ?: "Không có chi tiết"
-        holder.tvStatus.text = "Nguồn: ${item.sourceType ?: "N/A"} | User ID: ${item.userId ?: "N/A"}"
+
+        val source = friendlySource(item.sourceType, item.platform)
+        holder.tvMachine.text = "Thiet bi: ${item.deviceId ?: "N/A"} | Nen tang: ${item.platform ?: "N/A"}"
+        holder.tvFile.text = "Vi pham: ${friendlyViolation(item.violationType)} | Hanh dong: ${friendlyAction(item.action)}"
+
+        val snippet = item.contentSnippet?.takeIf { it.isNotBlank() }
+        holder.tvDetails.text = buildPreciseReason(item, snippet)
+
+        val userLabel = item.username ?: item.userId?.toString() ?: "N/A"
+        holder.tvStatus.text = "Nguon: $source | User: $userLabel"
         holder.tvTime.text = item.timestamp ?: "N/A"
+    }
+
+    private fun friendlySource(sourceType: String?, platform: String?): String {
+        val s = sourceType?.uppercase()
+        return when {
+            s == "PHONE" -> "Dien thoai"
+            s == "ANDROID_AGENT" -> "Agent mobile"
+            s == "WEB" -> "Web"
+            platform?.uppercase() == "ANDROID" -> "Dien thoai"
+            else -> sourceType ?: "N/A"
+        }
+    }
+
+    private fun friendlyViolation(violationType: String?): String {
+        val v = violationType?.uppercase() ?: return "N/A"
+        return when {
+            v.contains("CCCD") -> "CCCD/ID nhay cam"
+            v.contains("PHONE") -> "So dien thoai"
+            v.contains("EMAIL") -> "Email"
+            v.contains("SENSITIVE") || v.contains("HIV") || v.contains("KEYWORD") -> "Tu khoa nhay cam"
+            else -> violationType
+        }
+    }
+
+    private fun friendlyAction(action: String?): String {
+        return when (action?.uppercase()) {
+            "INPUT_SCAN" -> "Quet dau vao"
+            "OUTPUT_SCAN" -> "Quet dau ra"
+            "SUBMIT_FORM" -> "Gui form"
+            "COPY" -> "Copy"
+            "EXPORT" -> "Export"
+            else -> action ?: "N/A"
+        }
+    }
+
+    private fun friendlyEvent(eventType: String?, action: String?): String {
+        return when (eventType?.uppercase()) {
+            "FORM_DLP_MATCHED" -> "Vi pham khi dien form"
+            "COPY_PATIENT_DATA" -> "Vi pham khi copy"
+            "EXPORT_BLOCKED" -> "Chan export"
+            "INPUT_SCAN" -> "Quet du lieu dau vao"
+            "OUTPUT_SCAN" -> "Quet du lieu dau ra"
+            else -> friendlyAction(action)
+        }
+    }
+
+        private fun buildPreciseReason(item: DlpLog, snippet: String?): String {
+        val endpoint = item.details
+            ?.substringAfter("tai ", "")
+            ?.substringBefore(" -", "")
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+        val whereText = endpoint?.let { " tai $it" } ?: ""
+        val payload = snippet ?: "khong co"
+        val trigger = extractTrigger(item, payload)
+
+        return when (item.action?.uppercase()) {
+            "INPUT_SCAN", "SUBMIT_FORM" -> "Dien noi dung vi pham ($trigger)$whereText: $payload"
+            "COPY" -> "Copy du lieu vi pham ($trigger)$whereText: $payload"
+            "EXPORT" -> "Export du lieu vi pham ($trigger)$whereText: $payload"
+            "OUTPUT_SCAN" -> "Tra ve du lieu vi pham ($trigger)$whereText: $payload"
+            else -> "Noi dung vi pham ($trigger)$whereText: $payload"
+        }
+    }
+
+    private fun extractTrigger(item: DlpLog, payload: String): String {
+        val violation = item.violationType?.trim().orEmpty()
+        if (violation.isNotBlank()) return violation
+
+        val raw = payload.removePrefix("[").removeSuffix("]")
+        val first = raw.split(",").firstOrNull()?.trim().orEmpty()
+        return if (first.isNotBlank()) first else "UNKNOWN"
     }
 }

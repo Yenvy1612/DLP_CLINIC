@@ -13,6 +13,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.acare.clinic.R;
+import com.google.android.material.button.MaterialButton;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
@@ -20,6 +21,9 @@ import java.lang.String;
 public final class FragmentMedicalRecordBinding implements ViewBinding {
   @NonNull
   private final LinearLayout rootView;
+
+  @NonNull
+  public final MaterialButton btnExportPdf;
 
   @NonNull
   public final LinearLayout emptyState;
@@ -34,9 +38,11 @@ public final class FragmentMedicalRecordBinding implements ViewBinding {
   public final SwipeRefreshLayout swipeRefresh;
 
   private FragmentMedicalRecordBinding(@NonNull LinearLayout rootView,
-      @NonNull LinearLayout emptyState, @NonNull ProgressBar progressBar,
-      @NonNull RecyclerView rvRecords, @NonNull SwipeRefreshLayout swipeRefresh) {
+      @NonNull MaterialButton btnExportPdf, @NonNull LinearLayout emptyState,
+      @NonNull ProgressBar progressBar, @NonNull RecyclerView rvRecords,
+      @NonNull SwipeRefreshLayout swipeRefresh) {
     this.rootView = rootView;
+    this.btnExportPdf = btnExportPdf;
     this.emptyState = emptyState;
     this.progressBar = progressBar;
     this.rvRecords = rvRecords;
@@ -70,6 +76,12 @@ public final class FragmentMedicalRecordBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.btnExportPdf;
+      MaterialButton btnExportPdf = ViewBindings.findChildViewById(rootView, id);
+      if (btnExportPdf == null) {
+        break missingId;
+      }
+
       id = R.id.emptyState;
       LinearLayout emptyState = ViewBindings.findChildViewById(rootView, id);
       if (emptyState == null) {
@@ -94,8 +106,8 @@ public final class FragmentMedicalRecordBinding implements ViewBinding {
         break missingId;
       }
 
-      return new FragmentMedicalRecordBinding((LinearLayout) rootView, emptyState, progressBar,
-          rvRecords, swipeRefresh);
+      return new FragmentMedicalRecordBinding((LinearLayout) rootView, btnExportPdf, emptyState,
+          progressBar, rvRecords, swipeRefresh);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

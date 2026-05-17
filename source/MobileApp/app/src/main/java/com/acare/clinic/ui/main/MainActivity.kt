@@ -2,28 +2,17 @@ package com.acare.clinic.ui.main
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
+import androidx.navigation.navOptions
+import androidx.navigation.ui.onNavDestinationSelected
 import com.acare.clinic.R
 import com.acare.clinic.data.network.NetworkClient
 import com.acare.clinic.databinding.ActivityMainBinding
 import com.acare.clinic.ui.auth.LoginActivity
 import com.acare.clinic.utils.SessionManager
 
-/**
- * MainActivity — shell chứa Bottom Navigation + NavHostFragment.
- *
- * Phân quyền theo role (giống Frontend web):
- *  - PATIENT : Tab Trang chủ | Lịch hẹn | Hồ sơ bệnh | Tôi  (nav_graph_patient)
- *  - DOCTOR  : Tab Trang chủ | Lịch khám | Thống kê | Tôi   (nav_graph_doctor)
- *  - ADMIN   : Tab Tổng quan | Người dùng | Dịch vụ | Lịch hẹn | Bảo mật (nav_graph_admin)
- *
- * Anti-crash: Dùng setReorderingAllowed + debounce navigation
- * để tránh crash khi chuyển tab quá nhanh.
- */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -46,24 +35,19 @@ class MainActivity : AppCompatActivity() {
 
         when (role) {
             "DOCTOR" -> {
-                val inflater = navController.navInflater
-                val graph = inflater.inflate(R.navigation.nav_graph_doctor)
-                navController.graph = graph
+                navController.graph = navController.navInflater.inflate(R.navigation.nav_graph_doctor)
                 binding.bottomNavigation.menu.clear()
                 binding.bottomNavigation.inflateMenu(R.menu.bottom_nav_doctor)
+                binding.btnProfileOverlay.visibility = android.view.View.GONE
             }
             "ADMIN" -> {
-                val inflater = navController.navInflater
-                val graph = inflater.inflate(R.navigation.nav_graph_admin)
-                navController.graph = graph
+                navController.graph = navController.navInflater.inflate(R.navigation.nav_graph_admin)
                 binding.bottomNavigation.menu.clear()
                 binding.bottomNavigation.inflateMenu(R.menu.bottom_nav_admin)
+                binding.btnProfileOverlay.visibility = android.view.View.GONE
             }
             else -> {
-                // PATIENT (default)
-                val inflater = navController.navInflater
-                val graph = inflater.inflate(R.navigation.nav_graph_patient)
-                navController.graph = graph
+                navController.graph = navController.navInflater.inflate(R.navigation.nav_graph_patient)
                 binding.bottomNavigation.menu.clear()
                 binding.bottomNavigation.inflateMenu(R.menu.bottom_nav_menu)
                 binding.btnProfileOverlay.visibility = android.view.View.VISIBLE
@@ -75,16 +59,24 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        if (role == "DOCTOR" || role == "ADMIN") {
-            binding.btnProfileOverlay.visibility = android.view.View.GONE
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            try {
+                val options = navOptions {
+                    launchSingleTop = true
+                    restoreState = true
+                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                }
+                navController.navigate(item.itemId, null, options)
+                true
+            } catch (_: Exception) {
+                item.onNavDestinationSelected(navController)
+            }
         }
 
-        // Setup điều hướng tab chuẩn với NavigationUI
-        binding.bottomNavigation.setupWithNavController(navController)
+        binding.bottomNavigation.setOnItemReselectedListener { _ -> }
 
-        // Reselect: scroll to top hoặc refresh
-        binding.bottomNavigation.setOnItemReselectedListener { _ ->
-            // Không làm gì khi reselect — tránh recreate fragment
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            binding.bottomNavigation.menu.findItem(destination.id)?.isChecked = true
         }
     }
 

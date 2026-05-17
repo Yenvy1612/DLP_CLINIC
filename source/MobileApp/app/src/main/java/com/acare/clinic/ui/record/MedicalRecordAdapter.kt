@@ -6,8 +6,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.acare.clinic.data.model.MedicalRecord
 import com.acare.clinic.databinding.ItemMedicalRecordBinding
 
-class MedicalRecordAdapter(private val items: List<MedicalRecord>) :
-    RecyclerView.Adapter<MedicalRecordAdapter.VH>() {
+class MedicalRecordAdapter(
+    private val items: List<MedicalRecord>,
+    private val onItemClick: ((MedicalRecord) -> Unit)? = null
+) : RecyclerView.Adapter<MedicalRecordAdapter.VH>() {
 
     inner class VH(val binding: ItemMedicalRecordBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -24,6 +26,8 @@ class MedicalRecordAdapter(private val items: List<MedicalRecord>) :
             tvDiagnosis.text = rec.diagnosis?.take(100) ?: "Chưa có chẩn đoán"
             tvDate.text = formatDate(rec.createdAt)
             tvComplaint.text = rec.chiefComplaint?.take(80) ?: ""
+            
+            root.setOnClickListener { onItemClick?.invoke(rec) }
         }
     }
 

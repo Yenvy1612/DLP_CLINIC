@@ -99,6 +99,7 @@ data class DlpLog(
     val details: String?,
     val contentSnippet: String?,
     val userId: Long?,
+    val username: String?,
     val timestamp: String?
 )
 
@@ -216,11 +217,38 @@ data class AppointmentUpdateRequest(
 data class MedicalRecord(
     val id: Long,
     @SerializedName("recordCode") val recordCode: String,
+    @SerializedName("appointmentId") val appointmentId: Long? = null,
+    @SerializedName("patientId") val patientId: Long? = null,
+    @SerializedName("doctorId") val doctorId: Long? = null,
     @SerializedName("doctorName") val doctorName: String?,
     @SerializedName("chiefComplaint") val chiefComplaint: String?,
     val diagnosis: String?,
     @SerializedName("treatmentPlan") val treatmentPlan: String?,
-    @SerializedName("createdAt") val createdAt: String
+    @SerializedName("clinicalNotes") val clinicalNotes: String? = null,
+    @SerializedName("followUpDate") val followUpDate: String? = null,
+    @SerializedName("patientFullName") val patientFullName: String? = null,
+    @SerializedName("patientEmail") val patientEmail: String? = null,
+    @SerializedName("patientPhone") val patientPhone: String? = null,
+    @SerializedName("patientIdNumber") val patientIdNumber: String? = null,
+    @SerializedName("bloodType") val bloodType: String? = null,
+    @SerializedName("insuranceNumber") val insuranceNumber: String? = null,
+    @SerializedName("allergies") val allergies: String? = null,
+    @SerializedName("chronicConditions") val chronicConditions: String? = null,
+    @SerializedName("emergencyContactName") val emergencyContactName: String? = null,
+    @SerializedName("emergencyContactPhone") val emergencyContactPhone: String? = null,
+    @SerializedName("createdAt") val createdAt: String,
+    @SerializedName("updatedAt") val updatedAt: String? = null
+)
+
+data class CreateMedicalRecordRequest(
+    @SerializedName("appointmentId") val appointmentId: Long,
+    @SerializedName("patientId") val patientId: Long? = null,
+    @SerializedName("doctorId") val doctorId: Long? = null,
+    @SerializedName("chiefComplaint") val chiefComplaint: String? = null,
+    val diagnosis: String? = null,
+    @SerializedName("treatmentPlan") val treatmentPlan: String? = null,
+    @SerializedName("clinicalNotes") val clinicalNotes: String? = null,
+    @SerializedName("followUpDate") val followUpDate: String? = null
 )
 
 // ── Activity (Notification) ───────────────────────────────────────────────────

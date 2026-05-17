@@ -101,4 +101,7 @@ dependencies {
 
     // WorkManager (HeartbeatScheduler)
     implementation "androidx.work:work-runtime-ktx:2.9.0"
+
+    // PDF export
+    implementation 'com.itextpdf:itextg:5.5.10'
 }

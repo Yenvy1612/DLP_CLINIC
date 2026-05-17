@@ -28,7 +28,13 @@ public final class ItemDoctorAppointmentBinding implements ViewBinding {
   public final MaterialButton btnDone;
 
   @NonNull
+  public final MaterialButton btnRecord;
+
+  @NonNull
   public final Chip chipStatus;
+
+  @NonNull
+  public final TextView tvMedicalRecord;
 
   @NonNull
   public final TextView tvPatientInitial;
@@ -43,13 +49,16 @@ public final class ItemDoctorAppointmentBinding implements ViewBinding {
   public final TextView tvTime;
 
   private ItemDoctorAppointmentBinding(@NonNull CardView rootView,
-      @NonNull MaterialButton btnCancel, @NonNull MaterialButton btnDone, @NonNull Chip chipStatus,
-      @NonNull TextView tvPatientInitial, @NonNull TextView tvPatientName,
-      @NonNull TextView tvService, @NonNull TextView tvTime) {
+      @NonNull MaterialButton btnCancel, @NonNull MaterialButton btnDone,
+      @NonNull MaterialButton btnRecord, @NonNull Chip chipStatus,
+      @NonNull TextView tvMedicalRecord, @NonNull TextView tvPatientInitial,
+      @NonNull TextView tvPatientName, @NonNull TextView tvService, @NonNull TextView tvTime) {
     this.rootView = rootView;
     this.btnCancel = btnCancel;
     this.btnDone = btnDone;
+    this.btnRecord = btnRecord;
     this.chipStatus = chipStatus;
+    this.tvMedicalRecord = tvMedicalRecord;
     this.tvPatientInitial = tvPatientInitial;
     this.tvPatientName = tvPatientName;
     this.tvService = tvService;
@@ -95,9 +104,21 @@ public final class ItemDoctorAppointmentBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.btnRecord;
+      MaterialButton btnRecord = ViewBindings.findChildViewById(rootView, id);
+      if (btnRecord == null) {
+        break missingId;
+      }
+
       id = R.id.chipStatus;
       Chip chipStatus = ViewBindings.findChildViewById(rootView, id);
       if (chipStatus == null) {
+        break missingId;
+      }
+
+      id = R.id.tvMedicalRecord;
+      TextView tvMedicalRecord = ViewBindings.findChildViewById(rootView, id);
+      if (tvMedicalRecord == null) {
         break missingId;
       }
 
@@ -125,8 +146,8 @@ public final class ItemDoctorAppointmentBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ItemDoctorAppointmentBinding((CardView) rootView, btnCancel, btnDone, chipStatus,
-          tvPatientInitial, tvPatientName, tvService, tvTime);
+      return new ItemDoctorAppointmentBinding((CardView) rootView, btnCancel, btnDone, btnRecord,
+          chipStatus, tvMedicalRecord, tvPatientInitial, tvPatientName, tvService, tvTime);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

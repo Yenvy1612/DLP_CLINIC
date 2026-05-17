@@ -1,5 +1,6 @@
 package com.acare.clinic.agent.dlp
 import com.acare.clinic.agent.policy.PolicyManager
+import java.text.Normalizer
 
 class DlpScanner(
     private val policyManager: PolicyManager
@@ -26,8 +27,10 @@ class DlpScanner(
             }
         }
 
+        val normalizedText = normalizeForMatch(text)
         policy.keywords.forEach { keyword ->
-            if (text.contains(keyword, ignoreCase = true)) {
+            val normalizedKeyword = normalizeForMatch(keyword)
+            if (normalizedText.contains(normalizedKeyword)) {
                 violations.add("KEYWORD:$keyword")
                 maxSeverity = higherSeverity(maxSeverity, "CRITICAL")
             }
@@ -56,5 +59,10 @@ class DlpScanner(
         } else {
             current.uppercase()
         }
+    }
+
+    private fun normalizeForMatch(input: String): String {
+        val normalized = Normalizer.normalize(input, Normalizer.Form.NFD)
+        return normalized.replace("\\p{M}+".toRegex(), "").lowercase()
     }
 }

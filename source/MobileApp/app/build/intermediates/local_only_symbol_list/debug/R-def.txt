@@ -96,10 +96,14 @@ id btnChangePassword
 id btnConfirm
 id btnDoctorProfile
 id btnDone
+id btnExportDoctorPdf
+id btnExportPdf
+id btnExportUsersPdf
 id btnLogin
 id btnLogout
 id btnPatientProfile
 id btnProfileOverlay
+id btnRecord
 id btnRefresh
 id btnRegister
 id btnViewHistory
@@ -129,13 +133,17 @@ id emptyAppointments
 id emptyState
 id etAddress
 id etBirthDate
+id etChiefComplaint
 id etClinicLocation
+id etClinicalNotes
 id etConfirmNewPassword
 id etConfirmPassword
 id etCurrentPassword
 id etDepartment
 id etDescription
+id etDiagnosis
 id etEmail
+id etFollowUpDate
 id etFullName
 id etIdNumber
 id etNewPassword
@@ -147,6 +155,7 @@ id etServiceName
 id etServicePrice
 id etShiftEnd
 id etShiftStart
+id etTreatmentPlan
 id fabAddService
 id fabAddUser
 id formCard
@@ -218,6 +227,7 @@ id tvHighEvents
 id tvInitial
 id tvIpAddress
 id tvMachine
+id tvMedicalRecord
 id tvMonthRevenue
 id tvName
 id tvNoDoctors
@@ -272,6 +282,7 @@ layout activity_splash
 layout dialog_add_service
 layout dialog_add_user
 layout dialog_change_password
+layout dialog_create_medical_record
 layout dialog_edit_user
 layout fragment_admin_appointments
 layout fragment_admin_home

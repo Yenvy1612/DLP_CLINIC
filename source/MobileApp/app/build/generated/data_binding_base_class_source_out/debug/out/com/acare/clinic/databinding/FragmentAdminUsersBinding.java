@@ -26,6 +26,9 @@ public final class FragmentAdminUsersBinding implements ViewBinding {
   private final RelativeLayout rootView;
 
   @NonNull
+  public final MaterialButton btnExportUsersPdf;
+
+  @NonNull
   public final MaterialButton btnRefresh;
 
   @NonNull
@@ -47,11 +50,12 @@ public final class FragmentAdminUsersBinding implements ViewBinding {
   public final TextView tvUserCount;
 
   private FragmentAdminUsersBinding(@NonNull RelativeLayout rootView,
-      @NonNull MaterialButton btnRefresh, @NonNull LinearLayout emptyState,
-      @NonNull TextInputEditText etSearch, @NonNull FloatingActionButton fabAddUser,
-      @NonNull ProgressBar progressBar, @NonNull RecyclerView rvUsers,
-      @NonNull TextView tvUserCount) {
+      @NonNull MaterialButton btnExportUsersPdf, @NonNull MaterialButton btnRefresh,
+      @NonNull LinearLayout emptyState, @NonNull TextInputEditText etSearch,
+      @NonNull FloatingActionButton fabAddUser, @NonNull ProgressBar progressBar,
+      @NonNull RecyclerView rvUsers, @NonNull TextView tvUserCount) {
     this.rootView = rootView;
+    this.btnExportUsersPdf = btnExportUsersPdf;
     this.btnRefresh = btnRefresh;
     this.emptyState = emptyState;
     this.etSearch = etSearch;
@@ -88,6 +92,12 @@ public final class FragmentAdminUsersBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.btnExportUsersPdf;
+      MaterialButton btnExportUsersPdf = ViewBindings.findChildViewById(rootView, id);
+      if (btnExportUsersPdf == null) {
+        break missingId;
+      }
+
       id = R.id.btnRefresh;
       MaterialButton btnRefresh = ViewBindings.findChildViewById(rootView, id);
       if (btnRefresh == null) {
@@ -130,8 +140,8 @@ public final class FragmentAdminUsersBinding implements ViewBinding {
         break missingId;
       }
 
-      return new FragmentAdminUsersBinding((RelativeLayout) rootView, btnRefresh, emptyState,
-          etSearch, fabAddUser, progressBar, rvUsers, tvUserCount);
+      return new FragmentAdminUsersBinding((RelativeLayout) rootView, btnExportUsersPdf, btnRefresh,
+          emptyState, etSearch, fabAddUser, progressBar, rvUsers, tvUserCount);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

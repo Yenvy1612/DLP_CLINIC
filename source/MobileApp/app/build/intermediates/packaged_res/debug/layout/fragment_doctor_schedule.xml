@@ -7,7 +7,6 @@
     android:orientation="vertical"
     android:background="@color/background">
 
-    <!-- Header -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,7 +23,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Quản lý lịch khám"
+                android:text="Quan ly lich kham"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -33,13 +32,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="Xem và xử lý lịch hẹn của bệnh nhân"
+                android:text="Xem va xu ly lich hen cua benh nhan"
                 android:textColor="#94A3B8"
                 android:textSize="12sp" />
         </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnExportDoctorPdf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:text="Export PDF"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/primary" />
     </FrameLayout>
 
-    <!-- Tab Layout -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
@@ -53,15 +61,14 @@
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chờ duyệt" />
+            android:text="Cho duyet" />
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tất cả" />
+            android:text="Tat ca" />
     </com.google.android.material.tabs.TabLayout>
 
-    <!-- Progress bar -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="match_parent"
@@ -70,7 +77,6 @@
         android:indeterminate="true"
         android:visibility="gone" />
 
-    <!-- Empty state -->
     <LinearLayout
         android:id="@+id/emptyState"
         android:layout_width="match_parent"
@@ -84,18 +90,17 @@
             android:layout_width="140dp"
             android:layout_height="100dp"
             android:src="@drawable/illu_empty_appointment"
-            android:contentDescription="Không có lịch hẹn" />
+            android:contentDescription="Khong co lich hen" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Không có lịch hẹn nào"
+            android:text="Khong co lich hen nao"
             android:textColor="@color/text_secondary"
             android:textSize="15sp" />
     </LinearLayout>
 
-    <!-- List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSchedule"
         android:layout_width="match_parent"

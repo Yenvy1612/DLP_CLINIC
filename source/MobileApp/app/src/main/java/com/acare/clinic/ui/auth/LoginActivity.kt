@@ -50,7 +50,6 @@ class LoginActivity : AppCompatActivity() {
                 if (res.isSuccessful && res.body() != null) {
                     val auth = res.body()!!
 
-                    // Lấy thêm profile để lưu tên hiển thị
                     val meRes = api.getMe()
                     val name = meRes.body()?.fullName ?: auth.username
 
@@ -61,7 +60,6 @@ class LoginActivity : AppCompatActivity() {
                         role = auth.role
                     )
 
-                    // ── Đăng ký Agent sau khi login thành công ──
                     registerAgentAfterLogin(auth.username)
 
                     startActivity(Intent(this@LoginActivity, MainActivity::class.java))
@@ -77,10 +75,6 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Đăng ký agent device với backend sau khi login thành công.
-     * Chạy non-blocking để không ảnh hưởng luồng login.
-     */
     private fun registerAgentAfterLogin(username: String) {
         lifecycleScope.launch {
             try {
@@ -91,17 +85,12 @@ class LoginActivity : AppCompatActivity() {
 
                 val manager = AgentInitializer.getAgentManager()
                 manager.register(username)
-                Log.i("LoginActivity", "Agent registered successfully for $username")
-
-                // Track login event qua agent
-                val tracker = AgentInitializer.getEventTracker()
-                tracker.trackViewPatientDetail(
-                    userId = SessionManager.getUserId(),
-                    patientId = SessionManager.getUserId()
-                )
+                manager.syncPolicy()
+                manager.sendHeartbeat()
+                manager.syncPendingEvents()
+                Log.i("LoginActivity", "Agent registered + policy synced + heartbeat sent for $username")
             } catch (e: Exception) {
                 Log.e("LoginActivity", "Agent registration failed: ${e.message}", e)
-                // Không block login nếu agent registration thất bại
             }
         }
     }
@@ -134,4 +123,3 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 }
-

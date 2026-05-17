@@ -1,4 +1,4 @@
-package com.acare.clinic.agent.policy
+﻿package com.acare.clinic.agent.policy
 import com.acare.clinic.agent.network.AgentApiService
 import com.acare.clinic.agent.storage.AgentPreferences
 
@@ -30,7 +30,7 @@ class PolicyManager(
                 PatternRule("PHONE", "\\b(84|0[35789])\\d{8}\\b", "MEDIUM"),
                 PatternRule("EMAIL", "\\b[\\w.-]+@[\\w.-]+\\.\\w{2,4}\\b", "MEDIUM")
             ),
-            keywords = listOf("HIV", "Ung thư", "Tuyệt mật"),
+            keywords = listOf("HIV", "Ung thu", "Tuyet mat", "AIDS"),
             settings = mapOf(
                 "scanForm" to true,
                 "scanCopy" to true,

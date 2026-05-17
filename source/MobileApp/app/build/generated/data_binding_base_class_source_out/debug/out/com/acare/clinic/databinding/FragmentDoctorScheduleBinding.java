@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.acare.clinic.R;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -20,6 +21,9 @@ import java.lang.String;
 public final class FragmentDoctorScheduleBinding implements ViewBinding {
   @NonNull
   private final LinearLayout rootView;
+
+  @NonNull
+  public final MaterialButton btnExportDoctorPdf;
 
   @NonNull
   public final LinearLayout emptyState;
@@ -34,9 +38,11 @@ public final class FragmentDoctorScheduleBinding implements ViewBinding {
   public final TabLayout tabLayout;
 
   private FragmentDoctorScheduleBinding(@NonNull LinearLayout rootView,
-      @NonNull LinearLayout emptyState, @NonNull ProgressBar progressBar,
-      @NonNull RecyclerView rvSchedule, @NonNull TabLayout tabLayout) {
+      @NonNull MaterialButton btnExportDoctorPdf, @NonNull LinearLayout emptyState,
+      @NonNull ProgressBar progressBar, @NonNull RecyclerView rvSchedule,
+      @NonNull TabLayout tabLayout) {
     this.rootView = rootView;
+    this.btnExportDoctorPdf = btnExportDoctorPdf;
     this.emptyState = emptyState;
     this.progressBar = progressBar;
     this.rvSchedule = rvSchedule;
@@ -70,6 +76,12 @@ public final class FragmentDoctorScheduleBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.btnExportDoctorPdf;
+      MaterialButton btnExportDoctorPdf = ViewBindings.findChildViewById(rootView, id);
+      if (btnExportDoctorPdf == null) {
+        break missingId;
+      }
+
       id = R.id.emptyState;
       LinearLayout emptyState = ViewBindings.findChildViewById(rootView, id);
       if (emptyState == null) {
@@ -94,8 +106,8 @@ public final class FragmentDoctorScheduleBinding implements ViewBinding {
         break missingId;
       }
 
-      return new FragmentDoctorScheduleBinding((LinearLayout) rootView, emptyState, progressBar,
-          rvSchedule, tabLayout);
+      return new FragmentDoctorScheduleBinding((LinearLayout) rootView, btnExportDoctorPdf,
+          emptyState, progressBar, rvSchedule, tabLayout);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

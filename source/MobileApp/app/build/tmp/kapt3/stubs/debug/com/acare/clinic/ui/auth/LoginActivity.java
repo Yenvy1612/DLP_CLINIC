@@ -22,10 +22,6 @@ public final class LoginActivity extends androidx.appcompat.app.AppCompatActivit
     private final void doLogin() {
     }
     
-    /**
-     * Đăng ký agent device với backend sau khi login thành công.
-     * Chạy non-blocking để không ảnh hưởng luồng login.
-     */
     private final void registerAgentAfterLogin(java.lang.String username) {
     }
     

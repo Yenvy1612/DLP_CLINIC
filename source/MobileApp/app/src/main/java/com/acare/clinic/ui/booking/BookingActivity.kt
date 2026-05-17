@@ -7,6 +7,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import com.acare.clinic.agent.core.AgentInitializer
 import com.acare.clinic.R
 import com.acare.clinic.data.model.*
 import com.acare.clinic.data.network.ApiService
@@ -330,6 +331,30 @@ class BookingActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val normalizedReason = reason.ifBlank { null }
+
+                if (AgentInitializer.isInitialized()) {
+                    val tracker = AgentInitializer.getEventTracker()
+                    val accepted = tracker.trackFormSubmit(
+                        userId = patientId,
+                        formName = "BOOK_APPOINTMENT",
+                        formText = listOfNotNull(
+                            normalizedReason,
+                            "doctor=${doc.fullName}",
+                            "serviceId=$selectedServiceId",
+                            "startTime=$startTime"
+                        ).joinToString(" | ")
+                    )
+                    AgentInitializer.getAgentManager().syncPendingEvents()
+                    if (!accepted) {
+                        MaterialAlertDialogBuilder(this@BookingActivity)
+                            .setTitle("DLP đã chặn yêu cầu")
+                            .setMessage("Nội dung có dấu hiệu nhạy cảm/vi phạm chính sách. Vui lòng chỉnh sửa trước khi gửi.")
+                            .setPositiveButton("Đã hiểu", null)
+                            .show()
+                        return@launch
+                    }
+                }
+
                 val response = api.bookAppointment(
                     BookAppointmentRequest(
                         patientId = patientId,
@@ -358,6 +383,12 @@ class BookingActivity : AppCompatActivity() {
                     }
                     .setCancelable(false)
                     .show()
+
+                runCatching {
+                    if (AgentInitializer.isInitialized()) {
+                        AgentInitializer.getAgentManager().syncPendingEvents()
+                    }
+                }
             } catch (e: Exception) {
                 MaterialAlertDialogBuilder(this@BookingActivity)
                     .setTitle("Đặt lịch thất bại")

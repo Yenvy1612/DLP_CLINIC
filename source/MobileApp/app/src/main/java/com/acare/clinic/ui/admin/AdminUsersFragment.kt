@@ -18,6 +18,7 @@ import com.acare.clinic.data.model.UserProfile
 import com.acare.clinic.data.network.ApiService
 import com.acare.clinic.data.network.NetworkClient
 import com.acare.clinic.databinding.FragmentAdminUsersBinding
+import com.acare.clinic.utils.PdfExportUtil
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -38,6 +39,7 @@ class AdminUsersFragment : Fragment() {
     private val api by lazy { NetworkClient.create(ApiService::class.java) }
     private var searchJob: Job? = null
     private var specialties: List<com.acare.clinic.data.model.Specialty> = emptyList()
+    private var latestUsers: List<UserProfile> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,6 +67,9 @@ class AdminUsersFragment : Fragment() {
         binding.btnRefresh.setOnClickListener {
             binding.etSearch.text?.clear()
             loadUsers()
+        }
+        binding.btnExportUsersPdf.setOnClickListener {
+            exportUsersPdf()
         }
 
         binding.fabAddUser.setOnClickListener {
@@ -263,6 +268,7 @@ class AdminUsersFragment : Fragment() {
     }
 
     private fun displayUsers(users: List<UserProfile>) {
+        latestUsers = users
         binding.tvUserCount.text = "${users.size} người dùng"
         if (users.isEmpty()) {
             binding.emptyState.visibility = View.VISIBLE
@@ -341,7 +347,7 @@ class AdminUsersFragment : Fragment() {
     private fun confirmDeleteUser(user: UserProfile) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Xóa người dùng")
-            .setMessage("Bạn có chắc chắn muốn xóa \"${user.fullName ?: user.email}\"?")
+                        .setMessage("Ban co chac chan muon xoa \"${user.fullName ?: user.email}\"?")
             .setNegativeButton("Hủy") { d, _ -> d.dismiss() }
             .setPositiveButton("Xóa") { _, _ ->
                 setLoading(true)
@@ -366,6 +372,36 @@ class AdminUsersFragment : Fragment() {
             .show()
     }
 
+    
+    private fun exportUsersPdf() {
+        if (latestUsers.isEmpty()) {
+            Snackbar.make(binding.root, "Khong co du lieu de export", Snackbar.LENGTH_SHORT).show()
+            return
+        }
+
+        val lines = mutableListOf<String>()
+        lines += "Danh sach nguoi dung (${latestUsers.size})"
+        lines += ""
+        latestUsers.forEachIndexed { index, user ->
+            lines += "${index + 1}. Ho ten: ${user.fullName ?: "N/A"}"
+            lines += "   Email: ${user.email ?: "N/A"}"
+            lines += "   So dien thoai: ${user.phone ?: "N/A"}"
+            lines += "   Vai tro: ${user.role ?: "N/A"}"
+            lines += "   Gioi tinh: ${user.gender ?: "N/A"}"
+            lines += "   CCCD: ${user.idNumber ?: "N/A"}"
+            lines += "   Dia chi: ${user.address ?: "N/A"}"
+            lines += "   Ngay sinh: ${user.birthDate ?: "N/A"}"
+            lines += ""
+        }
+
+        val file = PdfExportUtil.exportTextAsPdf(
+            requireContext(),
+            title = "User report (admin full)",
+            lines = lines,
+            prefix = "admin_users_full"
+        )
+        Snackbar.make(binding.root, "Da export PDF: ${file.name}", Snackbar.LENGTH_LONG).show()
+    }
     private fun setLoading(loading: Boolean) {
         binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
     }
@@ -422,3 +458,10 @@ class UserCardAdapter(
         }
     }
 }
+
+
+
+
+
+
+
