@@ -4,6 +4,7 @@ package com.acare.clinic.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,7 +12,6 @@ import androidx.core.widget.NestedScrollView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.acare.clinic.R;
-import com.google.android.material.button.MaterialButton;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
@@ -21,10 +21,10 @@ public final class FragmentProfileBinding implements ViewBinding {
   private final NestedScrollView rootView;
 
   @NonNull
-  public final MaterialButton btnChangePassword;
+  public final LinearLayout btnChangePassword;
 
   @NonNull
-  public final MaterialButton btnLogout;
+  public final LinearLayout btnLogout;
 
   @NonNull
   public final TextView tvAddress;
@@ -45,7 +45,7 @@ public final class FragmentProfileBinding implements ViewBinding {
   public final TextView tvRole;
 
   private FragmentProfileBinding(@NonNull NestedScrollView rootView,
-      @NonNull MaterialButton btnChangePassword, @NonNull MaterialButton btnLogout,
+      @NonNull LinearLayout btnChangePassword, @NonNull LinearLayout btnLogout,
       @NonNull TextView tvAddress, @NonNull TextView tvAvatarInitial, @NonNull TextView tvEmail,
       @NonNull TextView tvName, @NonNull TextView tvPhone, @NonNull TextView tvRole) {
     this.rootView = rootView;
@@ -87,13 +87,13 @@ public final class FragmentProfileBinding implements ViewBinding {
     int id;
     missingId: {
       id = R.id.btnChangePassword;
-      MaterialButton btnChangePassword = ViewBindings.findChildViewById(rootView, id);
+      LinearLayout btnChangePassword = ViewBindings.findChildViewById(rootView, id);
       if (btnChangePassword == null) {
         break missingId;
       }
 
       id = R.id.btnLogout;
-      MaterialButton btnLogout = ViewBindings.findChildViewById(rootView, id);
+      LinearLayout btnLogout = ViewBindings.findChildViewById(rootView, id);
       if (btnLogout == null) {
         break missingId;
       }

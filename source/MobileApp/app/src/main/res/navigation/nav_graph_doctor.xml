@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- nav_graph_doctor.xml — navigation graph cho DOCTOR role -->
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph_doctor"
+    app:startDestination="@id/doctorHomeFragment">
+
+    <fragment
+        android:id="@+id/doctorHomeFragment"
+        android:name="com.acare.clinic.ui.doctor.DoctorHomeFragment"
+        android:label="Trang chủ" />
+
+    <fragment
+        android:id="@+id/doctorScheduleFragment"
+        android:name="com.acare.clinic.ui.doctor.DoctorScheduleFragment"
+        android:label="Lịch khám" />
+
+    <fragment
+        android:id="@+id/doctorStatisticFragment"
+        android:name="com.acare.clinic.ui.doctor.DoctorStatisticFragment"
+        android:label="Thống kê" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.acare.clinic.ui.profile.ProfileFragment"
+        android:label="Hồ sơ cá nhân" />
+
+</navigation>

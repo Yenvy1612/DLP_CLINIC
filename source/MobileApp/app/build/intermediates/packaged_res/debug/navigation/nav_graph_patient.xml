@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- nav_graph_patient.xml — navigation graph cho PATIENT role -->
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph_patient"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.acare.clinic.ui.home.HomeFragment"
+        android:label="Trang chủ" />
+
+    <fragment
+        android:id="@+id/appointmentFragment"
+        android:name="com.acare.clinic.ui.appointment.AppointmentFragment"
+        android:label="Lịch hẹn" />
+
+    <fragment
+        android:id="@+id/recordFragment"
+        android:name="com.acare.clinic.ui.record.MedicalRecordFragment"
+        android:label="Hồ sơ bệnh án" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.acare.clinic.ui.profile.ProfileFragment"
+        android:label="Hồ sơ cá nhân" />
+
+</navigation>

@@ -1,0 +1,9 @@
+{
+  "fullName": "Test User 997",
+  "email": "testuser997@acare.local",
+  "phone": "0987654997",
+  "password": "ChangeMe@123",
+  "confirmPassword": "ChangeMe@123",
+  "role": "PATIENT",
+  "idNumber": "997997997"
+}

@@ -54,7 +54,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Bệnh nhân"
+                    android:text="---"
                     android:textColor="#CCFFFFFF"
                     android:textSize="13sp" />
             </LinearLayout>
@@ -141,29 +141,81 @@
                 android:orientation="vertical"
                 android:padding="8dp">
 
-                <com.google.android.material.button.MaterialButton
+                <!-- Nút đổi mật khẩu -->
+                <LinearLayout
                     android:id="@+id/btnChangePassword"
-                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
-                    android:text="🔒  Đổi mật khẩu"
-                    android:textColor="@color/text_primary"
-                    android:gravity="start|center_vertical"
-                    android:paddingStart="12dp" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/illu_record_nav"
+                        android:contentDescription="Mật khẩu" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:text="Đổi mật khẩu"
+                        android:textColor="@color/text_primary"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="›"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="20sp" />
+                </LinearLayout>
 
                 <View android:layout_width="match_parent" android:layout_height="1dp"
-                    android:background="@color/divider" android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp" />
+                    android:background="@color/divider" android:layout_marginStart="46dp" />
 
-                <com.google.android.material.button.MaterialButton
+                <!-- Nút đăng xuất -->
+                <LinearLayout
                     android:id="@+id/btnLogout"
-                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
-                    android:text="🚪  Đăng xuất"
-                    android:textColor="@color/error"
-                    android:gravity="start|center_vertical"
-                    android:paddingStart="12dp" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/illu_admin_nav"
+                        android:contentDescription="Đăng xuất" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:text="Đăng xuất"
+                        android:textColor="@color/error"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="›"
+                        android:textColor="@color/error"
+                        android:textSize="20sp" />
+                </LinearLayout>
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>

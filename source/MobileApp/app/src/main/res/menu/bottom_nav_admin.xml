@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- bottom_nav_admin.xml — menu dành cho ADMIN role -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/adminHomeFragment"
+        android:icon="@drawable/illu_admin_nav"
+        android:title="Tổng quan" />
+    <item
+        android:id="@+id/adminUsersFragment"
+        android:icon="@drawable/illu_users_nav"
+        android:title="Người dùng" />
+    <item
+        android:id="@+id/adminServicesFragment"
+        android:icon="@drawable/illu_services_nav"
+        android:title="Dịch vụ" />
+    <item
+        android:id="@+id/adminAppointmentsFragment"
+        android:icon="@drawable/illu_calendar_nav"
+        android:title="Lịch hẹn" />
+    <item
+        android:id="@+id/adminSecurityFragment"
+        android:icon="@drawable/illu_record_nav"
+        android:title="Bảo mật" />
+</menu>

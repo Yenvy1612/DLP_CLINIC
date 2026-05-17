@@ -43,6 +43,7 @@ class LoginActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
+
                 val res = api.login(LoginRequest(email, password))
                 if (res.isSuccessful && res.body() != null) {
                     val auth = res.body()!!

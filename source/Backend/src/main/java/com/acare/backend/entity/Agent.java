@@ -7,6 +7,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "agents")
 @Getter
 @Setter
 @Builder
@@ -42,6 +43,7 @@ public class Agent {
     private Boolean trusted;
 
     // ONLINE / OFFLINE / BLOCKED
+    @Enumerated(EnumType.STRING)
     private AgentStatus status;
 
     private LocalDateTime registeredAt;

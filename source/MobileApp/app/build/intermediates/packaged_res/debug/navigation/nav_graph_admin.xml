@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- nav_graph_admin.xml — navigation graph cho ADMIN role -->
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph_admin"
+    app:startDestination="@id/adminHomeFragment">
+
+    <fragment
+        android:id="@+id/adminHomeFragment"
+        android:name="com.acare.clinic.ui.admin.AdminHomeFragment"
+        android:label="Tổng quan" />
+
+    <fragment
+        android:id="@+id/adminUsersFragment"
+        android:name="com.acare.clinic.ui.admin.AdminUsersFragment"
+        android:label="Người dùng" />
+
+    <fragment
+        android:id="@+id/adminServicesFragment"
+        android:name="com.acare.clinic.ui.admin.AdminServicesFragment"
+        android:label="Dịch vụ" />
+
+    <fragment
+        android:id="@+id/adminAppointmentsFragment"
+        android:name="com.acare.clinic.ui.admin.AdminAppointmentsFragment"
+        android:label="Lịch hẹn" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.acare.clinic.ui.profile.ProfileFragment"
+        android:label="Hồ sơ cá nhân" />
+
+    <fragment
+        android:id="@+id/adminSecurityFragment"
+        android:name="com.acare.clinic.ui.admin.AdminSecurityFragment"
+        android:label="Bảo mật" />
+
+</navigation>

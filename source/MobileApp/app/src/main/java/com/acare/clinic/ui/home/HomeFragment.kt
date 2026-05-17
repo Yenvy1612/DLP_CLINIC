@@ -45,6 +45,9 @@ class HomeFragment : Fragment() {
         binding.btnBookNow.setOnClickListener {
             findNavController().navigate(R.id.appointmentFragment)
         }
+        binding.btnPatientProfile.setOnClickListener {
+            findNavController().navigate(R.id.profileFragment)
+        }
     }
 
     private fun setupHeader() {
@@ -79,7 +82,7 @@ class HomeFragment : Fragment() {
         val userId = SessionManager.getUserId()
         if (userId < 0) return
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val res = api.getPendingAppointments(userId)
                 if (res.isSuccessful) {

@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.kapt'
 }
 
 android {
@@ -18,7 +19,7 @@ android {
         // [1] Emulator Android (AVD) — trỏ về localhost của máy host
         // buildConfigField "String", "BASE_URL", '"http://10.0.2.2:8080/"'
         // [2] Điện thoại thật cùng WiFi/LAN ← ĐANG DÙNG
-        buildConfigField "String", "BASE_URL", '"http://[IP_ADDRESS]/"'
+        buildConfigField "String", "BASE_URL", '"http://192.168.1.3:8080/"'
         // [3] Điện thoại qua Radmin VPN
         // buildConfigField "String", "BASE_URL", '"http://26.50.63.117:8080/"'
     }
@@ -88,7 +89,16 @@ dependencies {
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
 
     // ===================================================
-    // PLACEHOLDER: Agent SDK sẽ được thêm tại đây
-    // implementation 'com.your.agent:agent-sdk:1.0.0'
+    // Agent SDK — Room, DataStore, WorkManager
     // ===================================================
+    def room_version = "2.6.1"
+    implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+
+    // DataStore Preferences (AgentPreferences)
+    implementation "androidx.datastore:datastore-preferences:1.0.0"
+
+    // WorkManager (HeartbeatScheduler)
+    implementation "androidx.work:work-runtime-ktx:2.9.0"
 }

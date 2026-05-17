@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- bottom_nav_patient.xml — rename từ bottom_nav_menu.xml cho rõ ràng -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/homeFragment"
-        android:icon="@drawable/ic_home"
+        android:icon="@drawable/illu_home_nav"
         android:title="Trang chủ" />
     <item
         android:id="@+id/appointmentFragment"
-        android:icon="@drawable/ic_calendar"
+        android:icon="@drawable/illu_calendar_nav"
         android:title="Lịch hẹn" />
     <item
         android:id="@+id/recordFragment"
-        android:icon="@drawable/ic_medical_record"
+        android:icon="@drawable/illu_record_nav"
         android:title="Hồ sơ" />
-    <item
-        android:id="@+id/profileFragment"
-        android:icon="@drawable/ic_person"
-        android:title="Tôi" />
 </menu>

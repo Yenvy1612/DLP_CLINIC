@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- illu_users_nav.xml — 2D SVG: nhóm người dùng (Admin) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="28dp"
+    android:height="28dp"
+    android:viewportWidth="28"
+    android:viewportHeight="28">
+
+    <!-- Avatar người sau (trái) -->
+    <path
+        android:pathData="M9,8 A3.5,3.5 0 1,1 9,15 A3.5,3.5 0 1,1 9,8 Z"
+        android:fillColor="#90CAF9" />
+    <path
+        android:pathData="M2,25 Q2,19 9,19 Q11,19 13,20 Q9,21 9,25 Z"
+        android:fillColor="#90CAF9" />
+
+    <!-- Avatar người trước (phải) -->
+    <path
+        android:pathData="M19,8 A3.5,3.5 0 1,1 19,15 A3.5,3.5 0 1,1 19,8 Z"
+        android:fillColor="#2563EB" />
+    <path
+        android:pathData="M26,25 Q26,19 19,19 Q17,19 15,20 Q19,21 19,25 Z"
+        android:fillColor="#2563EB" />
+
+    <!-- Avatar người giữa (chính) -->
+    <path
+        android:pathData="M14,7 A4,4 0 1,1 14,15 A4,4 0 1,1 14,7 Z"
+        android:fillColor="#1E3A5F" />
+    <path
+        android:pathData="M6,26 Q6,19 14,19 Q22,19 22,26 Z"
+        android:fillColor="#1E3A5F" />
+</vector>

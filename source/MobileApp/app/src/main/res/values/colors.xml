@@ -4,6 +4,8 @@
     <color name="brand_navy">#0F172A</color>
     <color name="brand_navy_light">#1E293B</color>
     <color name="brand_navy_medium">#334155</color>
+    <!-- Brand Blue (alias cho primary blue) -->
+    <color name="brand_blue">#2563EB</color>
 
     <!-- Sky / Primary accent (từ web FE sky-500) -->
     <color name="primary">#0EA5E9</color>

@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    nav_graph.xml — Navigation graph mặc định (PATIENT role).
+    MainActivity sẽ load nav_graph_patient/doctor/admin tương ứng với role.
+    File này giữ để tương thích với activity_main.xml NavHostFragment.
+-->
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"

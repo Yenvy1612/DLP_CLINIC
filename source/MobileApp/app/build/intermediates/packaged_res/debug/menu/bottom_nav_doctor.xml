@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- bottom_nav_doctor.xml — menu dành cho DOCTOR role -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/doctorHomeFragment"
+        android:icon="@drawable/illu_home_nav"
+        android:title="Trang chủ" />
+    <item
+        android:id="@+id/doctorScheduleFragment"
+        android:icon="@drawable/illu_schedule_nav"
+        android:title="Lịch khám" />
+    <item
+        android:id="@+id/doctorStatisticFragment"
+        android:icon="@drawable/illu_statistic_nav"
+        android:title="Thống kê" />
+</menu>

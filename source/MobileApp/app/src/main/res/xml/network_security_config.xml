@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    network_security_config.xml
+    Cho phép HTTP cleartext đến IP LAN và localhost (emulator).
+    Production build nên dùng HTTPS và xóa phần cleartextTrafficPermitted.
+-->
+<network-security-config>
+    <!-- Chứng chỉ hệ thống mặc định cho tất cả domain (HTTPS) -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- ── Phát triển: cho phép HTTP đến IP LAN & localhost ── -->
+
+    <!-- Emulator Android → localhost của máy host -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">10.0.2.2</domain>
+    </domain-config>
+
+    <!-- Điện thoại thật cùng WiFi / Radmin VPN (thêm IP thực tế vào đây) -->
+    <!-- Ví dụ: 192.168.1.x, 26.x.x.x -->
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- TODO: Thay [IP_ADDRESS] bằng IP thực của máy chạy Spring Boot -->
+        <domain includeSubdomains="false">192.168.1.3</domain>
+    </domain-config>
+
+    <!-- Cho phép toàn bộ traffic cleartext trong debug build -->
+    <!-- Sẽ được loại bỏ trong release build -->
+</network-security-config>

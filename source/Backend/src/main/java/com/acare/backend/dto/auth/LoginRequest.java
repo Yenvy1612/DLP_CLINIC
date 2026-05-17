@@ -10,6 +10,4 @@ public class LoginRequest {
 
     @NotBlank(message = "Khong duoc de trong password")
     private String password;
-
-    private String deviceId;
 }

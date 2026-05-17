@@ -4,6 +4,7 @@ package com.acare.clinic.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -38,6 +39,9 @@ public final class FragmentHomeBinding implements ViewBinding {
   public final MaterialButton btnBookNow;
 
   @NonNull
+  public final FrameLayout btnPatientProfile;
+
+  @NonNull
   public final LinearLayout emptyState;
 
   @NonNull
@@ -58,15 +62,16 @@ public final class FragmentHomeBinding implements ViewBinding {
   private FragmentHomeBinding(@NonNull NestedScrollView rootView, @NonNull LinearLayout actionBook,
       @NonNull LinearLayout actionDoctors, @NonNull LinearLayout actionRecords,
       @NonNull LinearLayout actionServices, @NonNull MaterialButton btnBookNow,
-      @NonNull LinearLayout emptyState, @NonNull RecyclerView rvUpcomingAppointments,
-      @NonNull TextView tvAvatarInitial, @NonNull TextView tvGreeting, @NonNull TextView tvUserName,
-      @NonNull TextView tvViewAll) {
+      @NonNull FrameLayout btnPatientProfile, @NonNull LinearLayout emptyState,
+      @NonNull RecyclerView rvUpcomingAppointments, @NonNull TextView tvAvatarInitial,
+      @NonNull TextView tvGreeting, @NonNull TextView tvUserName, @NonNull TextView tvViewAll) {
     this.rootView = rootView;
     this.actionBook = actionBook;
     this.actionDoctors = actionDoctors;
     this.actionRecords = actionRecords;
     this.actionServices = actionServices;
     this.btnBookNow = btnBookNow;
+    this.btnPatientProfile = btnPatientProfile;
     this.emptyState = emptyState;
     this.rvUpcomingAppointments = rvUpcomingAppointments;
     this.tvAvatarInitial = tvAvatarInitial;
@@ -132,6 +137,12 @@ public final class FragmentHomeBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.btnPatientProfile;
+      FrameLayout btnPatientProfile = ViewBindings.findChildViewById(rootView, id);
+      if (btnPatientProfile == null) {
+        break missingId;
+      }
+
       id = R.id.emptyState;
       LinearLayout emptyState = ViewBindings.findChildViewById(rootView, id);
       if (emptyState == null) {
@@ -169,8 +180,8 @@ public final class FragmentHomeBinding implements ViewBinding {
       }
 
       return new FragmentHomeBinding((NestedScrollView) rootView, actionBook, actionDoctors,
-          actionRecords, actionServices, btnBookNow, emptyState, rvUpcomingAppointments,
-          tvAvatarInitial, tvGreeting, tvUserName, tvViewAll);
+          actionRecords, actionServices, btnBookNow, btnPatientProfile, emptyState,
+          rvUpcomingAppointments, tvAvatarInitial, tvGreeting, tvUserName, tvViewAll);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

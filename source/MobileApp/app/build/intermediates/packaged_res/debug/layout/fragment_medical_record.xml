@@ -51,11 +51,11 @@
         android:gravity="center"
         android:orientation="vertical"
         android:visibility="gone">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="🏥"
-            android:textSize="48sp" />
+        <ImageView
+            android:layout_width="140dp"
+            android:layout_height="100dp"
+            android:src="@drawable/illu_empty_record"
+            android:contentDescription="Không có hồ sơ" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

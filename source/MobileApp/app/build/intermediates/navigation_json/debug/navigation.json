@@ -3,5 +3,20 @@
     "name": "nav_graph",
     "navigationXmlIds": [],
     "deepLinks": []
+  },
+  {
+    "name": "nav_graph_admin",
+    "navigationXmlIds": [],
+    "deepLinks": []
+  },
+  {
+    "name": "nav_graph_doctor",
+    "navigationXmlIds": [],
+    "deepLinks": []
+  },
+  {
+    "name": "nav_graph_patient",
+    "navigationXmlIds": [],
+    "deepLinks": []
   }
 ]
