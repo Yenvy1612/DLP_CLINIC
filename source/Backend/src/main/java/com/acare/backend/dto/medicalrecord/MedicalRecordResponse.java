@@ -25,6 +25,17 @@ public class MedicalRecordResponse {
     private String treatmentPlan;
     private String clinicalNotes;
     private LocalDate followUpDate;
+    private String doctorName;
+    private String patientFullName;
+    private String patientEmail;
+    private String patientPhone;
+    private String patientIdNumber;
+    private String bloodType;
+    private String insuranceNumber;
+    private String allergies;
+    private String chronicConditions;
+    private String emergencyContactName;
+    private String emergencyContactPhone;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

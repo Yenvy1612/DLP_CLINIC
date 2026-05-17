@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.acare.backend.dto.ApiResponse;
 import com.acare.backend.dto.appointment.AppointmentAvailabilityOption;
 import com.acare.backend.dto.appointment.AppointmentCreateRequest;
+import com.acare.backend.dto.appointment.AppointmentResponse;
 import com.acare.backend.entity.Appointment;
 import com.acare.backend.entity.DoctorProfile;
 import com.acare.backend.entity.Specialty;
@@ -56,6 +57,28 @@ public class AppointmentService {
     private final DoctorProfileRepository doctorProfileRepository;
     private final SpecialtyService specialtyService;
     private final ActivityLogService activityLogService;
+
+    public AppointmentResponse toResponse(Appointment appointment) {
+        AppointmentResponse response = AppointmentResponse.from(appointment);
+        if (response == null) {
+            return null;
+        }
+
+        User patient = appointment.getPatientId() != null
+                ? userRepository.findById(appointment.getPatientId()).orElse(null)
+                : null;
+        User doctor = appointment.getDoctorId() != null
+                ? userRepository.findById(appointment.getDoctorId()).orElse(null)
+                : null;
+        com.acare.backend.entity.Service service = appointment.getServiceId() != null
+                ? serviceRepository.findById(appointment.getServiceId()).orElse(null)
+                : null;
+
+        response.setPatientName(patient != null ? patient.getFullName() : null);
+        response.setDoctorName(doctor != null ? doctor.getFullName() : null);
+        response.setServiceName(service != null ? service.getName() : null);
+        return response;
+    }
 
     @Transactional
     public ApiResponse<Appointment> createAppointment(AppointmentCreateRequest request) {

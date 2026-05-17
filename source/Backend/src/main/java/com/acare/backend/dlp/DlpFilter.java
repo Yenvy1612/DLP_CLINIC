@@ -37,6 +37,10 @@ public class DlpFilter extends OncePerRequestFilter {
             "/api/auth/register",
             "/api/auth/refresh",
             "/api/auth/logout",
+            "/api/agents/register",
+            "/api/agents/policy",
+            "/api/agents/",
+            "/api/agent-events",
             "/error",
             "/actuator"
     );
@@ -75,14 +79,19 @@ public class DlpFilter extends OncePerRequestFilter {
                     log.warn("[DLP INPUT] Vi pham tai {} {} - Violations: {}",
                             method, path, inputResult.getViolations());
 
-                    saveDlpLog(request, "INPUT_SCAN", inputResult, true);
+                    boolean blocked = shouldBlockInput(inputResult);
+                    if (shouldPersistViolation("INPUT_SCAN", inputResult)) {
+                        saveDlpLog(request, "INPUT_SCAN", inputResult, blocked);
+                    }
 
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.setContentType("application/json;charset=UTF-8");
-                    response.getWriter().write(
-                            "{\"status\":403,\"message\":\"DLP: Phat hien du lieu nhay cam trong request. Yeu cau bi chan.\"}"
-                    );
-                    return;
+                    if (blocked) {
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.setContentType("application/json;charset=UTF-8");
+                        response.getWriter().write(
+                                "{\"status\":403,\"message\":\"DLP: Phat hien du lieu nhay cam trong request. Yeu cau bi chan.\"}"
+                        );
+                        return;
+                    }
                 }
             }
 
@@ -117,7 +126,9 @@ public class DlpFilter extends OncePerRequestFilter {
                 log.warn("[DLP OUTPUT] Vi pham tai {} {} - Violations: {}",
                         method, path, outputResult.getViolations());
 
-                saveDlpLog(request, "OUTPUT_SCAN", outputResult, false);
+                if (shouldPersistViolation("OUTPUT_SCAN", outputResult)) {
+                    saveDlpLog(request, "OUTPUT_SCAN", outputResult, false);
+                }
 
                 String maskedBody = dlpScannerService.mask(responseBody);
                 response.setContentType(contentType);
@@ -151,15 +162,18 @@ public class DlpFilter extends OncePerRequestFilter {
             Long userId = null;
             String username = null;
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth != null && auth.getPrincipal() instanceof Jwt jwt) {
-                username = jwt.getSubject();
-                Object userIdClaim = jwt.getClaim("user_id");
-                if (userIdClaim instanceof Number num) {
-                    userId = num.longValue();
+            if (auth != null) {
+                username = auth.getName();
+                if (auth.getPrincipal() instanceof Jwt jwt) {
+                    username = jwt.getSubject();
+                    Object userIdClaim = jwt.getClaim("user_id");
+                    if (userIdClaim instanceof Number num) {
+                        userId = num.longValue();
+                    }
                 }
             }
 
-            String snippet = result.getViolations().toString();
+            String snippet = dlpScannerService.mask(result.getViolations().toString());
             if (snippet.length() > 200) {
                 snippet = snippet.substring(0, 200) + "...";
             }
@@ -169,13 +183,19 @@ public class DlpFilter extends OncePerRequestFilter {
             DlpLog dlpLog = DlpLog.builder()
                     .userId(userId)
                     .username(username)
+                    .deviceId(resolveDeviceId(request))
+                    .sourceType(resolveSourceType(request))
+                    .platform(resolvePlatform(request))
+                    .eventType(action)
                     .action(action)
                     .endpoint(request.getRequestURI())
                     .httpMethod(request.getMethod())
                     .contentSnippet(snippet)
                     .violationType(result.getPrimaryViolationType())
                     .riskLevel(riskLevel)
+                    .severity(riskLevel.name())
                     .blocked(blocked)
+                    .details(buildReason(action, request, result, blocked))
                     .clientIp(getClientIp(request))
                     .userAgent(request.getHeader("User-Agent"))
                     .build();
@@ -203,5 +223,64 @@ public class DlpFilter extends OncePerRequestFilter {
             return xForwardedFor.split(",")[0].trim();
         }
         return request.getRemoteAddr();
+    }
+
+    private boolean shouldBlockInput(DlpScanResult result) {
+        String primary = result.getPrimaryViolationType();
+        if (primary == null) return false;
+        String type = primary.toUpperCase();
+        return "CCCD_DETECTED".equals(type) || "SENSITIVE_WORD".equals(type);
+    }
+
+    private boolean shouldPersistViolation(String action, DlpScanResult result) {
+        String primary = result.getPrimaryViolationType();
+        if (primary == null) return false;
+        String type = primary.toUpperCase();
+
+        // Chi log cac vi pham nghiem trong dung nghia DLP.
+        if ("CCCD_DETECTED".equals(type) || "SENSITIVE_WORD".equals(type)) {
+            return true;
+        }
+
+        // EMAIL/PHONE duoc xem la thong tin thuong gap, khong log de tranh false-positive.
+        return false;
+    }
+
+    private String buildReason(String action, HttpServletRequest request, DlpScanResult result, boolean blocked) {
+        String type = result.getPrimaryViolationType() == null ? "UNKNOWN" : result.getPrimaryViolationType();
+        String humanType = switch (type) {
+            case "CCCD_DETECTED" -> "CCCD/ID";
+            case "SENSITIVE_WORD" -> "tu khoa nhay cam";
+            case "PHONE_DETECTED" -> "so dien thoai";
+            case "EMAIL_DETECTED" -> "email";
+            default -> "du lieu nhay cam";
+        };
+
+        String context = "INPUT_SCAN".equals(action) ? "dau vao" : "dau ra";
+        String decision = blocked ? "chan" : "canh bao";
+        return String.format("%s (%s) tai %s %s - %s",
+                humanType, context, request.getMethod(), request.getRequestURI(), decision);
+    }
+
+    private String resolvePlatform(HttpServletRequest request) {
+        String userAgent = request.getHeader("User-Agent");
+        if (userAgent == null) return "WEB";
+        String ua = userAgent.toLowerCase();
+        if (ua.contains("android") || ua.contains("okhttp")) return "ANDROID";
+        return "WEB";
+    }
+
+    private String resolveSourceType(HttpServletRequest request) {
+        String explicit = request.getHeader("X-Source-Type");
+        if (explicit != null && !explicit.isBlank()) {
+            return explicit.trim().toUpperCase();
+        }
+        return "ANDROID".equals(resolvePlatform(request)) ? "PHONE" : "WEB";
+    }
+
+    private String resolveDeviceId(HttpServletRequest request) {
+        String deviceId = request.getHeader("X-Device-Id");
+        if (deviceId == null || deviceId.isBlank()) return null;
+        return deviceId.trim();
     }
 }

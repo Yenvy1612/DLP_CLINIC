@@ -3,31 +3,43 @@ package com.acare.backend.service;
 
 import com.acare.backend.dto.agent.AgentEventRequest;
 import com.acare.backend.entity.DlpLog;
+import com.acare.backend.entity.enums.RiskLevel;
 import com.acare.backend.exception.ResourceNotFoundException;
-import com.acare.backend.repository.AgentRepository;
 import com.acare.backend.repository.DlpLogRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class AgentEventService {
 
-    private final AgentRepository agentRepository;
     private final DlpLogRepository dlpLogRepository;
+    private final AgentService agentService;
     private final ObjectMapper objectMapper;
 
     public void handleEvent(AgentEventRequest request) {
-        agentRepository.findByDeviceId(request.getDeviceId())
-                .orElseThrow(() -> new ResourceNotFoundException("Agent not found"));
+        if (request.getDeviceId() == null || request.getDeviceId().isBlank()) {
+            throw new ResourceNotFoundException("Agent deviceId is required");
+        }
 
         if (isDlpViolation(request)) {
-            saveDlpLog(request);
+            boolean blocked = shouldBlock(request);
+            saveDlpLog(request, blocked);
+            if (blocked) {
+                agentService.quarantineAgentAndRevokeSession(
+                        request.getDeviceId(),
+                        request.getUserId(),
+                        "Agent DLP violation: " + request.getViolationType()
+                );
+            }
         }
 
         // Nếu muốn log hành vi thường thì gọi ActivityLogService ở đây.
@@ -40,7 +52,7 @@ public class AgentEventService {
                 && !"NONE".equalsIgnoreCase(request.getViolationType());
     }
 
-    private void saveDlpLog(AgentEventRequest request) {
+    private void saveDlpLog(AgentEventRequest request, boolean blocked) {
         DlpLog log = DlpLog.builder()
                 .userId(request.getUserId())
                 .deviceId(request.getDeviceId())
@@ -50,11 +62,13 @@ public class AgentEventService {
                 .action(request.getAction())
                 .violationType(request.getViolationType())
                 .severity(defaultSeverity(request.getSeverity()))
+                .riskLevel(toRiskLevel(request.getSeverity()))
+                .blocked(blocked)
+                .endpoint("/api/agent-events")
+                .httpMethod("POST")
                 .contentSnippet(request.getContentSnippet())
                 .details(toJson(request.getDetails()))
-                .timestamp(request.getTimestamp() != null
-                        ? request.getTimestamp()
-                        : LocalDateTime.now())
+                .timestamp(parseTimestamp(request.getTimestamp()))
                 .build();
 
         dlpLogRepository.save(log);
@@ -84,6 +98,26 @@ public class AgentEventService {
         return severity;
     }
 
+    private RiskLevel toRiskLevel(String severity) {
+        if (severity == null || severity.isBlank()) return RiskLevel.LOW;
+        return switch (severity.trim().toUpperCase()) {
+            case "CRITICAL" -> RiskLevel.CRITICAL;
+            case "HIGH" -> RiskLevel.HIGH;
+            case "MEDIUM" -> RiskLevel.MEDIUM;
+            default -> RiskLevel.LOW;
+        };
+    }
+
+    private boolean shouldBlock(AgentEventRequest request) {
+        String sev = defaultSeverity(request.getSeverity()).toUpperCase();
+        if ("HIGH".equals(sev) || "CRITICAL".equals(sev)) return true;
+
+        String violation = request.getViolationType();
+        if (violation == null) return false;
+        String v = violation.toUpperCase();
+        return v.contains("CCCD") || v.contains("SENSITIVE") || v.contains("HIV");
+    }
+
     private String toJson(Map<String, Object> details) {
         if (details == null) {
             return "{}";
@@ -94,5 +128,22 @@ public class AgentEventService {
         } catch (JsonProcessingException e) {
             return details.toString();
         }
+    }
+
+    private LocalDateTime parseTimestamp(String raw) {
+        if (raw == null || raw.isBlank()) return LocalDateTime.now();
+        try {
+            return OffsetDateTime.parse(raw).toLocalDateTime();
+        } catch (Exception ignored) {
+        }
+        try {
+            return Instant.parse(raw).atZone(ZoneId.systemDefault()).toLocalDateTime();
+        } catch (Exception ignored) {
+        }
+        try {
+            return LocalDateTime.parse(raw);
+        } catch (Exception ignored) {
+        }
+        return LocalDateTime.now();
     }
 }

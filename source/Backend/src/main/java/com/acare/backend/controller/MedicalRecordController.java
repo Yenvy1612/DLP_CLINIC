@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.acare.backend.dlp.DlpProtected;
 import com.acare.backend.dto.medicalrecord.MedicalRecordRequest;
 import com.acare.backend.dto.medicalrecord.MedicalRecordResponse;
 import com.acare.backend.dto.medicalrecord.MedicalRecordServiceItemRequest;
@@ -30,37 +31,40 @@ public class MedicalRecordController {
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     @PostMapping
     public ResponseEntity<MedicalRecordResponse> createRecord(@RequestBody MedicalRecordRequest request) {
-        return ResponseEntity.ok(MedicalRecordResponse.from(medicalRecordService.createMedicalRecord(request.toEntity())));
+        return ResponseEntity.ok(medicalRecordService.toResponse(medicalRecordService.createMedicalRecord(request.toEntity())));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     @PutMapping("/{id}")
     public ResponseEntity<MedicalRecordResponse> updateRecord(@PathVariable Long id, @RequestBody MedicalRecordRequest request) {
-        return ResponseEntity.ok(MedicalRecordResponse.from(medicalRecordService.updateMedicalRecord(id, request.toEntity())));
+        return ResponseEntity.ok(medicalRecordService.toResponse(medicalRecordService.updateMedicalRecord(id, request.toEntity())));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
+    @DlpProtected(action = "DOWNLOAD")
     @GetMapping("/{id}")
     public ResponseEntity<MedicalRecordResponse> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(MedicalRecordResponse.from(medicalRecordService.getById(id)));
+        return ResponseEntity.ok(medicalRecordService.toResponse(medicalRecordService.getById(id)));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
+    @DlpProtected(action = "DOWNLOAD")
     @GetMapping("/appointment/{appointmentId}")
     public ResponseEntity<MedicalRecordResponse> getByAppointmentId(@PathVariable Long appointmentId) {
-        return ResponseEntity.ok(MedicalRecordResponse.from(medicalRecordService.getByAppointmentId(appointmentId)));
+        return ResponseEntity.ok(medicalRecordService.toResponse(medicalRecordService.getByAppointmentId(appointmentId)));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
+    @DlpProtected(action = "DOWNLOAD")
     @GetMapping("/patient/{patientId}")
     public ResponseEntity<List<MedicalRecordResponse>> getByPatientId(@PathVariable Long patientId) {
-        return ResponseEntity.ok(medicalRecordService.getByPatientId(patientId).stream().map(MedicalRecordResponse::from).toList());
+        return ResponseEntity.ok(medicalRecordService.getByPatientId(patientId).stream().map(medicalRecordService::toResponse).toList());
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     @GetMapping("/doctor/{doctorId}")
     public ResponseEntity<List<MedicalRecordResponse>> getByDoctorId(@PathVariable Long doctorId) {
-        return ResponseEntity.ok(medicalRecordService.getByDoctorId(doctorId).stream().map(MedicalRecordResponse::from).toList());
+        return ResponseEntity.ok(medicalRecordService.getByDoctorId(doctorId).stream().map(medicalRecordService::toResponse).toList());
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")

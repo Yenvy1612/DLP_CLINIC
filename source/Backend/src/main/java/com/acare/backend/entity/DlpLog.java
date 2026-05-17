@@ -34,6 +34,8 @@ public class DlpLog {
 
     private String deviceId;
     private String sourceType;
+    private String platform;
+    private String eventType;
 
     @Column(name = "user_id")
     private Long userId;
@@ -56,6 +58,15 @@ public class DlpLog {
     @Column(name = "violation_type", length = 80)
     private String violationType;
 
+    @Column(name = "severity", length = 20)
+    private String severity;
+
+    @Column(name = "details", columnDefinition = "TEXT")
+    private String details;
+
+    @Column(name = "timestamp")
+    private LocalDateTime timestamp;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "risk_level", length = 20)
     @Builder.Default
@@ -77,5 +88,11 @@ public class DlpLog {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        if (this.timestamp == null) {
+            this.timestamp = this.createdAt;
+        }
+        if (this.severity == null && this.riskLevel != null) {
+            this.severity = this.riskLevel.name();
+        }
     }
 }

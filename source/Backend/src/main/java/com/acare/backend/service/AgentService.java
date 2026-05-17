@@ -8,17 +8,22 @@ import com.acare.backend.entity.Agent;
 import com.acare.backend.entity.enums.AgentStatus;
 import com.acare.backend.exception.ResourceNotFoundException;
 import com.acare.backend.repository.AgentRepository;
+import com.acare.backend.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AgentService {
 
     private final AgentRepository agentRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public Agent register(AgentRegisterRequest request, String ipAddress) {
         return agentRepository.findByDeviceId(request.getDeviceId())
@@ -57,7 +62,16 @@ public class AgentService {
 
     public void heartbeat(String deviceId, AgentHeartbeatRequest request) {
         Agent agent = agentRepository.findByDeviceId(deviceId)
-                .orElseThrow(() -> new ResourceNotFoundException("Agent not found"));
+                .orElseGet(() -> agentRepository.save(
+                        Agent.builder()
+                                .deviceId(deviceId)
+                                .platform("ANDROID")
+                                .trusted(true)
+                                .status(AgentStatus.ONLINE)
+                                .registeredAt(LocalDateTime.now())
+                                .lastHeartbeat(LocalDateTime.now())
+                                .build()
+                ));
 
         agent.setLastHeartbeat(LocalDateTime.now());
         agent.setStatus(request != null && request.getStatus() != null
@@ -104,6 +118,22 @@ public class AgentService {
                         .message("Agent found")
                         .build())
                 .toList();
+    }
+
+    @Transactional
+    public void quarantineAgentAndRevokeSession(String deviceId, Long userId, String reason) {
+        agentRepository.findByDeviceId(deviceId).ifPresent(agent -> {
+            agent.setTrusted(false);
+            agent.setStatus(AgentStatus.BLOCKED);
+            agent.setLastHeartbeat(LocalDateTime.now());
+            agentRepository.save(agent);
+        });
+
+        if (userId != null) {
+            refreshTokenRepository.revokeAllByUserId(userId, LocalDateTime.now());
+        }
+
+        log.warn("[AGENT] Quarantined device={} userId={} reason={}", deviceId, userId, reason);
     }
 
     private String defaultPlatform(String platform) {

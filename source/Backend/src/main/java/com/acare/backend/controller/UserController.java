@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +38,7 @@ public class UserController {
 
     private final UserService userService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<UserResponse>> getUsers(
             @RequestParam(required = false) String fullName,
@@ -64,6 +66,7 @@ public class UserController {
         return ResponseEntity.ok(responses);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(UserResponse.from(userService.getUserById(id)));
@@ -87,6 +90,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getDoctors(pageable));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/patient")
     public ResponseEntity<List<UserResponse>> getPatients() {
         return ResponseEntity.ok(userService.getPatients().stream().map(UserResponse::from).toList());

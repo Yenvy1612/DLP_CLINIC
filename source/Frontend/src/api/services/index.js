@@ -3,6 +3,7 @@ export { adminDashboardService } from "./adminDashboardService";
 export { appointmentService } from "./appointmentService";
 export { authService } from "./authService";
 export { geminiService } from "./geminiService";
+export { medicalRecordService } from "./medicalRecordService";
 export * as dlpService from "./dlpService";
 export { serviceService } from "./serviceService";
 export { specialtyService } from "./specialtyService";

@@ -24,7 +24,8 @@ public class DlpLogController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
+        // Show newest ingested logs first so freshly synced mobile events are visible immediately.
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<DlpLog> logs = dlpLogRepository.findAll(pageable);
         return ApiResponse.ok("DLP Logs retrieved successfully", logs);
     }

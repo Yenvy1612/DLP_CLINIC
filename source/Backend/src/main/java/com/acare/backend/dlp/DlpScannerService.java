@@ -3,6 +3,7 @@ package com.acare.backend.dlp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.text.Normalizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,9 +70,9 @@ public class DlpScannerService {
 
         // --- Bước 2: Quét từ khóa nhạy cảm ---
         // Dùng case-insensitive để bắt cả "hiv", "HIV", "Hiv"
-        String contentLower = content.toLowerCase();
+        String normalizedContent = normalizeForMatch(content);
         for (String keyword : RegexPattern.SENSITIVE_WORDS) {
-            if (contentLower.contains(keyword.toLowerCase())) {
+            if (normalizedContent.contains(normalizeForMatch(keyword))) {
                 violations.add("SENSITIVE_WORD: " + keyword);
 
                 if (primaryType == null) {
@@ -143,5 +144,10 @@ public class DlpScannerService {
         });
 
         return masked;
+    }
+
+    private String normalizeForMatch(String input) {
+        String normalized = Normalizer.normalize(input, Normalizer.Form.NFD);
+        return normalized.replaceAll("\\p{M}+", "").toLowerCase();
     }
 }

@@ -18,8 +18,11 @@ public class AppointmentResponse {
     private Long id;
     private String appointmentCode;
     private Long patientId;
+    private String patientName;
     private Long doctorId;
+    private String doctorName;
     private Long serviceId;
+    private String serviceName;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String status;
@@ -39,8 +42,11 @@ public class AppointmentResponse {
                 .id(appointment.getId())
                 .appointmentCode(appointment.getAppointmentCode())
                 .patientId(appointment.getPatientId())
+                .patientName(null)
                 .doctorId(appointment.getDoctorId())
+                .doctorName(null)
                 .serviceId(appointment.getServiceId())
+                .serviceName(null)
                 .startTime(appointment.getStartTime())
                 .endTime(appointment.getEndTime())
                 .status(appointmentStatus != null ? appointmentStatus.name() : null)

@@ -6,9 +6,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.acare.backend.dto.medicalrecord.MedicalRecordResponse;
 import com.acare.backend.entity.Appointment;
 import com.acare.backend.entity.MedicalRecord;
 import com.acare.backend.entity.MedicalRecordServiceItem;
+import com.acare.backend.entity.PatientProfile;
 import com.acare.backend.entity.User;
 import com.acare.backend.entity.enums.UserRole;
 import com.acare.backend.exception.BadRequestException;
@@ -16,6 +18,7 @@ import com.acare.backend.exception.ResourceNotFoundException;
 import com.acare.backend.repository.AppointmentRepository;
 import com.acare.backend.repository.MedicalRecordRepository;
 import com.acare.backend.repository.MedicalRecordServiceRepository;
+import com.acare.backend.repository.PatientProfileRepository;
 import com.acare.backend.repository.ServiceRepository;
 import com.acare.backend.repository.UserRepository;
 
@@ -29,6 +32,7 @@ public class MedicalRecordService {
     private final MedicalRecordServiceRepository medicalRecordServiceRepository;
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;
+    private final PatientProfileRepository patientProfileRepository;
     private final ServiceRepository serviceRepository;
     private final ActivityLogService activityLogService;
 
@@ -90,6 +94,32 @@ public class MedicalRecordService {
 
     public List<MedicalRecordServiceItem> getServicesByRecordId(Long medicalRecordId) {
         return medicalRecordServiceRepository.findByMedicalRecordId(medicalRecordId);
+    }
+
+    public MedicalRecordResponse toResponse(MedicalRecord record) {
+        MedicalRecordResponse response = MedicalRecordResponse.from(record);
+        if (response == null) return null;
+
+        User doctor = userRepository.findById(record.getDoctorId()).orElse(null);
+        response.setDoctorName(doctor != null ? doctor.getFullName() : null);
+
+        User patient = userRepository.findById(record.getPatientId()).orElse(null);
+        PatientProfile profile = patientProfileRepository.findByUserId(record.getPatientId()).orElse(null);
+
+        response.setPatientFullName(patient != null ? patient.getFullName() : null);
+        response.setPatientEmail(patient != null ? patient.getEmail() : null);
+        response.setPatientPhone(patient != null ? patient.getPhone() : null);
+        response.setPatientIdNumber(patient != null ? patient.getIdNumber() : null);
+
+        if (profile != null) {
+            response.setBloodType(profile.getBloodType());
+            response.setInsuranceNumber(profile.getInsuranceNumber());
+            response.setAllergies(profile.getAllergies());
+            response.setChronicConditions(profile.getChronicConditions());
+            response.setEmergencyContactName(profile.getEmergencyContactName());
+            response.setEmergencyContactPhone(profile.getEmergencyContactPhone());
+        }
+        return response;
     }
 
     private void validateRecordActors(Long patientId, Long doctorId) {

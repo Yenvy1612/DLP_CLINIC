@@ -2,7 +2,6 @@ package com.acare.backend.dto.agent;
 
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 @Getter
@@ -37,5 +36,5 @@ public class AgentEventRequest {
 
     private Map<String, Object> details;
 
-    private LocalDateTime timestamp;
+    private String timestamp;
 }

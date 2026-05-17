@@ -32,7 +32,7 @@ public class AgentPolicyService {
                                 .severity("MEDIUM")
                                 .build()
                 ))
-                .keywords(List.of("HIV", "Ung thư", "Tuyệt mật"))
+                .keywords(List.of("HIV", "Ung thu", "Tuyet mat", "AIDS"))
                 .settings(Map.of(
                         "scanForm", true,
                         "scanCopy", true,
@@ -43,3 +43,4 @@ public class AgentPolicyService {
                 .build();
     }
 }
+
