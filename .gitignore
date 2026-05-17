@@ -1,1 +1,4 @@
 secrets.json
+.gradle-local/
+.gradle/
+build/
