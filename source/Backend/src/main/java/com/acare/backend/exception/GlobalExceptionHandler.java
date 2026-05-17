@@ -40,6 +40,17 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.fail(400, message, null));
     }
 
+    /**
+     * Xử lý SecurityException từ DLP Rule Engine.
+     * Khi RuleEngineService phát hiện hành vi bất thường (ngoài giờ, spam, vượt limit)
+     * → throw SecurityException → trả 403 Forbidden cho client.
+     */
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<ApiResponse<Object>> handleSecurityException(SecurityException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.fail(403, ex.getMessage(), null));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGeneric(Exception ex) {
         ex.printStackTrace(); // Print to console for debugging

@@ -28,11 +28,13 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.util.WebUtils;
 
+import com.acare.backend.dlp.DlpFilter;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.util.Base64;
 
@@ -45,6 +47,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
     private final AppSecurityProperties props;
+    private final DlpFilter dlpFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -61,6 +64,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/activities/recent/user/**").hasAnyRole("ADMIN", "DOCTOR", "PATIENT")
                         .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole("ADMIN", "DOCTOR", "PATIENT")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/dlp/**").hasRole("ADMIN")     // DLP Dashboard: chỉ ADMIN
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
                         .requestMatchers("/api/appointments/**").hasAnyRole("ADMIN", "DOCTOR", "PATIENT")
                         .requestMatchers("/api/medical-records/**").hasAnyRole("ADMIN", "DOCTOR", "PATIENT")
@@ -68,7 +72,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .bearerTokenResolver(bearerTokenResolver())
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
+                // Đăng ký DLP Filter: chạy SAU khi JWT đã xác thực + phân quyền
+                // Thứ tự: JWT Auth → Authorization → DLP Filter → Controller
+                .addFilterAfter(dlpFilter, AuthorizationFilter.class);
         return http.build();
     }
 

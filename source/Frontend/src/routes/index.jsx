@@ -25,6 +25,7 @@ import AddUser from "../pages/admin/user-management/AddUser";
 import AdminShowService from "../pages/admin/service-management/ShowService";
 import AdminEditService from "../pages/admin/service-management/UpdateService";
 import AddService from "../pages/admin/service-management/AddService";
+import DlpDashboard from "../pages/admin/dlp/DlpDashboard";  // DLP Dashboard
 import About from "../pages/About";
 import Instruction from "../pages/Instruction";
 import FAQ from "../pages/FAQ";
@@ -107,7 +108,8 @@ const router = createBrowserRouter([
                             { path: "services", element: <AdminServiceManagement /> },
                             { path: "statistics", element: <AdminStatistics /> },
                             { path: "edit-service/:id", element: <AdminEditService /> },
-                            { path: "add-service", element: <AddService /> }
+                            { path: "add-service", element: <AddService /> },
+                            { path: "dlp", element: <DlpDashboard /> },  // DLP Dashboard route
                         ]
                     }
                 ]
