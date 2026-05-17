@@ -13,4 +13,8 @@
         android:id="@+id/recordFragment"
         android:icon="@drawable/illu_record_nav"
         android:title="Hồ sơ" />
+    <item
+        android:id="@+id/servicesFragment"
+        android:icon="@drawable/illu_services_nav"
+        android:title="Dịch vụ" />
 </menu>

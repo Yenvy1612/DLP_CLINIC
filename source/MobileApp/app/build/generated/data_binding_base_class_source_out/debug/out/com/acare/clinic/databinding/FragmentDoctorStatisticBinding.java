@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.acare.clinic.R;
@@ -32,7 +33,19 @@ public final class FragmentDoctorStatisticBinding implements ViewBinding {
   public final ProgressBar progressBar;
 
   @NonNull
+  public final RecyclerView rvPatientRows;
+
+  @NonNull
   public final TextView tvCompletedMonth;
+
+  @NonNull
+  public final TextView tvPatientEmpty;
+
+  @NonNull
+  public final TextView tvPatientSectionRange;
+
+  @NonNull
+  public final TextView tvPatientSectionTitle;
 
   @NonNull
   public final TextView tvPendingAppointments;
@@ -48,14 +61,20 @@ public final class FragmentDoctorStatisticBinding implements ViewBinding {
 
   private FragmentDoctorStatisticBinding(@NonNull FrameLayout rootView,
       @NonNull MaterialButton btnRefresh, @NonNull NestedScrollView contentLayout,
-      @NonNull ProgressBar progressBar, @NonNull TextView tvCompletedMonth,
+      @NonNull ProgressBar progressBar, @NonNull RecyclerView rvPatientRows,
+      @NonNull TextView tvCompletedMonth, @NonNull TextView tvPatientEmpty,
+      @NonNull TextView tvPatientSectionRange, @NonNull TextView tvPatientSectionTitle,
       @NonNull TextView tvPendingAppointments, @NonNull TextView tvTodayAppointments,
       @NonNull TextView tvTotalAppointments, @NonNull TextView tvTotalPatients) {
     this.rootView = rootView;
     this.btnRefresh = btnRefresh;
     this.contentLayout = contentLayout;
     this.progressBar = progressBar;
+    this.rvPatientRows = rvPatientRows;
     this.tvCompletedMonth = tvCompletedMonth;
+    this.tvPatientEmpty = tvPatientEmpty;
+    this.tvPatientSectionRange = tvPatientSectionRange;
+    this.tvPatientSectionTitle = tvPatientSectionTitle;
     this.tvPendingAppointments = tvPendingAppointments;
     this.tvTodayAppointments = tvTodayAppointments;
     this.tvTotalAppointments = tvTotalAppointments;
@@ -107,9 +126,33 @@ public final class FragmentDoctorStatisticBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.rvPatientRows;
+      RecyclerView rvPatientRows = ViewBindings.findChildViewById(rootView, id);
+      if (rvPatientRows == null) {
+        break missingId;
+      }
+
       id = R.id.tvCompletedMonth;
       TextView tvCompletedMonth = ViewBindings.findChildViewById(rootView, id);
       if (tvCompletedMonth == null) {
+        break missingId;
+      }
+
+      id = R.id.tvPatientEmpty;
+      TextView tvPatientEmpty = ViewBindings.findChildViewById(rootView, id);
+      if (tvPatientEmpty == null) {
+        break missingId;
+      }
+
+      id = R.id.tvPatientSectionRange;
+      TextView tvPatientSectionRange = ViewBindings.findChildViewById(rootView, id);
+      if (tvPatientSectionRange == null) {
+        break missingId;
+      }
+
+      id = R.id.tvPatientSectionTitle;
+      TextView tvPatientSectionTitle = ViewBindings.findChildViewById(rootView, id);
+      if (tvPatientSectionTitle == null) {
         break missingId;
       }
 
@@ -138,8 +181,9 @@ public final class FragmentDoctorStatisticBinding implements ViewBinding {
       }
 
       return new FragmentDoctorStatisticBinding((FrameLayout) rootView, btnRefresh, contentLayout,
-          progressBar, tvCompletedMonth, tvPendingAppointments, tvTodayAppointments,
-          tvTotalAppointments, tvTotalPatients);
+          progressBar, rvPatientRows, tvCompletedMonth, tvPatientEmpty, tvPatientSectionRange,
+          tvPatientSectionTitle, tvPendingAppointments, tvTodayAppointments, tvTotalAppointments,
+          tvTotalPatients);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

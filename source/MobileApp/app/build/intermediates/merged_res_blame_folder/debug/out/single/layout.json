@@ -1,126 +1,138 @@
 [
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/dialog_edit_user.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/dialog_edit_user.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\activity_splash.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\activity_splash.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/fragment_admin_appointments.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/fragment_admin_appointments.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\item_appointment_card.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\item_appointment_card.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/fragment_home.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/fragment_home.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\fragment_home.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\fragment_home.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/fragment_doctor_statistic.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/fragment_doctor_statistic.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\item_medical_record.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\item_medical_record.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/item_service_card.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/item_service_card.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\fragment_admin_appointments.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\fragment_admin_appointments.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/item_time_slot.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/item_time_slot.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\fragment_doctor_home.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\fragment_doctor_home.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/activity_booking.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/activity_booking.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\item_doctor_patient_row.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\item_doctor_patient_row.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/dialog_change_password.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/dialog_change_password.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\dialog_add_service.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\dialog_add_service.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/fragment_profile.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/fragment_profile.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\dialog_change_password.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\dialog_change_password.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/fragment_admin_services.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/fragment_admin_services.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\dialog_add_user.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\dialog_add_user.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/fragment_medical_record.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/fragment_medical_record.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\fragment_admin_security.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\fragment_admin_security.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/item_doctor_appointment.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/item_doctor_appointment.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\activity_register.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\activity_register.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/activity_register.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/activity_register.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\item_service_card.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\item_service_card.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/item_doctor_card.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/item_doctor_card.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\activity_login.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\activity_login.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/dialog_add_user.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/dialog_add_user.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\activity_main.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\activity_main.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/fragment_doctor_schedule.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/fragment_doctor_schedule.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\item_doctor_card.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\item_doctor_card.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/activity_splash.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/activity_splash.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\item_time_slot.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\item_time_slot.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/item_dlp_log.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/item_dlp_log.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\activity_booking.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\activity_booking.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/fragment_doctor_home.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/fragment_doctor_home.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\fragment_admin_home.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\fragment_admin_home.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/item_admin_appointment.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/item_admin_appointment.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\fragment_profile.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\fragment_profile.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/dialog_add_service.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/dialog_add_service.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\dialog_edit_user.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\dialog_edit_user.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/activity_main.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/activity_main.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\item_dlp_log.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\item_dlp_log.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/item_appointment_card.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/item_appointment_card.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\fragment_admin_users.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\fragment_admin_users.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/fragment_admin_security.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/fragment_admin_security.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\item_doctor_appointment.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\item_doctor_appointment.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/fragment_appointment.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/fragment_appointment.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\fragment_doctor_statistic.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\fragment_doctor_statistic.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/activity_login.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/activity_login.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\fragment_patient_services.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\fragment_patient_services.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/fragment_admin_users.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/fragment_admin_users.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\item_user_card.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\item_user_card.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/item_user_card.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/item_user_card.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\fragment_admin_services.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\fragment_admin_services.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/fragment_admin_home.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/fragment_admin_home.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\fragment_medical_record.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\fragment_medical_record.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/item_medical_record.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/item_medical_record.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\item_admin_appointment.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\item_admin_appointment.xml"
     },
     {
-        "merged": "com.acare.clinic.app-mergeDebugResources-62:/layout/item_security_event.xml",
-        "source": "com.acare.clinic.app-main-65:/layout/item_security_event.xml"
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\item_security_event.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\item_security_event.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\fragment_appointment.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\fragment_appointment.xml"
+    },
+    {
+        "merged": "com.acare.clinic.app-mergeDebugResources-3:/layout/fragment_appointment.xml",
+        "source": "com.acare.clinic.app-main-6:/layout/fragment_appointment.xml"
+    },
+    {
+        "merged": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-mergeDebugResources-3:\\layout\\fragment_doctor_schedule.xml",
+        "source": "C:\\Users\\admin\\.gradle\\daemon\\8.14\\com.acare.clinic.app-main-6:\\layout\\fragment_doctor_schedule.xml"
     }
 ]

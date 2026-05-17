@@ -41,13 +41,21 @@ public class BehaviorTrackingFilter extends OncePerRequestFilter {
             "/favicon.ico"
     );
 
+    /** Các prefix nội bộ/dashboard để tránh tự tạo nhiễu khi admin mở màn hình log */
+    private static final Set<String> SKIP_PREFIXES = Set.of(
+            "/api/security",
+            "/api/dlp/logs",
+            "/api/agent-events"
+    );
+
     /** Ngưỡng risk score để tự động block request */
     private static final int BLOCK_THRESHOLD = 70;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String uri = request.getRequestURI();
-        return SKIP_PATHS.contains(uri);
+        if (SKIP_PATHS.contains(uri)) return true;
+        return SKIP_PREFIXES.stream().anyMatch(uri::startsWith);
     }
 
     @Override
@@ -66,6 +74,16 @@ public class BehaviorTrackingFilter extends OncePerRequestFilter {
         if (riskScore >= BLOCK_THRESHOLD) {
             log.warn("[BEHAVIOR_FILTER] Blocked request: userId={} ip={} uri={} score={}",
                     userId, ip, uri, riskScore);
+
+            // Ghi nhận hành động chặn ngay tại request hiện tại.
+            anomalyDetectionService.record(
+                    userId, ip, method, uri,
+                    "REQUEST_BLOCKED",
+                    riskScore >= 90 ? "CRITICAL" : "HIGH",
+                    "Request bị chặn tự động do vượt ngưỡng rủi ro",
+                    riskScore,
+                    riskScore >= 90 ? "TOKEN_REVOKED" : "BLOCKED"
+            );
 
             // Nếu CRITICAL → thu hồi token luôn
             if (riskScore >= 90 && userId != null) {

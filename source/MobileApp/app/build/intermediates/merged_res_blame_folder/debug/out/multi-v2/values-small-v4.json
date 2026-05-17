@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.acare.clinic.app-mergeDebugResources-61:/values-small-v4/values-small-v4.xml",
+            "outputFile": "com.acare.clinic.app-mergeDebugResources-2:/values-small-v4/values-small-v4.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Admin\\.gradle\\caches\\8.14\\transforms\\40c21d34b86f79bc33bc3758b5bf11b1\\transformed\\material-1.11.0\\res\\values-small-v4\\values-small-v4.xml",
+                    "source": "C:\\Users\\admin\\.gradle\\caches\\8.14\\transforms\\40c21d34b86f79bc33bc3758b5bf11b1\\transformed\\material-1.11.0\\res\\values-small-v4\\values-small-v4.xml",
                     "from": {
                         "startLines": "2,3,4,5",
                         "startColumns": "4,4,4,4",

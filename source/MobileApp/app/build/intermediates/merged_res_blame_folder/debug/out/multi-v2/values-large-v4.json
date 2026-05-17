@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.acare.clinic.app-mergeDebugResources-61:/values-large-v4/values-large-v4.xml",
+            "outputFile": "com.acare.clinic.app-mergeDebugResources-2:/values-large-v4/values-large-v4.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Admin\\.gradle\\caches\\8.14\\transforms\\40c21d34b86f79bc33bc3758b5bf11b1\\transformed\\material-1.11.0\\res\\values-large-v4\\values-large-v4.xml",
+                    "source": "C:\\Users\\admin\\.gradle\\caches\\8.14\\transforms\\40c21d34b86f79bc33bc3758b5bf11b1\\transformed\\material-1.11.0\\res\\values-large-v4\\values-large-v4.xml",
                     "from": {
                         "startLines": "2,3,4,5",
                         "startColumns": "4,4,4,4",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\Admin\\.gradle\\caches\\8.14\\transforms\\7632e902ac53f519140266c7e6afa8b7\\transformed\\appcompat-1.6.1\\res\\values-large-v4\\values-large-v4.xml",
+                    "source": "C:\\Users\\admin\\.gradle\\caches\\8.14\\transforms\\7632e902ac53f519140266c7e6afa8b7\\transformed\\appcompat-1.6.1\\res\\values-large-v4\\values-large-v4.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10",
                         "startColumns": "4,4,4,4,4,4,4,4,4",

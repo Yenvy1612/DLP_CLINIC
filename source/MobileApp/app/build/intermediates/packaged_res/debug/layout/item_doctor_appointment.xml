@@ -83,7 +83,7 @@
             android:background="@color/divider"
             android:layout_marginVertical="10dp" />
 
-        <!-- Row 2: thời gian + nút Done -->
+        <!-- Row 2: thời gian + nút Done/Cancel -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -106,17 +106,36 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnDone"
-                style="@style/Widget.Material3.Button.TonalButton"
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="Hoàn thành"
-                android:textSize="12sp"
-                android:backgroundTint="@color/success"
-                android:textColor="@color/white"
-                app:cornerRadius="8dp"
-                android:visibility="visible" />
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCancel"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="Hủy"
+                    android:textSize="12sp"
+                    android:backgroundTint="@color/error"
+                    android:textColor="@color/white"
+                    app:cornerRadius="8dp"
+                    android:visibility="gone" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDone"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="6dp"
+                    android:text="Hoàn thành"
+                    android:textSize="12sp"
+                    android:backgroundTint="@color/success"
+                    android:textColor="@color/white"
+                    app:cornerRadius="8dp"
+                    android:visibility="gone" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

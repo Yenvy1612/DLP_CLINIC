@@ -6,13 +6,14 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.acare.clinic.data.model.LoginRequest
-import com.acare.clinic.data.network.NetworkClient
 import com.acare.clinic.data.network.ApiService
+import com.acare.clinic.data.network.NetworkClient
 import com.acare.clinic.databinding.ActivityLoginBinding
 import com.acare.clinic.ui.main.MainActivity
 import com.acare.clinic.utils.SessionManager
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 class LoginActivity : AppCompatActivity() {
 
@@ -43,12 +44,11 @@ class LoginActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-
                 val res = api.login(LoginRequest(email, password))
                 if (res.isSuccessful && res.body() != null) {
                     val auth = res.body()!!
 
-                    // Lấy thêm profile để lưu tên
+                    // Lấy thêm profile để lưu tên hiển thị
                     val meRes = api.getMe()
                     val name = meRes.body()?.fullName ?: auth.username
 
@@ -62,7 +62,7 @@ class LoginActivity : AppCompatActivity() {
                     startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                     finish()
                 } else {
-                    showError("Sai tài khoản hoặc mật khẩu")
+                    showError(extractLoginError(res.code(), res.errorBody()?.string()))
                 }
             } catch (e: Exception) {
                 showError("Lỗi kết nối: ${e.localizedMessage}")
@@ -80,5 +80,23 @@ class LoginActivity : AppCompatActivity() {
 
     private fun showError(msg: String) {
         Snackbar.make(binding.root, msg, Snackbar.LENGTH_LONG).show()
+    }
+
+    private fun extractLoginError(statusCode: Int, rawErrorBody: String?): String {
+        val backendMessage = try {
+            if (rawErrorBody.isNullOrBlank()) null
+            else JSONObject(rawErrorBody).optString("message").takeIf { it.isNotBlank() }
+        } catch (_: Exception) {
+            null
+        }
+
+        if (!backendMessage.isNullOrBlank()) return backendMessage
+
+        return when (statusCode) {
+            400, 401 -> "Sai tài khoản hoặc mật khẩu"
+            404 -> "Không tìm thấy API đăng nhập. Kiểm tra đúng địa chỉ backend"
+            500 -> "Backend đang lỗi nội bộ (500)"
+            else -> "Đăng nhập thất bại (HTTP $statusCode)"
+        }
     }
 }

@@ -17,6 +17,9 @@ public interface SecurityEventRepository extends JpaRepository<SecurityEvent, Lo
     /** Đếm số sự kiện của một user trong khoảng thời gian */
     long countByUserIdAndEventTypeAndOccurredAtAfter(Long userId, String eventType, LocalDateTime since);
 
+    /** Đếm số sự kiện theo IP + loại sự kiện trong khoảng thời gian */
+    long countByIpAddressAndEventTypeAndOccurredAtAfter(String ipAddress, String eventType, LocalDateTime since);
+
     /** Đếm request từ IP trong khoảng thời gian */
     long countByIpAddressAndOccurredAtAfter(String ipAddress, LocalDateTime since);
 

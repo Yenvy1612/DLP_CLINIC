@@ -22,6 +22,9 @@ public final class ItemDoctorAppointmentBinding implements ViewBinding {
   private final CardView rootView;
 
   @NonNull
+  public final MaterialButton btnCancel;
+
+  @NonNull
   public final MaterialButton btnDone;
 
   @NonNull
@@ -39,10 +42,12 @@ public final class ItemDoctorAppointmentBinding implements ViewBinding {
   @NonNull
   public final TextView tvTime;
 
-  private ItemDoctorAppointmentBinding(@NonNull CardView rootView, @NonNull MaterialButton btnDone,
-      @NonNull Chip chipStatus, @NonNull TextView tvPatientInitial, @NonNull TextView tvPatientName,
+  private ItemDoctorAppointmentBinding(@NonNull CardView rootView,
+      @NonNull MaterialButton btnCancel, @NonNull MaterialButton btnDone, @NonNull Chip chipStatus,
+      @NonNull TextView tvPatientInitial, @NonNull TextView tvPatientName,
       @NonNull TextView tvService, @NonNull TextView tvTime) {
     this.rootView = rootView;
+    this.btnCancel = btnCancel;
     this.btnDone = btnDone;
     this.chipStatus = chipStatus;
     this.tvPatientInitial = tvPatientInitial;
@@ -78,6 +83,12 @@ public final class ItemDoctorAppointmentBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.btnCancel;
+      MaterialButton btnCancel = ViewBindings.findChildViewById(rootView, id);
+      if (btnCancel == null) {
+        break missingId;
+      }
+
       id = R.id.btnDone;
       MaterialButton btnDone = ViewBindings.findChildViewById(rootView, id);
       if (btnDone == null) {
@@ -114,7 +125,7 @@ public final class ItemDoctorAppointmentBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ItemDoctorAppointmentBinding((CardView) rootView, btnDone, chipStatus,
+      return new ItemDoctorAppointmentBinding((CardView) rootView, btnCancel, btnDone, chipStatus,
           tvPatientInitial, tvPatientName, tvService, tvTime);
     }
     String missingId = rootView.getResources().getResourceName(id);

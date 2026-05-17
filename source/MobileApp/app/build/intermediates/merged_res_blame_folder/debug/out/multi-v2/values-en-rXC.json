@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.acare.clinic.app-mergeDebugResources-61:/values-en-rXC/values-en-rXC.xml",
+            "outputFile": "com.acare.clinic.app-mergeDebugResources-2:/values-en-rXC/values-en-rXC.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Admin\\.gradle\\caches\\8.14\\transforms\\7632e902ac53f519140266c7e6afa8b7\\transformed\\appcompat-1.6.1\\res\\values-en-rXC\\values-en-rXC.xml",
+                    "source": "C:\\Users\\admin\\.gradle\\caches\\8.14\\transforms\\7632e902ac53f519140266c7e6afa8b7\\transformed\\appcompat-1.6.1\\res\\values-en-rXC\\values-en-rXC.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\Admin\\.gradle\\caches\\8.14\\transforms\\4c0baf78fd7bf6146cf73eaad9119295\\transformed\\core-1.12.0\\res\\values-en-rXC\\values-en-rXC.xml",
+                    "source": "C:\\Users\\admin\\.gradle\\caches\\8.14\\transforms\\4c0baf78fd7bf6146cf73eaad9119295\\transformed\\core-1.12.0\\res\\values-en-rXC\\values-en-rXC.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",

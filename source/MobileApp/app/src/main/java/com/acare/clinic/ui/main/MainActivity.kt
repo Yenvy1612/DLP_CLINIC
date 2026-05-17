@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -29,10 +28,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-
-    /** Debounce: ngăn chuyển tab quá nhanh (< 300ms) */
-    private var lastNavTime = 0L
-    private val NAV_DEBOUNCE_MS = 300L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,44 +66,21 @@ class MainActivity : AppCompatActivity() {
                 navController.graph = graph
                 binding.bottomNavigation.menu.clear()
                 binding.bottomNavigation.inflateMenu(R.menu.bottom_nav_menu)
+                binding.btnProfileOverlay.visibility = android.view.View.VISIBLE
+                binding.btnProfileOverlay.setOnClickListener {
+                    if (navController.currentDestination?.id != R.id.profileFragment) {
+                        navController.navigate(R.id.profileFragment)
+                    }
+                }
             }
         }
 
-        // Setup với debounce navigation
+        if (role == "DOCTOR" || role == "ADMIN") {
+            binding.btnProfileOverlay.visibility = android.view.View.GONE
+        }
+
+        // Setup điều hướng tab chuẩn với NavigationUI
         binding.bottomNavigation.setupWithNavController(navController)
-
-        // Thêm debounce listener chống crash khi chuyển tab nhanh
-        binding.bottomNavigation.setOnItemSelectedListener { item ->
-            val now = System.currentTimeMillis()
-            if (now - lastNavTime < NAV_DEBOUNCE_MS) {
-                return@setOnItemSelectedListener false
-            }
-            lastNavTime = now
-
-            // Nếu đang ở tab hiện tại → không làm gì (tránh recreate)
-            if (navController.currentDestination?.id == item.itemId) {
-                return@setOnItemSelectedListener true
-            }
-
-            // Navigation an toàn: bắt exception nếu fragment chưa sẵn sàng
-            try {
-                navController.navigate(item.itemId, null,
-                    androidx.navigation.NavOptions.Builder()
-                        .setLaunchSingleTop(true)
-                        .setRestoreState(true)
-                        .setPopUpTo(
-                            navController.graph.startDestinationId,
-                            inclusive = false,
-                            saveState = true
-                        )
-                        .build()
-                )
-                true
-            } catch (e: Exception) {
-                // Bỏ qua — tránh crash khi destination chưa sẵn sàng
-                false
-            }
-        }
 
         // Reselect: scroll to top hoặc refresh
         binding.bottomNavigation.setOnItemReselectedListener { _ ->

@@ -196,7 +196,19 @@ data class BookAppointmentRequest(
     @SerializedName("serviceId") val serviceId: Long,
     @SerializedName("startTime") val startTime: String,
     val reason: String?,
-    val paymentMethod: String = "COUNTER"
+    val note: String? = null
+)
+
+/** Dùng để cập nhật lịch - PUT /api/appointments/{id} */
+data class AppointmentUpdateRequest(
+    val patientId: Long,
+    val doctorId: Long,
+    val serviceId: Long,
+    val startTime: String,
+    val endTime: String? = null,
+    val status: String? = null,
+    val reason: String? = null,
+    val note: String? = null
 )
 
 // ── Medical Record ────────────────────────────────────────────────────────────
@@ -228,6 +240,54 @@ data class DoctorDashboard(
     @SerializedName("pendingAppointments") val pendingAppointments: Int = 0,
     @SerializedName("completedThisMonth") val completedThisMonth: Int = 0,
     @SerializedName("todayAppointments") val todayAppointments: Int = 0
+)
+
+// ── Doctor Statistics (New API) ─────────────────────────────────────────────
+
+data class DoctorStatisticsDashboard(
+    val periodType: String?,
+    val fromDate: String?,
+    val toDate: String?,
+    val uniquePatientCount: Long = 0,
+    val doneAppointmentCount: Long = 0,
+    val dailyVisits: List<DoctorDailyVisitPoint>? = null,
+    val patientRows: List<DoctorPatientSummaryRow>? = null
+)
+
+data class DoctorDailyVisitPoint(
+    val date: String?,
+    val doneAppointments: Long = 0
+)
+
+data class DoctorPatientSummaryRow(
+    val patientId: Long,
+    val patientName: String?,
+    val doneAppointments: Long = 0,
+    val services: List<String> = emptyList()
+)
+
+data class DoctorPatientAppointmentPage(
+    val patientId: Long,
+    val patientName: String?,
+    val periodType: String?,
+    val fromDate: String?,
+    val toDate: String?,
+    val page: Int,
+    val size: Int,
+    val totalPages: Int,
+    val totalElements: Long,
+    val items: List<DoctorPatientAppointmentItem> = emptyList()
+)
+
+data class DoctorPatientAppointmentItem(
+    val appointmentId: Long,
+    val appointmentCode: String?,
+    val startTime: String?,
+    val endTime: String?,
+    val status: String?,
+    val serviceName: String?,
+    val reason: String?,
+    val note: String?
 )
 
 // ── Admin Dashboard Summary ───────────────────────────────────────────────────

@@ -329,16 +329,26 @@ class BookingActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                api.bookAppointment(
+                val normalizedReason = reason.ifBlank { null }
+                val response = api.bookAppointment(
                     BookAppointmentRequest(
                         patientId = patientId,
                         doctorId = doc.id,
                         serviceId = selectedServiceId,
                         startTime = startTime,
-                        reason = reason.ifBlank { null },
-                        paymentMethod = "COUNTER"
+                        reason = normalizedReason,
+                        note = normalizedReason
                     )
                 )
+                val body = response.body()
+                if (!response.isSuccessful || body?.success != true) {
+                    MaterialAlertDialogBuilder(this@BookingActivity)
+                        .setTitle("Đặt lịch thất bại")
+                        .setMessage(body?.message ?: "Không thể tạo lịch hẹn. Vui lòng kiểm tra lại thông tin.")
+                        .setPositiveButton("Đã hiểu", null)
+                        .show()
+                    return@launch
+                }
                 MaterialAlertDialogBuilder(this@BookingActivity)
                     .setTitle("✅ Đặt lịch thành công")
                     .setMessage("Lịch hẹn của bạn đã được xác nhận.\nThanh toán tại quầy khi đến khám.")

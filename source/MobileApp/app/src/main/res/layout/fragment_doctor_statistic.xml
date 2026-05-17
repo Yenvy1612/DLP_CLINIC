@@ -98,13 +98,13 @@
                             android:orientation="vertical"
                             android:padding="16dp">
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Hôm nay" android:textColor="@color/text_secondary" android:textSize="12sp" />
+                                android:text="Đã khám hôm nay" android:textColor="@color/text_secondary" android:textSize="12sp" />
                             <TextView android:id="@+id/tvTodayAppointments"
                                 android:layout_width="wrap_content" android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp" android:text="—"
                                 android:textColor="@color/primary" android:textSize="28sp" android:textStyle="bold" />
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="lịch hẹn" android:textColor="@color/text_secondary" android:textSize="11sp" />
+                                android:text="lượt" android:textColor="@color/text_secondary" android:textSize="11sp" />
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
@@ -176,7 +176,7 @@
                             android:orientation="vertical"
                             android:padding="16dp">
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Hoàn thành tháng" android:textColor="@color/text_secondary" android:textSize="12sp" />
+                                android:text="Ngày có khám" android:textColor="@color/text_secondary" android:textSize="12sp" />
                             <TextView android:id="@+id/tvCompletedMonth"
                                 android:layout_width="wrap_content" android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp" android:text="—"
@@ -206,7 +206,7 @@
                             android:layout_weight="1" android:layout_marginStart="16dp"
                             android:orientation="vertical">
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Tổng lịch hẹn" android:textColor="#94A3B8" android:textSize="12sp" />
+                                android:text="Tổng lượt khám" android:textColor="#94A3B8" android:textSize="12sp" />
                             <TextView android:id="@+id/tvTotalAppointments"
                                 android:layout_width="wrap_content" android:layout_height="wrap_content"
                                 android:text="—" android:textColor="@color/white" android:textSize="24sp" android:textStyle="bold" />
@@ -223,6 +223,50 @@
                     android:text="Làm mới dữ liệu"
                     android:backgroundTint="@color/primary"
                     app:cornerRadius="10dp" />
+
+                <!-- Patient summary -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvPatientSectionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Bệnh nhân đã khám"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvPatientSectionRange"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text=""
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvPatientRows"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:nestedScrollingEnabled="false"
+                        android:clipToPadding="false" />
+
+                    <TextView
+                        android:id="@+id/tvPatientEmpty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Chưa có dữ liệu bệnh nhân"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp"
+                        android:visibility="gone" />
+                </LinearLayout>
             </LinearLayout>
 
             <View android:layout_width="match_parent" android:layout_height="32dp" />

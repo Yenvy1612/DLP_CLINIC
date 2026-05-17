@@ -4,6 +4,7 @@ package com.acare.clinic.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -24,13 +25,17 @@ public final class ActivityMainBinding implements ViewBinding {
   public final BottomNavigationView bottomNavigation;
 
   @NonNull
+  public final ImageButton btnProfileOverlay;
+
+  @NonNull
   public final FragmentContainerView navHostFragment;
 
   private ActivityMainBinding(@NonNull ConstraintLayout rootView,
-      @NonNull BottomNavigationView bottomNavigation,
+      @NonNull BottomNavigationView bottomNavigation, @NonNull ImageButton btnProfileOverlay,
       @NonNull FragmentContainerView navHostFragment) {
     this.rootView = rootView;
     this.bottomNavigation = bottomNavigation;
+    this.btnProfileOverlay = btnProfileOverlay;
     this.navHostFragment = navHostFragment;
   }
 
@@ -67,6 +72,12 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.btnProfileOverlay;
+      ImageButton btnProfileOverlay = ViewBindings.findChildViewById(rootView, id);
+      if (btnProfileOverlay == null) {
+        break missingId;
+      }
+
       id = R.id.nav_host_fragment;
       FragmentContainerView navHostFragment = ViewBindings.findChildViewById(rootView, id);
       if (navHostFragment == null) {
@@ -74,7 +85,7 @@ public final class ActivityMainBinding implements ViewBinding {
       }
 
       return new ActivityMainBinding((ConstraintLayout) rootView, bottomNavigation,
-          navHostFragment);
+          btnProfileOverlay, navHostFragment);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

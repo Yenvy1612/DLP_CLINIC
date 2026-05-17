@@ -23,7 +23,7 @@
     <!-- Ví dụ: 192.168.1.x, 26.x.x.x -->
     <domain-config cleartextTrafficPermitted="true">
         <!-- TODO: Thay [IP_ADDRESS] bằng IP thực của máy chạy Spring Boot -->
-        <domain includeSubdomains="false">192.168.1.3</domain>
+        <domain includeSubdomains="false">192.168.33.216</domain>
     </domain-config>
 
     <!-- Cho phép toàn bộ traffic cleartext trong debug build -->

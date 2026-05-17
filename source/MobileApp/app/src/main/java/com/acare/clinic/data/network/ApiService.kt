@@ -85,7 +85,7 @@ interface ApiService {
     ): Response<List<TimeSlot>>
 
     @POST("api/appointments")
-    suspend fun bookAppointment(@Body request: BookAppointmentRequest): Response<Appointment>
+    suspend fun bookAppointment(@Body request: BookAppointmentRequest): Response<ApiResponse<Appointment>>
 
     /** GET /appointments/pending/patient/{patientId} */
     @GET("api/appointments/pending/patient/{patientId}")
@@ -119,13 +119,26 @@ interface ApiService {
         @Query("sort") sort: String = "startTime,desc"
     ): Response<PageResponse<Appointment>>
 
+    /** GET /appointments/{id} */
+    @GET("api/appointments/{id}")
+    suspend fun getAppointmentById(
+        @Path("id") id: Long
+    ): Response<Appointment>
+
+    /** PUT /appointments/{id} */
+    @PUT("api/appointments/{id}")
+    suspend fun updateAppointment(
+        @Path("id") id: Long,
+        @Body request: AppointmentUpdateRequest
+    ): Response<Appointment>
+
     /** DELETE /appointments/{id} — bệnh nhân hủy */
     @DELETE("api/appointments/{id}")
     suspend fun cancelAppointment(
         @Path("id") id: Long,
         @Query("cancelledBy") cancelledBy: String = "PATIENT",
         @Query("cancelReason") cancelReason: String = ""
-    ): Response<Void>
+    ): Response<ApiResponse<Any>>
 
     // ── Appointments (DOCTOR) ─────────────────────────────────────────────────
 
@@ -138,10 +151,8 @@ interface ApiService {
     /** GET /appointments/doctor/{doctorId} — có phân trang */
     @GET("api/appointments/doctor/{doctorId}")
     suspend fun getAppointmentsByDoctor(
-        @Path("doctorId") doctorId: Long,
-        @Query("page") page: Int = 0,
-        @Query("size") size: Int = 20
-    ): Response<PageResponse<Appointment>>
+        @Path("doctorId") doctorId: Long
+    ): Response<List<Appointment>>
 
     /** PATCH /appointments/done/{id} — bác sĩ đánh dấu hoàn thành */
     @PATCH("api/appointments/done/{id}")
@@ -155,20 +166,39 @@ interface ApiService {
     @PATCH("api/appointments/{id}/status")
     suspend fun updateAppointmentStatus(
         @Path("id") id: Long,
-        @Body request: Map<String, String>
-    ): Response<Appointment>
+        @Query("status") status: String
+    ): Response<ApiResponse<Any>>
 
     // ── Doctor Statistics ─────────────────────────────────────────────────────
 
-    /** GET /api/doctor/statistics/dashboard */
+    /** GET /api/doctor/statistics/dashboard (legacy) */
     @GET("api/doctor/statistics/dashboard")
     suspend fun getDoctorDashboard(): Response<DoctorDashboard>
+
+    /** GET /api/doctor/statistics/dashboard (new) */
+    @GET("api/doctor/statistics/dashboard")
+    suspend fun getDoctorStatisticsDashboard(
+        @Query("periodType") periodType: String? = null,
+        @Query("date") date: String? = null,
+        @Query("month") month: Int? = null,
+        @Query("quarter") quarter: Int? = null,
+        @Query("year") year: Int? = null,
+        @Query("keyword") keyword: String? = null
+    ): Response<DoctorStatisticsDashboard>
 
     /** GET /api/doctor/statistics/patients/{patientId}/appointments */
     @GET("api/doctor/statistics/patients/{patientId}/appointments")
     suspend fun getPatientAppointmentsForDoctor(
-        @Path("patientId") patientId: Long
-    ): Response<List<Appointment>>
+        @Path("patientId") patientId: Long,
+        @Query("periodType") periodType: String? = null,
+        @Query("date") date: String? = null,
+        @Query("month") month: Int? = null,
+        @Query("quarter") quarter: Int? = null,
+        @Query("year") year: Int? = null,
+        @Query("keyword") keyword: String? = null,
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 5
+    ): Response<DoctorPatientAppointmentPage>
 
     // ── Admin Dashboard ───────────────────────────────────────────────────────
 

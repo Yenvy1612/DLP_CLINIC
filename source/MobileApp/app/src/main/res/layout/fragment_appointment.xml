@@ -42,7 +42,7 @@
             app:tabGravity="fill"
             app:tabMode="fixed"
             app:tabSelectedTextColor="@color/white"
-            app:tabTextColor="#64748B"
+            app:tabTextColor="@color/text_hint"
             app:tabIndicatorColor="@color/primary"
             app:tabIndicatorHeight="3dp"
             app:tabBackground="@android:color/transparent"

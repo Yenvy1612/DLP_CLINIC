@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Deque;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * AnomalyDetectionService — phân tích hành vi bất thường từ request HTTP.
@@ -38,6 +41,12 @@ public class AnomalyDetectionService {
 
     /** Số lần thử login thất bại tối đa trong 10 phút */
     private static final int MAX_LOGIN_FAILURES = 5;
+    private static final int ESCALATION_STEP = 2;
+
+    /** Bộ đếm in-memory theo cửa sổ 1 phút để tránh ghi mọi request vào DB */
+    private final ConcurrentHashMap<String, Deque<LocalDateTime>> endpointWindow = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Deque<LocalDateTime>> ipWindow = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, String> lastKnownIpByUser = new ConcurrentHashMap<>();
 
     // ─── API công khai ─────────────────────────────────────────────────────────
 
@@ -49,35 +58,42 @@ public class AnomalyDetectionService {
      */
     public int evaluateRequest(Long userId, String ip, String method, String uri) {
         int score = 0;
+        LocalDateTime now = LocalDateTime.now();
 
         // 1. Kiểm tra endpoint rate limit
         if (userId != null) {
-            long countEndpoint = securityEventRepository
-                    .countByUserIdAndRequestUriAndOccurredAtAfter(userId, uri, oneMinuteAgo());
-            if (countEndpoint >= RATE_LIMIT_PER_MINUTE) {
-                score += 50;
+            String endpointKey = userId + "|" + method + "|" + uri;
+            int countEndpoint = incrementAndCount(endpointWindow, endpointKey, now, 1);
+            if (countEndpoint >= RATE_LIMIT_PER_MINUTE && shouldLogThresholdBreach(countEndpoint, RATE_LIMIT_PER_MINUTE)) {
+                SeverityRisk endpointSeverity = severityForEndpointRate(countEndpoint);
+                score += endpointSeverity.risk;
                 recordAsync(userId, ip, method, uri,
                         "ENDPOINT_RATE_LIMIT",
-                        "HIGH",
-                        String.format("User %d đã gửi %d request đến %s trong 1 phút", userId, countEndpoint + 1, uri),
-                        score, "LOGGED");
+                        endpointSeverity.severity,
+                        String.format("User %d đã gửi %d request đến %s trong 1 phút", userId, countEndpoint, uri),
+                        Math.min(score, 100), actionForScore(score));
             }
         }
 
         // 2. Kiểm tra IP rate limit (phòng bot/scanner)
-        long countIp = securityEventRepository.countByIpAddressAndOccurredAtAfter(ip, oneMinuteAgo());
-        if (countIp >= IP_RATE_LIMIT_PER_MINUTE) {
-            score += 40;
-            recordAsync(null, ip, method, uri,
-                    "IP_RATE_LIMIT",
-                    "MEDIUM",
-                    String.format("IP %s đã gửi %d request trong 1 phút", ip, countIp + 1),
-                    score, "LOGGED");
+        // Theo thiết kế: IP rate limit chủ yếu cho anonymous/bot scanner.
+        // User đã đăng nhập có thể tạo nhiều request hợp lệ khi chuyển tab/load dữ liệu.
+        if (userId == null) {
+            int countIp = incrementAndCount(ipWindow, ip, now, 1);
+            if (countIp >= IP_RATE_LIMIT_PER_MINUTE && shouldLogThresholdBreach(countIp, IP_RATE_LIMIT_PER_MINUTE)) {
+                SeverityRisk ipSeverity = severityForIpRate(countIp);
+                score += ipSeverity.risk;
+                recordAsync(null, ip, method, uri,
+                        "IP_RATE_LIMIT",
+                        ipSeverity.severity,
+                        String.format("IP %s đã gửi %d request trong 1 phút", ip, countIp),
+                        Math.min(score, 100), actionForScore(score));
+            }
         }
 
         // 3. Kiểm tra IP bất ngờ thay đổi (session hijacking hint)
         if (userId != null) {
-            String lastIp = securityEventRepository.findLastKnownIp(userId);
+            String lastIp = lastKnownIpByUser.put(userId, ip);
             if (lastIp != null && !lastIp.equals(ip)) {
                 score += 30;
                 recordAsync(userId, ip, method, uri,
@@ -114,7 +130,7 @@ public class AnomalyDetectionService {
      */
     public void recordSuspiciousLoginSuccess(Long userId, String ip) {
         long priorFailures = securityEventRepository
-                .countByUserIdAndEventTypeAndOccurredAtAfter(userId, "LOGIN_FAILURE", tenMinutesAgo());
+                .countByIpAddressAndEventTypeAndOccurredAtAfter(ip, "LOGIN_FAILURE", tenMinutesAgo());
         if (priorFailures >= 3) {
             record(userId, ip, "POST", "/api/auth/login",
                     "SUSPICIOUS_LOGIN_SUCCESS",
@@ -187,5 +203,60 @@ public class AnomalyDetectionService {
 
     private LocalDateTime tenMinutesAgo() {
         return LocalDateTime.now().minusMinutes(10);
+    }
+
+    private int incrementAndCount(ConcurrentHashMap<String, Deque<LocalDateTime>> windows,
+                                  String key,
+                                  LocalDateTime now,
+                                  int minutes) {
+        LocalDateTime threshold = now.minusMinutes(minutes);
+        Deque<LocalDateTime> deque = windows.computeIfAbsent(key, k -> new ConcurrentLinkedDeque<>());
+        synchronized (deque) {
+            while (!deque.isEmpty() && deque.peekFirst().isBefore(threshold)) {
+                deque.pollFirst();
+            }
+            deque.addLast(now);
+            return deque.size();
+        }
+    }
+
+    /**
+     * Tránh spam log: chỉ ghi tại ngưỡng đầu tiên và mỗi 10 request vượt ngưỡng.
+     * Ví dụ threshold=30 => ghi tại 30, 40, 50...
+     */
+    private boolean shouldLogThresholdBreach(int count, int threshold) {
+        return count == threshold || ((count - threshold) % 10 == 0);
+    }
+
+    private SeverityRisk severityForEndpointRate(int count) {
+        int level = count / RATE_LIMIT_PER_MINUTE;
+        if (level >= 4) return new SeverityRisk("CRITICAL", 95);
+        if (level >= 3) return new SeverityRisk("HIGH", 80);
+        if (level >= ESCALATION_STEP) return new SeverityRisk("MEDIUM", 55);
+        return new SeverityRisk("LOW", 25);
+    }
+
+    private SeverityRisk severityForIpRate(int count) {
+        int level = count / IP_RATE_LIMIT_PER_MINUTE;
+        if (level >= 6) return new SeverityRisk("CRITICAL", 95);
+        if (level >= 4) return new SeverityRisk("HIGH", 80);
+        if (level >= ESCALATION_STEP) return new SeverityRisk("MEDIUM", 50);
+        return new SeverityRisk("LOW", 20);
+    }
+
+    private String actionForScore(int score) {
+        if (score >= 90) return "TOKEN_REVOKED";
+        if (score >= 70) return "BLOCKED";
+        return "LOGGED";
+    }
+
+    private static class SeverityRisk {
+        final String severity;
+        final int risk;
+
+        SeverityRisk(String severity, int risk) {
+            this.severity = severity;
+            this.risk = risk;
+        }
     }
 }

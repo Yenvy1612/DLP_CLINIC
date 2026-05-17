@@ -3366,8 +3366,10 @@ id btnDone
 id btnLogin
 id btnLogout
 id btnPatientProfile
+id btnProfileOverlay
 id btnRefresh
 id btnRegister
+id btnViewHistory
 id buttonPanel
 id cache_measures
 id callMeasure
@@ -3722,6 +3724,7 @@ id row_reverse
 id rtl
 id rvAppointments
 id rvLogs
+id rvPatientRows
 id rvPendingAppointments
 id rvRecords
 id rvSchedule
@@ -3753,6 +3756,7 @@ id sectionDoctors
 id select_dialog_listview
 id selected
 id selection_type
+id servicesFragment
 id sharedValueSet
 id sharedValueUnset
 id shortcut
@@ -3863,6 +3867,7 @@ id tvClinicLocation
 id tvCode
 id tvComplaint
 id tvCompletedMonth
+id tvCount
 id tvCriticalEvents
 id tvDate
 id tvDepartment
@@ -3871,7 +3876,9 @@ id tvDetails
 id tvDiagnosis
 id tvDoctor
 id tvDoctorName
+id tvDoneCount
 id tvEmail
+id tvEmpty
 id tvEventType
 id tvFile
 id tvGreeting
@@ -3882,8 +3889,11 @@ id tvMachine
 id tvMonthRevenue
 id tvName
 id tvNoDoctors
+id tvPatientEmpty
 id tvPatientInitial
 id tvPatientName
+id tvPatientSectionRange
+id tvPatientSectionTitle
 id tvPendingAppointments
 id tvPendingCount
 id tvPhone
@@ -3897,10 +3907,12 @@ id tvService
 id tvServiceCount
 id tvServiceName
 id tvServicePrice
+id tvServices
 id tvSlotsEmpty
 id tvSpecialty
 id tvStatus
 id tvTime
+id tvTitle
 id tvTodayAppointments
 id tvTodayCount
 id tvTodayDate
@@ -4095,6 +4107,7 @@ layout fragment_doctor_schedule
 layout fragment_doctor_statistic
 layout fragment_home
 layout fragment_medical_record
+layout fragment_patient_services
 layout fragment_profile
 layout ime_base_split_test_activity
 layout ime_secondary_split_test_activity
@@ -4103,6 +4116,7 @@ layout item_appointment_card
 layout item_dlp_log
 layout item_doctor_appointment
 layout item_doctor_card
+layout item_doctor_patient_row
 layout item_medical_record
 layout item_security_event
 layout item_service_card

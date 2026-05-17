@@ -31,4 +31,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:elevation="8dp" />
 
+    <ImageButton
+        android:id="@+id/btnProfileOverlay"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/bg_avatar_circle"
+        android:src="@drawable/ic_person"
+        android:contentDescription="Hồ sơ cá nhân"
+        android:tint="@color/white"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

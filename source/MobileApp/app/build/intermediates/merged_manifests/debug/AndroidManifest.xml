@@ -60,6 +60,9 @@
         <activity
             android:name="com.acare.clinic.ui.main.MainActivity"
             android:exported="false" />
+        <activity
+            android:name="com.acare.clinic.ui.booking.BookingActivity"
+            android:exported="false" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"

@@ -1,10 +1,27 @@
 {
     "logs": [
         {
-            "outputFile": "com.acare.clinic.app-mergeDebugResources-61:/values-cs/values-cs.xml",
+            "outputFile": "com.acare.clinic.app-mergeDebugResources-2:/values-cs/values-cs.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Admin\\.gradle\\caches\\8.14\\transforms\\4c0baf78fd7bf6146cf73eaad9119295\\transformed\\core-1.12.0\\res\\values-cs\\values-cs.xml",
+                    "source": "C:\\Users\\admin\\.gradle\\caches\\8.14\\transforms\\0f9838a61a91456e288e9ff6480d7bb5\\transformed\\navigation-ui-2.7.7\\res\\values-cs\\values-cs.xml",
+                    "from": {
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,163",
+                        "endColumns": "107,126",
+                        "endOffsets": "158,285"
+                    },
+                    "to": {
+                        "startLines": "109,110",
+                        "startColumns": "4,4",
+                        "startOffsets": "9232,9340",
+                        "endColumns": "107,126",
+                        "endOffsets": "9335,9462"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\admin\\.gradle\\caches\\8.14\\transforms\\4c0baf78fd7bf6146cf73eaad9119295\\transformed\\core-1.12.0\\res\\values-cs\\values-cs.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",
@@ -21,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\Admin\\.gradle\\caches\\8.14\\transforms\\40c21d34b86f79bc33bc3758b5bf11b1\\transformed\\material-1.11.0\\res\\values-cs\\values-cs.xml",
+                    "source": "C:\\Users\\admin\\.gradle\\caches\\8.14\\transforms\\40c21d34b86f79bc33bc3758b5bf11b1\\transformed\\material-1.11.0\\res\\values-cs\\values-cs.xml",
                     "from": {
                         "startLines": "2,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -40,24 +57,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\Admin\\.gradle\\caches\\8.14\\transforms\\0f9838a61a91456e288e9ff6480d7bb5\\transformed\\navigation-ui-2.7.7\\res\\values-cs\\values-cs.xml",
-                    "from": {
-                        "startLines": "2,3",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,163",
-                        "endColumns": "107,126",
-                        "endOffsets": "158,285"
-                    },
-                    "to": {
-                        "startLines": "109,110",
-                        "startColumns": "4,4",
-                        "startOffsets": "9232,9340",
-                        "endColumns": "107,126",
-                        "endOffsets": "9335,9462"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\Admin\\.gradle\\caches\\8.14\\transforms\\7632e902ac53f519140266c7e6afa8b7\\transformed\\appcompat-1.6.1\\res\\values-cs\\values-cs.xml",
+                    "source": "C:\\Users\\admin\\.gradle\\caches\\8.14\\transforms\\7632e902ac53f519140266c7e6afa8b7\\transformed\\appcompat-1.6.1\\res\\values-cs\\values-cs.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",

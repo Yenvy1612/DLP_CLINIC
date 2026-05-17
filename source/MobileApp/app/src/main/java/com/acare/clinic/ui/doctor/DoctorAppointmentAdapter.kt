@@ -16,7 +16,8 @@ import com.google.android.material.chip.Chip
  */
 class DoctorAppointmentAdapter(
     private val items: List<Appointment>,
-    private val onDone: ((Appointment) -> Unit)? = null
+    private val onDone: ((Appointment) -> Unit)? = null,
+    private val onCancel: ((Appointment) -> Unit)? = null
 ) : RecyclerView.Adapter<DoctorAppointmentAdapter.VH>() {
 
     inner class VH(view: View) : RecyclerView.ViewHolder(view) {
@@ -25,6 +26,7 @@ class DoctorAppointmentAdapter(
         val tvTime: TextView = view.findViewById(R.id.tvTime)
         val chipStatus: Chip = view.findViewById(R.id.chipStatus)
         val btnDone: MaterialButton = view.findViewById(R.id.btnDone)
+        val btnCancel: MaterialButton = view.findViewById(R.id.btnCancel)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -43,13 +45,13 @@ class DoctorAppointmentAdapter(
         holder.chipStatus.text = mapStatus(apt.status)
         holder.chipStatus.setChipBackgroundColorResource(statusColor(apt.status))
 
-        // Chỉ cho phép Done khi đang PENDING hoặc CONFIRMED
-        if (apt.status in listOf("PENDING", "CONFIRMED")) {
-            holder.btnDone.visibility = View.VISIBLE
-            holder.btnDone.setOnClickListener { onDone?.invoke(apt) }
-        } else {
-            holder.btnDone.visibility = View.GONE
-        }
+        val canAct = apt.status in listOf("PENDING", "CONFIRMED")
+
+        holder.btnDone.visibility = if (canAct) View.VISIBLE else View.GONE
+        holder.btnCancel.visibility = if (canAct) View.VISIBLE else View.GONE
+
+        holder.btnDone.setOnClickListener { onDone?.invoke(apt) }
+        holder.btnCancel.setOnClickListener { onCancel?.invoke(apt) }
     }
 
     private fun formatTime(raw: String): String {
