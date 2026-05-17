@@ -60,16 +60,37 @@ public class DlpFilter extends OncePerRequestFilter {
     private static final Set<String> METHODS_WITH_BODY = Set.of("POST", "PUT", "PATCH");
 
     /**
-     * Các URL pattern KHÔNG cần quét DLP (auth endpoints, public endpoints).
-     * Tránh quét login request (chứa password) hoặc register (chứa thông tin cá nhân hợp lệ).
+     * SKIP_ALL: Bỏ qua DLP HOÀN TOÀN (không quét input, không quét output).
+     * Dùng cho auth endpoints — login chứa password, register chứa PII hợp lệ.
      */
-    private static final Set<String> SKIP_PATHS = Set.of(
+    private static final Set<String> SKIP_ALL_PATHS = Set.of(
             "/api/auth/login",
             "/api/auth/register",
             "/api/auth/refresh",
             "/api/auth/logout",
             "/error",
             "/actuator"
+    );
+
+    /**
+     * SKIP_INPUT: Bỏ qua INPUT CHECK nhưng VẪN quét OUTPUT.
+     *
+     * Đây là các endpoint mà PII (CCCD, SĐT, email) ĐƯỢC PHÉP xuất hiện trong request body
+     * vì nghiệp vụ yêu cầu (tạo user, cập nhật hồ sơ, ghi bệnh án).
+     *
+     * Tuy nhiên, OUTPUT vẫn được mask để bảo vệ PII khi trả dữ liệu về client.
+     *
+     * Ai nhập PII:
+     * - /api/users/**              → Admin tạo/sửa user (nhập CCCD, SĐT, email)
+     * - /api/patient-profiles/**   → Bác sĩ/Admin cập nhật hồ sơ bệnh nhân (BHYT, dị ứng)
+     * - /api/medical-records/**    → Bác sĩ tạo/sửa bệnh án (chẩn đoán, phác đồ)
+     * - /api/appointments/**       → Bệnh nhân/Bác sĩ đặt lịch (thông tin liên hệ)
+     */
+    private static final Set<String> SKIP_INPUT_PATHS = Set.of(
+            "/api/users",
+            "/api/patient-profiles",
+            "/api/medical-records",
+            "/api/appointments"
     );
 
     @Override
@@ -81,49 +102,55 @@ public class DlpFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
-        // --- Bỏ qua các endpoint không cần quét ---
-        if (shouldSkip(path)) {
+        // --- Bỏ qua hoàn toàn (auth, actuator) ---
+        if (shouldSkipAll(path)) {
             filterChain.doFilter(request, response);
             return;
         }
 
+        // --- Kiểm tra endpoint có được phép nhập PII không ---
+        boolean skipInput = shouldSkipInput(path);
+
         // ==================== INPUT CHECK (POST/PUT/PATCH) ====================
-        // Chỉ quét body khi request có body (POST, PUT, PATCH)
         if (METHODS_WITH_BODY.contains(method)) {
-            // Wrap request để đọc body nhiều lần
             CachedBodyHttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(request);
-            String requestBody = cachedRequest.getCachedBody();
 
-            // Quét body tìm dữ liệu nhạy cảm
-            DlpScanResult inputResult = dlpScannerService.scan(requestBody);
+            // CHỈ quét input nếu endpoint KHÔNG nằm trong danh sách skip
+            // VD: POST /api/users → skip input (Admin được phép nhập CCCD)
+            //     POST /api/search → quét input (không nên chứa CCCD)
+            if (!skipInput) {
+                String requestBody = cachedRequest.getCachedBody();
+                DlpScanResult inputResult = dlpScannerService.scan(requestBody);
 
-            if (inputResult.isViolated()) {
-                log.warn("[DLP INPUT] Vi phạm tại {} {} - Violations: {}",
-                        method, path, inputResult.getViolations());
+                if (inputResult.isViolated()) {
+                    log.warn("[DLP INPUT] Vi phạm tại {} {} - Violations: {}",
+                            method, path, inputResult.getViolations());
 
-                // Ghi log vi phạm vào database
-                saveDlpLog(request, "INPUT_SCAN", inputResult, true);
+                    saveDlpLog(request, "INPUT_SCAN", inputResult, true);
 
-                // Trả 403 Forbidden + thông báo lỗi (CHẶN request, không cho đến Controller)
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                response.setContentType("application/json;charset=UTF-8");
-                response.getWriter().write(
-                        "{\"status\":403,\"message\":\"DLP: Phát hiện dữ liệu nhạy cảm trong request. Yêu cầu bị chặn.\"}"
-                );
-                return; // Dừng filter chain → Controller không được gọi
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write(
+                            "{\"status\":403,\"message\":\"DLP: Phát hiện dữ liệu nhạy cảm trong request. Yêu cầu bị chặn.\"}"
+                    );
+                    return;
+                }
             }
 
-            // Nếu input an toàn → tiếp tục xử lý nhưng dùng cachedRequest (để Controller đọc body)
-            // Output check sẽ chạy sau khi Controller trả response
+            // Output check vẫn chạy cho TẤT CẢ endpoint (kể cả skip input)
             doOutputCheck(cachedRequest, response, filterChain, path, method);
         } else {
-            // GET, DELETE → không có body, chỉ cần check output
             doOutputCheck(request, response, filterChain, path, method);
         }
     }
 
     /**
      * OUTPUT CHECK: quét response body trước khi trả về client.
+     *
+     * Quy tắc theo role:
+     * - ADMIN:   Xem FULL dữ liệu (không mask) — cần quản lý user, xem CCCD đầy đủ
+     * - DOCTOR:  Bị mask PII (CCCD, SĐT) — chỉ cần thông tin y tế, không cần CCCD bệnh nhân
+     * - PATIENT: Bị mask PII — bảo vệ thông tin người khác
      *
      * Dùng ContentCachingResponseWrapper để cache response body.
      * Sau khi Controller ghi xong response → đọc body từ cache → quét → mask nếu cần.
@@ -140,7 +167,13 @@ public class DlpFilter extends OncePerRequestFilter {
         // Cho request đi qua Controller bình thường
         filterChain.doFilter(request, responseWrapper);
 
-        // --- Sau khi Controller xử lý xong, đọc response body ---
+        // --- ADMIN được xem full dữ liệu, không mask ---
+        if (isAdmin()) {
+            responseWrapper.copyBodyToResponse();
+            return;
+        }
+
+        // --- Với DOCTOR/PATIENT: quét và mask response ---
         byte[] responseBodyBytes = responseWrapper.getContentAsByteArray();
         String responseBody = new String(responseBodyBytes, StandardCharsets.UTF_8);
 
@@ -176,11 +209,32 @@ public class DlpFilter extends OncePerRequestFilter {
     // ==================== HELPER METHODS ====================
 
     /**
-     * Kiểm tra path có nằm trong danh sách bỏ qua không.
-     * Các endpoint auth/public không cần quét DLP.
+     * Bỏ qua DLP hoàn toàn (auth, error, actuator).
      */
-    private boolean shouldSkip(String path) {
-        return SKIP_PATHS.stream().anyMatch(path::startsWith);
+    private boolean shouldSkipAll(String path) {
+        return SKIP_ALL_PATHS.stream().anyMatch(path::startsWith);
+    }
+
+    /**
+     * Bỏ qua INPUT CHECK cho các endpoint mà PII là dữ liệu hợp lệ.
+     * VD: POST /api/users/add-user chứa CCCD → hợp lệ vì Admin đang tạo user.
+     *     POST /api/search chứa CCCD → bất thường → cần chặn.
+     */
+    private boolean shouldSkipInput(String path) {
+        return SKIP_INPUT_PATHS.stream().anyMatch(path::startsWith);
+    }
+
+    /**
+     * Kiểm tra user hiện tại có phải ADMIN không.
+     * ADMIN được xem full dữ liệu (không mask output).
+     *
+     * Đọc role từ JWT authorities trong SecurityContext.
+     */
+    private boolean isAdmin() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) return false;
+        return auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 
     /**
