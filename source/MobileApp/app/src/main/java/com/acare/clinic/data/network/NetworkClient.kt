@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit
 object NetworkClient {
 
     private lateinit var retrofit: Retrofit
+    private lateinit var okHttpClient: OkHttpClient
     private val cookieStore = ConcurrentHashMap<String, MutableList<Cookie>>()
 
     fun init(context: Context) {
@@ -49,7 +50,7 @@ object NetworkClient {
                 HttpLoggingInterceptor.Level.NONE
         }
 
-        val okHttp = OkHttpClient.Builder()
+        okHttpClient = OkHttpClient.Builder()
             .cookieJar(cookieJar)
             .addInterceptor(logging)
             .connectTimeout(30, TimeUnit.SECONDS)
@@ -59,13 +60,17 @@ object NetworkClient {
 
         retrofit = Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
-            .client(okHttp)
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
 
     fun <T> create(service: Class<T>): T = retrofit.create(service)
 
+    /** Lấy OkHttpClient (có CookieJar) để chia sẻ cho Agent module */
+    fun getOkHttpClient(): OkHttpClient = okHttpClient
+
     /** Xóa toàn bộ cookie (dùng khi logout) */
     fun clearCookies() = cookieStore.clear()
 }
+
