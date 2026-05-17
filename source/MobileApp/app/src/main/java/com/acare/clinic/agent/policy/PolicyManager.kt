@@ -10,7 +10,7 @@ class PolicyManager(
 
     suspend fun syncPolicy(): AgentPolicyResponse {
         val response = api.getPolicy()
-        val policy = response.result ?: defaultPolicy()
+        val policy = response.data ?: defaultPolicy()
 
         cachedPolicy = policy
         preferences.savePolicyVersion(policy.version)

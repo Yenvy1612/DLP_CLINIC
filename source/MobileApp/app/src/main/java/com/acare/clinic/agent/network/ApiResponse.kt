@@ -1,7 +1,8 @@
 package com.acare.clinic.agent.network
 
 data class ApiResponse<T>(
-    val code: Int? = null,
+    val status: Int? = null,
+    val success: Boolean? = null,
     val message: String? = null,
-    val result: T? = null
+    val data: T? = null
 )

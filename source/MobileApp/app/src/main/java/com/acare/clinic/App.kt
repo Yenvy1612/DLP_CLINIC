@@ -1,15 +1,17 @@
 package com.acare.clinic
 
 import android.app.Application
+import android.util.Log
+import com.acare.clinic.agent.core.AgentConfig
+import com.acare.clinic.agent.core.AgentInitializer
 import com.acare.clinic.data.network.NetworkClient
 import com.acare.clinic.utils.SessionManager
 
 /**
- * Application class — khởi tạo NetworkClient (OkHttp + CookieJar) một lần duy nhất.
+ * Application class — khởi tạo NetworkClient, SessionManager và Agent SDK.
  *
- * PLACEHOLDER: Agent SDK sẽ được khởi tạo ở đây khi có.
- * Ví dụ:
- *   AgentSDK.init(this, AgentConfig(backendUrl = BuildConfig.BASE_URL))
+ * Agent SDK dùng chung OkHttpClient (CookieJar) với NetworkClient
+ * để gửi request với cùng session xác thực.
  */
 class App : Application() {
 
@@ -19,8 +21,29 @@ class App : Application() {
         SessionManager.init(this)
 
         // ===================================================
-        // PLACEHOLDER: Khởi tạo Agent SDK tại đây
-        // AgentSDK.init(this, BuildConfig.BASE_URL)
+        // Khởi tạo Agent SDK — dùng CookieJar từ NetworkClient
         // ===================================================
+        initAgent()
+    }
+
+    private fun initAgent() {
+        try {
+            val config = AgentConfig(
+                backendBaseUrl = BuildConfig.BASE_URL,
+                appVersion = BuildConfig.VERSION_NAME,
+                agentVersion = "1.0.0",
+                platform = "ANDROID"
+            )
+
+            AgentInitializer.init(
+                context = this,
+                config = config,
+                okHttpClient = NetworkClient.getOkHttpClient()
+            )
+
+            Log.i("App", "Agent SDK initialized")
+        } catch (e: Exception) {
+            Log.e("App", "Failed to init Agent SDK: ${e.message}", e)
+        }
     }
 }

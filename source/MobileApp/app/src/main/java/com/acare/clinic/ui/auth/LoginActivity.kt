@@ -2,9 +2,11 @@ package com.acare.clinic.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.acare.clinic.agent.core.AgentInitializer
 import com.acare.clinic.data.model.LoginRequest
 import com.acare.clinic.data.network.ApiService
 import com.acare.clinic.data.network.NetworkClient
@@ -59,6 +61,9 @@ class LoginActivity : AppCompatActivity() {
                         role = auth.role
                     )
 
+                    // ── Đăng ký Agent sau khi login thành công ──
+                    registerAgentAfterLogin(auth.username)
+
                     startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                     finish()
                 } else {
@@ -68,6 +73,35 @@ class LoginActivity : AppCompatActivity() {
                 showError("Lỗi kết nối: ${e.localizedMessage}")
             } finally {
                 setLoading(false)
+            }
+        }
+    }
+
+    /**
+     * Đăng ký agent device với backend sau khi login thành công.
+     * Chạy non-blocking để không ảnh hưởng luồng login.
+     */
+    private fun registerAgentAfterLogin(username: String) {
+        lifecycleScope.launch {
+            try {
+                if (!AgentInitializer.isInitialized()) {
+                    Log.w("LoginActivity", "Agent not initialized, skipping registration")
+                    return@launch
+                }
+
+                val manager = AgentInitializer.getAgentManager()
+                manager.register(username)
+                Log.i("LoginActivity", "Agent registered successfully for $username")
+
+                // Track login event qua agent
+                val tracker = AgentInitializer.getEventTracker()
+                tracker.trackViewPatientDetail(
+                    userId = SessionManager.getUserId(),
+                    patientId = SessionManager.getUserId()
+                )
+            } catch (e: Exception) {
+                Log.e("LoginActivity", "Agent registration failed: ${e.message}", e)
+                // Không block login nếu agent registration thất bại
             }
         }
     }
@@ -100,3 +134,4 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 }
+
